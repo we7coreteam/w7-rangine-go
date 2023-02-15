@@ -8,6 +8,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/components/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
 	"github.com/we7coreteam/w7-rangine-go/src/components/validation"
+	"github.com/we7coreteam/w7-rangine-go/src/core/console"
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
 )
 
@@ -16,6 +17,7 @@ type App struct {
 	Config          *viper.Viper
 	Container       container.Container
 	ProviderManager *provider.ProviderManager
+	Console         *console.Console
 }
 
 func NewApp() *App {
@@ -65,8 +67,12 @@ func (app *App) RegisterProviders() {
 	app.ProviderManager.RegisterProvider(new(redis.RedisProvider)).Register()
 }
 
-func Run() {
+func (app *App) InitConsole() {
+	app.Console = new(console.Console)
+}
 
+func (app *App) RunConsole() {
+	app.Console.Run()
 }
 
 //func (app *App) registerEvent() {
