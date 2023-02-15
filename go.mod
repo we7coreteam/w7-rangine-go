@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/alexedwards/scs/v2 v2.5.0
+	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/gin-gonic/gin v1.8.2
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golobby/container/v3 v3.0.2

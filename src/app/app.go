@@ -7,7 +7,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/components/event"
 	"github.com/we7coreteam/w7-rangine-go/src/components/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
-	"github.com/we7coreteam/w7-rangine-go/src/components/validation"
+	"github.com/we7coreteam/w7-rangine-go/src/components/translator"
 	"github.com/we7coreteam/w7-rangine-go/src/core/console"
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
 )
@@ -70,7 +70,7 @@ func (app *App) GetProviderManager() *provider.ProviderManager {
 func (app *App) RegisterProviders() {
 	app.providerManager.RegisterProvider(new(logger.LoggerProvider)).Register()
 	app.providerManager.RegisterProvider(new(event.EventProvider)).Register()
-	app.providerManager.RegisterProvider(new(validation.ValidationProvider)).Register()
+	app.providerManager.RegisterProvider(new(translator.TranslatorProvider)).Register()
 	app.providerManager.RegisterProvider(new(database.DatabaseProvider)).Register()
 	app.providerManager.RegisterProvider(new(redis.RedisProvider)).Register()
 }
@@ -91,13 +91,3 @@ func (app *App) RunConsole() {
 //	app.Event = EventBus.New()
 //}
 //
-//func (app *App) registerValidation() {
-//	uni := ut.New(zh.New())
-//	lang := app.Config.App.Lang
-//	if lang == "" {
-//		lang = "zh"
-//	}
-//
-//	app.Translator, _ = uni.GetTranslator(lang)
-//	_ = zh_translations.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), app.Translator)
-//}
