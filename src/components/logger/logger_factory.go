@@ -83,7 +83,7 @@ func (loggerFactory *LoggerFactory) MakeLogger(log Config) *zap.Logger {
 	}
 
 	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(encoderConfig),            // 编码器配置
+		zapcore.NewJSONEncoder(encoderConfig),               // 编码器配置
 		zapcore.NewMultiWriteSyncer(zapcore.AddSync(&hook)), // 打印到控制台和文件
 		atomicLevel, // 日志级别
 	)
