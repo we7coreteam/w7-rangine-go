@@ -27,9 +27,9 @@ func NewApp() *App {
 
 	app.InitConfig()
 	app.InitContainer()
+	app.InitConsole()
 	app.InitProviderManager()
 	app.RegisterProviders()
-	app.InitConsole()
 
 	return app
 }
@@ -58,7 +58,7 @@ func (app *App) GetContainer() container.Container {
 }
 
 func (app *App) InitProviderManager() {
-	app.providerManager = provider.NewProviderManager(app.container, app.config)
+	app.providerManager = provider.NewProviderManager(app.container, app.config, app.console)
 }
 
 func (app *App) GetProviderManager() *provider.ProviderManager {
