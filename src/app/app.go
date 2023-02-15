@@ -14,6 +14,7 @@ import (
 
 type App struct {
 	Name            string
+	Version         string
 	config          *viper.Viper
 	container       container.Container
 	providerManager *provider.ProviderManager
@@ -22,7 +23,8 @@ type App struct {
 
 func NewApp() *App {
 	app := &App{
-		Name: "rangine",
+		Name:    "rangine",
+		Version: "1.0.0",
 	}
 
 	app.InitConfig()
@@ -36,7 +38,7 @@ func NewApp() *App {
 
 func (app *App) InitConfig() {
 	conf := viper.New()
-	conf.SetConfigFile("./.env")
+	conf.AddConfigPath("./.env")
 
 	if err := conf.ReadInConfig(); err != nil {
 		panic(err)
