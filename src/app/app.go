@@ -14,10 +14,10 @@ import (
 
 type App struct {
 	Name            string
-	Config          *viper.Viper
-	Container       container.Container
-	ProviderManager *provider.ProviderManager
-	Console         *console.Console
+	config          *viper.Viper
+	container       container.Container
+	providerManager *provider.ProviderManager
+	console         *console.Console
 }
 
 func NewApp() *App {
@@ -41,38 +41,50 @@ func (app *App) InitConfig() {
 		panic(err)
 	}
 
-	app.Config = conf
+	app.config = conf
 }
 
 func (app *App) GetConfig() *viper.Viper {
-	return app.Config
+	return app.config
 }
 
 func (app *App) InitContainer() {
-	app.Container = container.New()
+	app.container = container.New()
+}
+
+func (app *App) GetContainer() container.Container {
+	return app.container
 }
 
 func (app *App) InitProviderManager() {
-	app.ProviderManager = &provider.ProviderManager{
-		Container: app.Container,
-		Config:    app.Config,
+	app.providerManager = &provider.ProviderManager{
+		Container: app.container,
+		Config:    app.config,
 	}
 }
 
+func (app *App) GetProviderManager() *provider.ProviderManager {
+	return app.providerManager
+}
+
 func (app *App) RegisterProviders() {
-	app.ProviderManager.RegisterProvider(new(logger.LoggerProvider)).Register()
-	app.ProviderManager.RegisterProvider(new(event.EventProvider)).Register()
-	app.ProviderManager.RegisterProvider(new(validation.ValidationProvider)).Register()
-	app.ProviderManager.RegisterProvider(new(database.DatabaseProvider)).Register()
-	app.ProviderManager.RegisterProvider(new(redis.RedisProvider)).Register()
+	app.providerManager.RegisterProvider(new(logger.LoggerProvider)).Register()
+	app.providerManager.RegisterProvider(new(event.EventProvider)).Register()
+	app.providerManager.RegisterProvider(new(validation.ValidationProvider)).Register()
+	app.providerManager.RegisterProvider(new(database.DatabaseProvider)).Register()
+	app.providerManager.RegisterProvider(new(redis.RedisProvider)).Register()
 }
 
 func (app *App) InitConsole() {
-	app.Console = new(console.Console)
+	app.console = new(console.Console)
+}
+
+func (app *App) GetConsole() *console.Console {
+	return app.console
 }
 
 func (app *App) RunConsole() {
-	app.Console.Run()
+	app.console.Run()
 }
 
 //func (app *App) registerEvent() {
