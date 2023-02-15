@@ -1,15 +1,13 @@
 package app
 
 import (
-	"github.com/asaskevich/EventBus"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/locales/zh"
-	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
-	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/src/core/exception"
+	"github.com/we7coreteam/w7-rangine-go/src/components/database"
+	"github.com/we7coreteam/w7-rangine-go/src/components/event"
+	"github.com/we7coreteam/w7-rangine-go/src/components/logger"
+	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
+	"github.com/we7coreteam/w7-rangine-go/src/components/validation"
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
 )
 
@@ -20,57 +18,68 @@ type App struct {
 	ProviderManager *provider.ProviderManager
 }
 
-func NewApp(config *viper.Viper) *App {
-	return &App{
-		Name:   "rangine",
-		Config: config,
+func NewApp() *App {
+	app := &App{
+		Name: "rangine",
 	}
+
+	app.InitConfig()
+	app.InitContainer()
+	app.InitProviderManager()
+	app.RegisterProviders()
+
+	return app
 }
 
-func (app *App) registerContainer() {
+func (app *App) InitConfig() {
+	conf := viper.New()
+	conf.SetConfigFile("./.env")
+
+	if err := conf.ReadInConfig(); err != nil {
+		panic(err)
+	}
+
+	app.Config = conf
+}
+
+func (app *App) GetConfig() *viper.Viper {
+	return app.Config
+}
+
+func (app *App) InitContainer() {
 	app.Container = container.New()
 }
 
-func (app *App) initProviderManager() {
-	err := app.Container.NamedSingleton("provider_manager", func() *provider.ProviderManager {
-		return &provider.ProviderManager{
-			Container: app.Container,
-		}
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	var providerManager *provider.ProviderManager
-	err = app.Container.NamedResolve(&providerManager, "provider_manager")
-	if err != nil {
-		panic(err)
-	}
-
-	app.ProviderManager = providerManager
-}
-
-func (app *App) Bootstrap() {
-	app.registerContainer()
-	app.initProviderManager()
-}
-
-func (app *App) registerEvent() {
-	app.Event = EventBus.New()
-}
-
-func (app *App) registerValidation() {
-	uni := ut.New(zh.New())
-	lang := app.Config.App.Lang
-	if lang == "" {
-		lang = "zh"
-	}
-
-	app.Translator, _ = uni.GetTranslator(lang)
-	_ = zh_translations.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), app.Translator)
-}
-func (app *App) registerExceptionHandler() {
-	app.HandlerExceptions = &exception.HandlerExceptions{
-		Logger: app.LoggerFactory.Channel("default"),
+func (app *App) InitProviderManager() {
+	app.ProviderManager = &provider.ProviderManager{
+		Container: app.Container,
+		Config:    app.Config,
 	}
 }
+
+func (app *App) RegisterProviders() {
+	app.ProviderManager.RegisterProvider(new(logger.LoggerProvider)).Register()
+	app.ProviderManager.RegisterProvider(new(event.EventProvider)).Register()
+	app.ProviderManager.RegisterProvider(new(validation.ValidationProvider)).Register()
+	app.ProviderManager.RegisterProvider(new(database.DatabaseProvider)).Register()
+	app.ProviderManager.RegisterProvider(new(redis.RedisProvider)).Register()
+}
+
+func Run() {
+
+}
+
+//func (app *App) registerEvent() {
+//	app.Event = EventBus.New()
+//}
+//
+//func (app *App) registerValidation() {
+//	uni := ut.New(zh.New())
+//	lang := app.Config.App.Lang
+//	if lang == "" {
+//		lang = "zh"
+//	}
+//
+//	app.Translator, _ = uni.GetTranslator(lang)
+//	_ = zh_translations.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), app.Translator)
+//}

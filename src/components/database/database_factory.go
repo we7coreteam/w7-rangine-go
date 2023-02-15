@@ -5,8 +5,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/we7coreteam/w7-rangine-go/src/core/config"
-
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -61,7 +59,7 @@ func (databaseFactory *DatabaseFactory) Channel(channel string) *gorm.DB {
 	return databaseFactory.dbMap[channel]
 }
 
-func (databaseFactory *DatabaseFactory) makeDb(databaseConfig config.Database) *gorm.DB {
+func (databaseFactory *DatabaseFactory) makeDb(databaseConfig Config) *gorm.DB {
 	//"user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
 	dns := databaseConfig.User + ":" + databaseConfig.Password + "@tcp(" + databaseConfig.Host + ":" + strconv.Itoa(databaseConfig.Port) + ")/" + databaseConfig.DbName + "?charset=" + databaseConfig.Charset + "&parseTime=True&loc=Local"
 	//可根据配置开启日志
@@ -100,7 +98,7 @@ func (databaseFactory *DatabaseFactory) makeDb(databaseConfig config.Database) *
 	return db
 }
 
-func (databaseFactory *DatabaseFactory) Register(maps map[string]config.Database) {
+func (databaseFactory *DatabaseFactory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		databaseFactory.dbResolverMap[key] = func() *gorm.DB {
 			return databaseFactory.makeDb(value)

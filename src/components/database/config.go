@@ -1,6 +1,6 @@
-package config
+package database
 
-type Database struct {
+type Config struct {
 	Driver   string `mapstructure:"driver" json:"driver" yaml:"driver"`
 	Host     string `mapstructure:"host" json:"host" yaml:"host"`
 	Port     int    `mapstructure:"port" json:"port" yaml:"port"`

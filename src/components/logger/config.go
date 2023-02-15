@@ -1,6 +1,6 @@
-package config
+package logger
 
-type Log struct {
+type Config struct {
 	Path    string `mapstructure:"path" json:"path" yaml:"path"`
 	Level   string `mapstructure:"level" json:"level" yaml:"level"`
 	MaxDays int    `mapstructure:"max_days" json:"max_days" yaml:"max_days"`

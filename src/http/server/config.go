@@ -1,6 +1,6 @@
-package config
+package server
 
-type Server struct {
+type Config struct {
 	Host string `mapstructure:"host" json:"host" yaml:"host"`
 	Port int    `mapstructure:"port" json:"port" yaml:"port"`
 }

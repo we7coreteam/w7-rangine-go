@@ -3,8 +3,6 @@ package redis
 import (
 	"strconv"
 
-	"github.com/we7coreteam/w7-rangine-go/src/core/config"
-
 	"github.com/go-redis/redis/v8"
 )
 
@@ -27,7 +25,7 @@ func (redisFactory *RedisFactory) Channel(channel string) *redis.Client {
 	return redis
 }
 
-func (redisFactory *RedisFactory) MakeRedis(redisConfig config.Redis) *redis.Client {
+func (redisFactory *RedisFactory) MakeRedis(redisConfig Config) *redis.Client {
 	return redis.NewClient(&redis.Options{
 		Addr:     redisConfig.Host + ":" + strconv.Itoa(redisConfig.Port),
 		Username: redisConfig.Username,
@@ -37,7 +35,7 @@ func (redisFactory *RedisFactory) MakeRedis(redisConfig config.Redis) *redis.Cli
 	})
 }
 
-func (redisFactory *RedisFactory) Register(maps map[string]config.Redis) {
+func (redisFactory *RedisFactory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		redisFactory.channelMap[key] = redisFactory.MakeRedis(value)
 	}

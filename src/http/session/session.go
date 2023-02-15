@@ -8,7 +8,6 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/alexedwards/scs/v2/memstore"
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go/src/core/config"
 )
 
 type Session struct {
@@ -16,7 +15,7 @@ type Session struct {
 	storageResolver func() scs.Store
 }
 
-func NewSession(sessionConfig config.Session, cookieConfig config.Cookie) *Session {
+func NewSession(sessionConfig SessionConf, cookieConfig Cookie) *Session {
 	session := &Session{
 		SessionManager: *scs.New(),
 	}

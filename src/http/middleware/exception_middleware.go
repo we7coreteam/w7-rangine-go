@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 
@@ -11,11 +10,10 @@ import (
 
 type ExceptionRecoverLogger struct {
 	io.Writer
-	HandlerExceptions *exception.HandlerExceptions
 }
 
 func (exceptionRecoverLogger *ExceptionRecoverLogger) Write(p []byte) (n int, err error) {
-	exceptionRecoverLogger.HandlerExceptions.GetExceptionHandler().Reporter(exceptionRecoverLogger.HandlerExceptions.Logger, fmt.Errorf("%v", err), string(exceptionRecoverLogger.HandlerExceptions.Stack(4)))
+	//exceptionRecoverLogger.HandlerExceptions.GetExceptionHandler().Reporter(exceptionRecoverLogger.HandlerExceptions.Logger, fmt.Errorf("%v", err), string(exceptionRecoverLogger.HandlerExceptions.Stack(4)))
 	return len(p), nil
 }
 
@@ -25,9 +23,7 @@ type ExceptionMiddleware struct {
 }
 
 func (exceptionMiddleware ExceptionMiddleware) Process(ctx *gin.Context) {
-	gin.CustomRecoveryWithWriter(&ExceptionRecoverLogger{
-		HandlerExceptions: exceptionMiddleware.HandlerExceptions,
-	}, func(ctx *gin.Context, err interface{}) {
+	gin.CustomRecoveryWithWriter(&ExceptionRecoverLogger{}, func(ctx *gin.Context, err interface{}) {
 		if gin.Mode() == gin.DebugMode {
 			exceptionMiddleware.JsonResponseWithError(ctx, string(exceptionMiddleware.HandlerExceptions.Stack(4)), http.StatusInternalServerError)
 		} else {

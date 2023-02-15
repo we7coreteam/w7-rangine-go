@@ -1,7 +1,6 @@
 package logger
 
 import (
-	config "github.com/we7coreteam/w7-rangine-go/src/core/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -32,7 +31,7 @@ func (loggerFactory *LoggerFactory) Channel(channel string) *zap.Logger {
 	return logger
 }
 
-func (loggerFactory *LoggerFactory) MakeLogger(log config.Log) *zap.Logger {
+func (loggerFactory *LoggerFactory) MakeLogger(log Config) *zap.Logger {
 	maxSize := log.MaxSize
 	maxAge := log.MaxDays
 	if maxSize <= 0 {
@@ -92,7 +91,7 @@ func (loggerFactory *LoggerFactory) MakeLogger(log config.Log) *zap.Logger {
 	return zap.New(core)
 }
 
-func (loggerFactory *LoggerFactory) Register(maps map[string]config.Log) {
+func (loggerFactory *LoggerFactory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		loggerFactory.loggerMap[key] = loggerFactory.MakeLogger(value)
 	}
