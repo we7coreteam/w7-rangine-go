@@ -7,21 +7,14 @@ import (
 
 type ProviderAbstract struct {
 	ProviderInterface
-	Container container.Container
-	Config    interface{}
+	container container.Container
+	config    interface{}
 }
 
 func (providerAbstract *ProviderAbstract) SetContainer(container container.Container) {
-	providerAbstract.Container = container
+	providerAbstract.container = container
 }
 
 func (providerAbstract *ProviderAbstract) SetConfig(config *viper.Viper) {
-	providerAbstract.Config = config
-}
-
-func (providerAbstract *ProviderAbstract) RegisterAutoPanic(name string, resolver interface{}) {
-	err := providerAbstract.Container.NamedSingleton(name, resolver)
-	if err != nil {
-		panic(err)
-	}
+	providerAbstract.config = config
 }

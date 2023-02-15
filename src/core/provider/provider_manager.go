@@ -6,12 +6,19 @@ import (
 )
 
 type ProviderManager struct {
-	Container container.Container
-	Config    *viper.Viper
+	container container.Container
+	config    *viper.Viper
+}
+
+func NewProviderManager(container container.Container, config *viper.Viper) *ProviderManager {
+	return &ProviderManager{
+		container: container,
+		config:    config,
+	}
 }
 
 func (providerManager *ProviderManager) RegisterProvider(abstract ProviderInterface) ProviderInterface {
-	abstract.SetContainer(providerManager.Container)
-	abstract.SetConfig(providerManager.Config)
+	abstract.SetContainer(providerManager.container)
+	abstract.SetConfig(providerManager.config)
 	return abstract
 }

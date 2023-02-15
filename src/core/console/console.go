@@ -3,12 +3,12 @@ package console
 import "github.com/spf13/cobra"
 
 type Console struct {
-	Handler *cobra.Command
+	handler *cobra.Command
 }
 
 func NewConsole() *Console {
 	return &Console{
-		Handler: &cobra.Command{Use: "rangine"},
+		handler: &cobra.Command{Use: "rangine"},
 	}
 }
 
@@ -18,11 +18,11 @@ func (console *Console) RegisterCommand(command CommandInterface) {
 	}
 	command.Configure(handler)
 
-	console.Handler.AddCommand(handler)
+	console.handler.AddCommand(handler)
 }
 
 func (console *Console) Run() {
-	err := console.Handler.Execute()
+	err := console.handler.Execute()
 	if err != nil {
 		panic(err)
 	}

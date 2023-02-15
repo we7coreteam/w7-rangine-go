@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go/src/core/exception"
 )
 
 type ExceptionRecoverLogger struct {
@@ -19,13 +18,12 @@ func (exceptionRecoverLogger *ExceptionRecoverLogger) Write(p []byte) (n int, er
 
 type ExceptionMiddleware struct {
 	MiddlewareAbstract
-	HandlerExceptions *exception.HandlerExceptions
 }
 
 func (exceptionMiddleware ExceptionMiddleware) Process(ctx *gin.Context) {
 	gin.CustomRecoveryWithWriter(&ExceptionRecoverLogger{}, func(ctx *gin.Context, err interface{}) {
 		if gin.Mode() == gin.DebugMode {
-			exceptionMiddleware.JsonResponseWithError(ctx, string(exceptionMiddleware.HandlerExceptions.Stack(4)), http.StatusInternalServerError)
+			exceptionMiddleware.JsonResponseWithError(ctx, "", http.StatusInternalServerError)
 		} else {
 			exceptionMiddleware.JsonResponseWithError(ctx, "系统内部错误", http.StatusInternalServerError)
 		}

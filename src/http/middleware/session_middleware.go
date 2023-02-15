@@ -9,16 +9,16 @@ import (
 
 type SessionMiddleware struct {
 	MiddlewareAbstract
-	Session *session.Session
+	session *session.Session
 }
 
 func NewSessionMiddleware(appSession *session.Session) *SessionMiddleware {
 	appSession.Init()
-	return &SessionMiddleware{Session: appSession}
+	return &SessionMiddleware{session: appSession}
 }
 
 func (sessionMiddleware SessionMiddleware) Process(ctx *gin.Context) {
-	err := sessionMiddleware.Session.Start(ctx)
+	err := sessionMiddleware.session.Start(ctx)
 	if err != nil {
 		sessionMiddleware.JsonResponseWithError(ctx, err, http.StatusInternalServerError)
 		return
