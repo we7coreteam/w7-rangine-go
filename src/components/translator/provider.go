@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
+	"github.com/we7coreteam/w7-rangine-go/src/global"
 )
 
 type TranslatorProvider struct {
@@ -19,4 +20,6 @@ func (translatorProvider *TranslatorProvider) Register() {
 
 	translator, _ := uni.GetTranslator(lang)
 	_ = zh_translations.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), translator)
+
+	global.G.Translator = translator
 }
