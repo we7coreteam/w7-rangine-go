@@ -20,9 +20,9 @@ func NewConsole() *Console {
 
 func (console *Console) RegisterCommand(command CommandInterface) {
 	handler := &cobra.Command{
-		Use:  command.GetName(),
-		Long: command.GetDescription(),
-		Run:  command.Handle,
+		Use:   command.GetName(),
+		Short: command.GetDescription(),
+		Run:   command.Handle,
 	}
 	command.Configure(handler)
 

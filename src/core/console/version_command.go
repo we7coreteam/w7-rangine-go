@@ -11,7 +11,7 @@ func (versionCommand *VersionCommand) GetName() string {
 }
 
 func (versionCommand *VersionCommand) GetDescription() string {
-	return ""
+	return "version"
 }
 
 func (versionCommand *VersionCommand) Configure(command *cobra.Command) {
