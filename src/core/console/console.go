@@ -7,14 +7,22 @@ type Console struct {
 }
 
 func NewConsole() *Console {
-	return &Console{
-		handler: &cobra.Command{Use: "rangine"},
+	console := &Console{
+		handler: &cobra.Command{
+			Use: "",
+		},
 	}
+
+	console.RegisterCommand(new(VersionCommand))
+
+	return console
 }
 
 func (console *Console) RegisterCommand(command CommandInterface) {
 	handler := &cobra.Command{
-		Run: command.Handle,
+		Use:  command.GetName(),
+		Long: command.GetDescription(),
+		Run:  command.Handle,
 	}
 	command.Configure(handler)
 

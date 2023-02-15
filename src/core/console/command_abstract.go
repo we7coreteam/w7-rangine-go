@@ -7,6 +7,10 @@ type CommandAbstract struct {
 	CommandInterface
 }
 
+func (commandAbstract *CommandAbstract) GetDescription() string {
+	return ""
+}
+
 func (commandAbstract *CommandAbstract) Configure(command *cobra.Command) {
 
 }

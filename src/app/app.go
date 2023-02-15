@@ -29,6 +29,7 @@ func NewApp() *App {
 	app.InitContainer()
 	app.InitProviderManager()
 	app.RegisterProviders()
+	app.InitConsole()
 
 	return app
 }
@@ -73,7 +74,7 @@ func (app *App) RegisterProviders() {
 }
 
 func (app *App) InitConsole() {
-	app.console = new(console.Console)
+	app.console = console.NewConsole()
 }
 
 func (app *App) GetConsole() *console.Console {
