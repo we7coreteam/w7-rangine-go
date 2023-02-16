@@ -1,6 +1,8 @@
 package database
 
-import "github.com/we7coreteam/w7-rangine-go/src/core/provider"
+import (
+	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
+)
 
 type DatabaseProvider struct {
 	provider.ProviderAbstract
@@ -19,4 +21,11 @@ func (databaseProvider *DatabaseProvider) Register() {
 		dbFactory.SetLogger(logger)
 	}
 	dbFactory.Register(dbConfigMap)
+
+	err = databaseProvider.GetContainer().NamedSingleton("db-factory", func() *DatabaseFactory {
+		return dbFactory
+	})
+	if err != nil {
+		panic(err)
+	}
 }

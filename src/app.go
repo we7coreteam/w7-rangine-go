@@ -12,6 +12,8 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
 )
 
+var GApp *App
+
 type App struct {
 	Name            string
 	Version         string
@@ -37,12 +39,14 @@ func NewApp() *App {
 	app.InitProviderManager()
 	app.RegisterProviders()
 
+	GApp = app
+
 	return app
 }
 
 func (app *App) InitConfig() {
 	conf := viper.New()
-	conf.SetConfigFile("./.config.yaml")
+	conf.SetConfigFile("./config.yaml")
 
 	if err := conf.ReadInConfig(); err != nil {
 		panic(err)
