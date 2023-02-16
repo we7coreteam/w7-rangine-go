@@ -47,20 +47,21 @@ func (loggerFactory *LoggerFactory) ConvertLevel(level string) zapcore.Level {
 }
 
 func (loggerFactory *LoggerFactory) MakeFileDriver(config Config) zapcore.WriteSyncer {
-	maxSize := config.MaxSize
-	maxAge := config.MaxDays
-	if maxSize <= 0 {
-		maxSize = 2
+	if config.MaxSize <= 0 {
+		config.MaxSize = 2
 	}
-	if maxAge <= 0 {
-		maxAge = 7
+	if config.MaxDays <= 0 {
+		config.MaxDays = 7
+	}
+	if config.MaxBackups <= 0 {
+		config.MaxBackups = 1
 	}
 	hook := lumberjack.Logger{
 		Filename:   "./runtimes/logs/" + config.Path,
-		MaxSize:    maxSize,
-		MaxBackups: 2,
-		MaxAge:     maxAge,
-		Compress:   true,
+		MaxSize:    config.MaxSize,
+		MaxBackups: config.MaxBackups,
+		MaxAge:     config.MaxDays,
+		Compress:   false,
 	}
 
 	return zapcore.AddSync(&hook)

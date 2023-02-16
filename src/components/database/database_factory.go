@@ -72,15 +72,18 @@ func (databaseFactory *DatabaseFactory) MakeDb(databaseConfig Config, driver gor
 	//可根据配置开启日志
 	var dbLogger logger.Interface = nil
 	if databaseFactory.logger != nil {
+		if databaseConfig.SlowThreshold <= 0 {
+			databaseConfig.SlowThreshold = int64(200 * time.Millisecond)
+		}
 		dbLogger = logger.New(
 			&DbLogger{
 				logger: databaseFactory.logger,
 			},
 			logger.Config{
-				SlowThreshold:             200 * time.Millisecond, // Slow SQL threshold
-				LogLevel:                  logger.Info,            // Log level
-				IgnoreRecordNotFoundError: true,                   // Ignore ErrRecordNotFound error for logger
-				Colorful:                  false,                  // Disable color
+				SlowThreshold:             time.Duration(databaseConfig.SlowThreshold),     // Slow SQL threshold
+				LogLevel:                  logger.LogLevel(databaseFactory.logger.Level()), // Log level
+				IgnoreRecordNotFoundError: true,                                            // Ignore ErrRecordNotFound error for logger
+				Colorful:                  false,                                           // Disable color
 			},
 		)
 	}
