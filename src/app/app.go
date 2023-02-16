@@ -38,7 +38,7 @@ func NewApp() *App {
 
 func (app *App) InitConfig() {
 	conf := viper.New()
-	conf.SetConfigFile("./.env")
+	conf.SetConfigFile("./.config.yaml")
 
 	if err := conf.ReadInConfig(); err != nil {
 		panic(err)

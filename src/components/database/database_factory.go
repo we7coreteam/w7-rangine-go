@@ -26,19 +26,84 @@ func (dbLogger *DbLogger) Printf(info string, vs ...interface{}) {
 }
 
 type DatabaseFactory struct {
-	dbMu          sync.Mutex
-	dbResolverMap map[string]func() *gorm.DB
-	dbMap         map[string]*gorm.DB
-	logger        *zap.Logger
-	once          sync.Once
+	driverResolverMap map[string]func(config Config) gorm.Dialector
+	dbResolverMap     map[string]func() *gorm.DB
+	dbMap             map[string]*gorm.DB
+	logger            *zap.Logger
+	once              sync.Once
 }
 
-func NewDatabaseFactory(logger *zap.Logger) *DatabaseFactory {
-	return &DatabaseFactory{
-		dbMap:         make(map[string]*gorm.DB),
-		dbResolverMap: make(map[string]func() *gorm.DB),
-		logger:        logger,
+func NewDatabaseFactory() *DatabaseFactory {
+	databaseFactory := &DatabaseFactory{
+		dbMap:             make(map[string]*gorm.DB),
+		dbResolverMap:     make(map[string]func() *gorm.DB),
+		driverResolverMap: make(map[string]func(config Config) gorm.Dialector),
 	}
+
+	databaseFactory.RegisterDriverResolver("mysql", databaseFactory.MakeMysqlDriver)
+
+	return databaseFactory
+}
+
+func (databaseFactory *DatabaseFactory) SetLogger(logger *zap.Logger) {
+	databaseFactory.logger = logger
+}
+
+func (databaseFactory *DatabaseFactory) MakeMysqlDriver(databaseConfig Config) gorm.Dialector {
+	dns := databaseConfig.User + ":" + databaseConfig.Password + "@tcp(" + databaseConfig.Host + ":" + strconv.Itoa(databaseConfig.Port) + ")/" + databaseConfig.DbName + "?charset=" + databaseConfig.Charset + "&parseTime=True&loc=Local"
+
+	return mysql.New(mysql.Config{
+		DSN:                       dns,   // data source name
+		SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
+	})
+}
+
+func (databaseFactory *DatabaseFactory) MakeDriver(databaseConfig Config) gorm.Dialector {
+	driverResolver, exists := databaseFactory.driverResolverMap[databaseConfig.Driver]
+	if !exists {
+		panic("db driver " + databaseConfig.Driver + " not exists")
+	}
+
+	return driverResolver(databaseConfig)
+}
+
+func (databaseFactory *DatabaseFactory) MakeDb(databaseConfig Config, driver gorm.Dialector) *gorm.DB {
+	//可根据配置开启日志
+	var dbLogger logger.Interface = nil
+	if databaseFactory.logger != nil {
+		dbLogger = logger.New(
+			&DbLogger{
+				logger: databaseFactory.logger,
+			},
+			logger.Config{
+				SlowThreshold:             200 * time.Millisecond, // Slow SQL threshold
+				LogLevel:                  logger.Info,            // Log level
+				IgnoreRecordNotFoundError: true,                   // Ignore ErrRecordNotFound error for logger
+				Colorful:                  false,                  // Disable color
+			},
+		)
+	}
+
+	db, err := gorm.Open(driver, &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   databaseConfig.Prefix,
+			SingularTable: true,
+		},
+		Logger: dbLogger,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	dbDriver, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
+
+	dbDriver.SetMaxIdleConns(databaseConfig.MaxIdleConn)
+	dbDriver.SetMaxOpenConns(databaseConfig.MaxConn)
+
+	return db
 }
 
 func (databaseFactory *DatabaseFactory) Channel(channel string) *gorm.DB {
@@ -48,61 +113,32 @@ func (databaseFactory *DatabaseFactory) Channel(channel string) *gorm.DB {
 	}
 
 	databaseFactory.once.Do(func() {
-		dbResover, exists := databaseFactory.dbResolverMap[channel]
+		dbResolver, exists := databaseFactory.dbResolverMap[channel]
 		if !exists {
 			panic("db channel " + channel + " not exists")
 		}
 
-		databaseFactory.dbMap[channel] = dbResover()
+		databaseFactory.dbMap[channel] = dbResolver()
 	})
 
 	return databaseFactory.dbMap[channel]
 }
 
-func (databaseFactory *DatabaseFactory) makeDb(databaseConfig Config) *gorm.DB {
-	//"user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
-	dns := databaseConfig.User + ":" + databaseConfig.Password + "@tcp(" + databaseConfig.Host + ":" + strconv.Itoa(databaseConfig.Port) + ")/" + databaseConfig.DbName + "?charset=" + databaseConfig.Charset + "&parseTime=True&loc=Local"
-	//可根据配置开启日志
-	newLogger := logger.New(
-		&DbLogger{
-			logger: databaseFactory.logger,
-		},
-		logger.Config{
-			SlowThreshold:             200 * time.Millisecond, // Slow SQL threshold
-			LogLevel:                  logger.Info,            // Log level
-			IgnoreRecordNotFoundError: true,                   // Ignore ErrRecordNotFound error for logger
-			Colorful:                  false,                  // Disable color
-		},
-	)
-	db, err := gorm.Open(mysql.New(mysql.Config{
-		DSN:                       dns,   // data source name
-		SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
-	}), &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   databaseConfig.Prefix,
-			SingularTable: true,
-		},
-		Logger: newLogger,
-	})
-	if err != nil {
-		panic(err)
-	}
+func (databaseFactory *DatabaseFactory) RegisterDriverResolver(driver string, resolver func(config Config) gorm.Dialector) {
+	databaseFactory.driverResolverMap[driver] = resolver
+}
 
-	mysqlDb, err := db.DB()
-	if err != nil {
-		panic(err)
-	}
-
-	mysqlDb.SetMaxIdleConns(databaseConfig.MaxIdleConn)
-	mysqlDb.SetMaxOpenConns(databaseConfig.MaxConn)
-
-	return db
+func (databaseFactory *DatabaseFactory) RegisterDb(channel string, dbResolver func() *gorm.DB) {
+	databaseFactory.dbResolverMap[channel] = dbResolver
 }
 
 func (databaseFactory *DatabaseFactory) Register(maps map[string]Config) {
 	for key, value := range maps {
-		databaseFactory.dbResolverMap[key] = func() *gorm.DB {
-			return databaseFactory.makeDb(value)
-		}
+		func(channel string, config Config) {
+			databaseFactory.RegisterDb(channel, func() *gorm.DB {
+				return databaseFactory.MakeDb(config, databaseFactory.MakeDriver(config))
+			})
+		}(key, value)
+
 	}
 }

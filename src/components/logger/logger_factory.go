@@ -4,41 +4,57 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"sync"
 )
 
 const DEFAULT_CHANNEL = "default"
 
 type LoggerFactory struct {
-	loggerMap map[string]*zap.Logger
+	driverResolverMap map[string]func(config Config) zapcore.WriteSyncer
+	loggerResolverMap map[string]func() *zap.Logger
+	loggerMap         map[string]*zap.Logger
+	once              sync.Once
 }
 
 func NewLoggerFactory() *LoggerFactory {
-	return &LoggerFactory{
-		loggerMap: make(map[string]*zap.Logger),
+	loggerFactory := &LoggerFactory{
+		loggerMap:         make(map[string]*zap.Logger),
+		loggerResolverMap: make(map[string]func() *zap.Logger),
+		driverResolverMap: make(map[string]func(config Config) zapcore.WriteSyncer),
+	}
+
+	loggerFactory.RegisterDriverResolver("file", loggerFactory.MakeFileDriver)
+
+	return loggerFactory
+}
+
+func (loggerFactory *LoggerFactory) ConvertLevel(level string) zapcore.Level {
+	switch level {
+	case "debug":
+		return zap.DebugLevel
+	case "info":
+		return zap.InfoLevel
+	case "warn":
+		return zap.WarnLevel
+	case "error":
+		return zap.ErrorLevel
+	case "fatal":
+		return zap.FatalLevel
+	case "Panic":
+		return zap.PanicLevel
+	default:
+		return zap.DebugLevel
 	}
 }
 
-func (loggerFactory *LoggerFactory) Channel(channel string) *zap.Logger {
-	logger, exists := loggerFactory.loggerMap[channel]
-	if !exists && channel == DEFAULT_CHANNEL {
-		panic("logger channel " + channel + " not exists")
-	}
-
-	if !exists {
-		return loggerFactory.Channel(DEFAULT_CHANNEL)
-	}
-
-	return logger
-}
-
-func (loggerFactory *LoggerFactory) MakeFileWriteSyncer(config Config) zapcore.WriteSyncer {
+func (loggerFactory *LoggerFactory) MakeFileDriver(config Config) zapcore.WriteSyncer {
 	maxSize := config.MaxSize
 	maxAge := config.MaxDays
 	if maxSize <= 0 {
 		maxSize = 2
 	}
 	if maxAge <= 0 {
-		maxAge = 2
+		maxAge = 7
 	}
 	hook := lumberjack.Logger{
 		Filename:   "./runtimes/logs/" + config.Path,
@@ -51,7 +67,16 @@ func (loggerFactory *LoggerFactory) MakeFileWriteSyncer(config Config) zapcore.W
 	return zapcore.AddSync(&hook)
 }
 
-func (loggerFactory *LoggerFactory) MakeLogger(config Config, ws ...zapcore.WriteSyncer) *zap.Logger {
+func (loggerFactory *LoggerFactory) MakeDriver(config Config) zapcore.WriteSyncer {
+	driverResolver, exists := loggerFactory.driverResolverMap[config.Driver]
+	if !exists {
+		panic("logger driver " + config.Driver + " not exists")
+	}
+
+	return driverResolver(config)
+}
+
+func (loggerFactory *LoggerFactory) MakeLogger(level zapcore.Level, ws ...zapcore.WriteSyncer) *zap.Logger {
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "time",
 		LevelKey:       "level",
@@ -69,38 +94,49 @@ func (loggerFactory *LoggerFactory) MakeLogger(config Config, ws ...zapcore.Writ
 
 	// 设置日志级别
 	atomicLevel := zap.NewAtomicLevel()
-	switch config.Level {
-	case "debug":
-		atomicLevel.SetLevel(zap.DebugLevel)
-	case "info":
-		atomicLevel.SetLevel(zap.InfoLevel)
-	case "warn":
-		atomicLevel.SetLevel(zap.WarnLevel)
-	case "error":
-		atomicLevel.SetLevel(zap.ErrorLevel)
-	case "fatal":
-		atomicLevel.SetLevel(zap.FatalLevel)
-	case "Panic":
-		atomicLevel.SetLevel(zap.PanicLevel)
-	default:
-		atomicLevel.SetLevel(zap.DebugLevel)
-	}
+	atomicLevel.SetLevel(level)
 
 	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig),               // 编码器配置
-		zapcore.NewMultiWriteSyncer(ws...), // 打印到控制台和文件
-		atomicLevel, // 日志级别
+		zapcore.NewJSONEncoder(encoderConfig), // 编码器配置
+		zapcore.NewMultiWriteSyncer(ws...),    // 打印到控制台和文件
+		atomicLevel,                           // 日志级别
 	)
 
 	return zap.New(core)
 }
 
-func (loggerFactory *LoggerFactory) RegisterLogger(channel string, logger *zap.Logger) {
-	loggerFactory.loggerMap[channel] = logger
+func (loggerFactory *LoggerFactory) Channel(channel string) *zap.Logger {
+	logger, exists := loggerFactory.loggerMap[channel]
+	if exists {
+		return logger
+	}
+
+	loggerFactory.once.Do(func() {
+		loggerResolver, exists := loggerFactory.loggerResolverMap[channel]
+		if !exists {
+			panic("logger channel " + channel + " not exists")
+		}
+
+		loggerFactory.loggerMap[channel] = loggerResolver()
+	})
+
+	return loggerFactory.loggerMap[channel]
+}
+
+func (loggerFactory *LoggerFactory) RegisterDriverResolver(driver string, resolver func(config Config) zapcore.WriteSyncer) {
+	loggerFactory.driverResolverMap[driver] = resolver
+}
+
+func (loggerFactory *LoggerFactory) RegisterLogger(channel string, loggerResolver func() *zap.Logger) {
+	loggerFactory.loggerResolverMap[channel] = loggerResolver
 }
 
 func (loggerFactory *LoggerFactory) Register(maps map[string]Config) {
 	for key, value := range maps {
-		loggerFactory.loggerMap[key] = loggerFactory.MakeLogger(value, loggerFactory.MakeFileWriteSyncer(value))
+		func(channel string, config Config) {
+			loggerFactory.RegisterLogger(channel, func() *zap.Logger {
+				return loggerFactory.MakeLogger(loggerFactory.ConvertLevel(config.Level), loggerFactory.MakeDriver(config))
+			})
+		}(key, value)
 	}
 }

@@ -35,8 +35,12 @@ func (redisFactory *RedisFactory) MakeRedis(redisConfig Config) *redis.Client {
 	})
 }
 
+func (redisFactory *RedisFactory) RegisterRedis(channel string, client *redis.Client) {
+	redisFactory.channelMap[channel] = client
+}
+
 func (redisFactory *RedisFactory) Register(maps map[string]Config) {
 	for key, value := range maps {
-		redisFactory.channelMap[key] = redisFactory.MakeRedis(value)
+		redisFactory.RegisterRedis(key, redisFactory.MakeRedis(value))
 	}
 }
