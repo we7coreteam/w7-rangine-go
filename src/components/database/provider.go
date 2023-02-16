@@ -7,5 +7,16 @@ type DatabaseProvider struct {
 }
 
 func (databaseProvider *DatabaseProvider) Register() {
+	var dbConfigMap map[string]Config
+	err := databaseProvider.GetConfig().Unmarshal(&dbConfigMap)
+	if err != nil {
+		panic(err)
+	}
 
+	dbFactory := NewDatabaseFactory()
+	logger, err := databaseProvider.GetLoggerFactory().Channel("default")
+	if err == nil {
+		dbFactory.SetLogger(logger)
+	}
+	dbFactory.Register(dbConfigMap)
 }

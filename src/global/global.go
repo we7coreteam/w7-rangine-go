@@ -4,8 +4,8 @@ import (
 	"github.com/asaskevich/EventBus"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
-	"github.com/we7coreteam/w7-rangine-go/src/components/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
+	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 )
 
 type RGlobal struct {

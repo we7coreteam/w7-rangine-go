@@ -1,14 +1,14 @@
 package app
 
 import (
+	"github.com/asaskevich/EventBus"
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
-	"github.com/we7coreteam/w7-rangine-go/src/components/event"
-	"github.com/we7coreteam/w7-rangine-go/src/components/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
 	"github.com/we7coreteam/w7-rangine-go/src/components/translator"
 	"github.com/we7coreteam/w7-rangine-go/src/core/console"
+	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
 )
 
@@ -17,6 +17,8 @@ type App struct {
 	Version         string
 	config          *viper.Viper
 	container       container.Container
+	loggerFactory   *logger.LoggerFactory
+	event           EventBus.Bus
 	providerManager *provider.ProviderManager
 	console         *console.Console
 }
@@ -29,6 +31,8 @@ func NewApp() *App {
 
 	app.InitConfig()
 	app.InitContainer()
+	app.InitEvent()
+	app.InitLoggerFactory()
 	app.InitConsole()
 	app.InitProviderManager()
 	app.RegisterProviders()
@@ -59,8 +63,32 @@ func (app *App) GetContainer() container.Container {
 	return app.container
 }
 
+func (app *App) InitLoggerFactory() {
+	app.loggerFactory = logger.NewLoggerFactory()
+
+	var loggerConfigMap map[string]logger.Config
+	err := app.config.Unmarshal(&loggerConfigMap)
+	if err != nil {
+		panic(err)
+	}
+
+	app.loggerFactory.Register(loggerConfigMap)
+}
+
+func (app *App) GetLoggerFactory() *logger.LoggerFactory {
+	return app.loggerFactory
+}
+
+func (app *App) InitEvent() {
+	app.event = EventBus.New()
+}
+
+func (app *App) GetEvent() EventBus.Bus {
+	return app.event
+}
+
 func (app *App) InitProviderManager() {
-	app.providerManager = provider.NewProviderManager(app.container, app.config, app.console)
+	app.providerManager = provider.NewProviderManager(app.container, app.config, app.loggerFactory, app.event, app.console)
 }
 
 func (app *App) GetProviderManager() *provider.ProviderManager {
@@ -68,8 +96,6 @@ func (app *App) GetProviderManager() *provider.ProviderManager {
 }
 
 func (app *App) RegisterProviders() {
-	app.providerManager.RegisterProvider(new(logger.LoggerProvider)).Register()
-	app.providerManager.RegisterProvider(new(event.EventProvider)).Register()
 	app.providerManager.RegisterProvider(new(translator.TranslatorProvider)).Register()
 	app.providerManager.RegisterProvider(new(database.DatabaseProvider)).Register()
 	app.providerManager.RegisterProvider(new(redis.RedisProvider)).Register()
@@ -86,8 +112,3 @@ func (app *App) GetConsole() *console.Console {
 func (app *App) RunConsole() {
 	app.console.Run()
 }
-
-//func (app *App) registerEvent() {
-//	app.Event = EventBus.New()
-//}
-//

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"strconv"
 	"sync"
 	"time"
@@ -106,22 +107,27 @@ func (databaseFactory *DatabaseFactory) MakeDb(databaseConfig Config, driver gor
 	return db
 }
 
-func (databaseFactory *DatabaseFactory) Channel(channel string) *gorm.DB {
+func (databaseFactory *DatabaseFactory) Channel(channel string) (*gorm.DB, error) {
 	db, exists := databaseFactory.dbMap[channel]
 	if exists {
-		return db
+		return db, nil
 	}
 
+	var err error = nil
 	databaseFactory.once.Do(func() {
 		dbResolver, exists := databaseFactory.dbResolverMap[channel]
 		if !exists {
-			panic("db channel " + channel + " not exists")
+			err = errors.New("db channel " + channel + " not exists")
+			return
 		}
 
 		databaseFactory.dbMap[channel] = dbResolver()
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	return databaseFactory.dbMap[channel]
+	return databaseFactory.dbMap[channel], nil
 }
 
 func (databaseFactory *DatabaseFactory) RegisterDriverResolver(driver string, resolver func(config Config) gorm.Dialector) {

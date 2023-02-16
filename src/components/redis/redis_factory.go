@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/go-redis/redis/v8"
@@ -16,13 +17,13 @@ func NewRedisFactory() *RedisFactory {
 	}
 }
 
-func (redisFactory *RedisFactory) Channel(channel string) *redis.Client {
+func (redisFactory *RedisFactory) Channel(channel string) (*redis.Client, error) {
 	redis, exists := redisFactory.channelMap[channel]
 	if !exists {
-		panic("redis channel " + channel + " not exists")
+		return nil, errors.New("redis channel " + channel + " not exists")
 	}
 
-	return redis
+	return redis, nil
 }
 
 func (redisFactory *RedisFactory) MakeRedis(redisConfig Config) *redis.Client {

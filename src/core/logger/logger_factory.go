@@ -1,13 +1,12 @@
 package logger
 
 import (
+	"errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"sync"
 )
-
-const DEFAULT_CHANNEL = "default"
 
 type LoggerFactory struct {
 	driverResolverMap map[string]func(config Config) zapcore.WriteSyncer
@@ -105,22 +104,27 @@ func (loggerFactory *LoggerFactory) MakeLogger(level zapcore.Level, ws ...zapcor
 	return zap.New(core)
 }
 
-func (loggerFactory *LoggerFactory) Channel(channel string) *zap.Logger {
+func (loggerFactory *LoggerFactory) Channel(channel string) (*zap.Logger, error) {
 	logger, exists := loggerFactory.loggerMap[channel]
 	if exists {
-		return logger
+		return logger, nil
 	}
 
+	var err error = nil
 	loggerFactory.once.Do(func() {
 		loggerResolver, exists := loggerFactory.loggerResolverMap[channel]
 		if !exists {
-			panic("logger channel " + channel + " not exists")
+			err = errors.New("logger channel " + channel + " not exists")
+			return
 		}
 
 		loggerFactory.loggerMap[channel] = loggerResolver()
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	return loggerFactory.loggerMap[channel]
+	return loggerFactory.loggerMap[channel], nil
 }
 
 func (loggerFactory *LoggerFactory) RegisterDriverResolver(driver string, resolver func(config Config) zapcore.WriteSyncer) {

@@ -7,5 +7,12 @@ type RedisProvider struct {
 }
 
 func (redisProvider *RedisProvider) Register() {
+	var redisConfigMap map[string]Config
+	err := redisProvider.GetConfig().Unmarshal(&redisConfigMap)
+	if err != nil {
+		panic(err)
+	}
 
+	redisFactory := NewRedisFactory()
+	redisFactory.Register(redisConfigMap)
 }
