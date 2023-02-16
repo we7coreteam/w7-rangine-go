@@ -93,7 +93,8 @@ func (databaseFactory *DatabaseFactory) makeDb(databaseConfig Config) *gorm.DB {
 		panic(err)
 	}
 
-	mysqlDb.SetMaxOpenConns(databaseConfig.PoolSize)
+	mysqlDb.SetMaxIdleConns(databaseConfig.MaxIdleConn)
+	mysqlDb.SetMaxOpenConns(databaseConfig.MaxConn)
 
 	return db
 }
