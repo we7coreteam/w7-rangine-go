@@ -87,9 +87,9 @@ func (loggerFactory *LoggerFactory) MakeLogger(config Config, ws ...zapcore.Writ
 	}
 
 	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(encoderConfig), // 编码器配置
-		zapcore.NewMultiWriteSyncer(ws...),       // 打印到控制台和文件
-		atomicLevel,                              // 日志级别
+		zapcore.NewJSONEncoder(encoderConfig),               // 编码器配置
+		zapcore.NewMultiWriteSyncer(ws...), // 打印到控制台和文件
+		atomicLevel, // 日志级别
 	)
 
 	return zap.New(core)
