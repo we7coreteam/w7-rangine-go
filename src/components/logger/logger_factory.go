@@ -31,9 +31,9 @@ func (loggerFactory *LoggerFactory) Channel(channel string) *zap.Logger {
 	return logger
 }
 
-func (loggerFactory *LoggerFactory) MakeLogger(log Config) *zap.Logger {
-	maxSize := log.MaxSize
-	maxAge := log.MaxDays
+func (loggerFactory *LoggerFactory) MakeFileWriteSyncer(config Config) zapcore.WriteSyncer {
+	maxSize := config.MaxSize
+	maxAge := config.MaxDays
 	if maxSize <= 0 {
 		maxSize = 2
 	}
@@ -41,13 +41,17 @@ func (loggerFactory *LoggerFactory) MakeLogger(log Config) *zap.Logger {
 		maxAge = 2
 	}
 	hook := lumberjack.Logger{
-		Filename:   "./runtimes/logs/" + log.Path,
+		Filename:   "./runtimes/logs/" + config.Path,
 		MaxSize:    maxSize,
 		MaxBackups: 2,
 		MaxAge:     maxAge,
 		Compress:   true,
 	}
 
+	return zapcore.AddSync(&hook)
+}
+
+func (loggerFactory *LoggerFactory) MakeLogger(config Config, ws ...zapcore.WriteSyncer) *zap.Logger {
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "time",
 		LevelKey:       "level",
@@ -65,7 +69,7 @@ func (loggerFactory *LoggerFactory) MakeLogger(log Config) *zap.Logger {
 
 	// 设置日志级别
 	atomicLevel := zap.NewAtomicLevel()
-	switch log.Level {
+	switch config.Level {
 	case "debug":
 		atomicLevel.SetLevel(zap.DebugLevel)
 	case "info":
@@ -83,16 +87,20 @@ func (loggerFactory *LoggerFactory) MakeLogger(log Config) *zap.Logger {
 	}
 
 	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(encoderConfig),            // 编码器配置
-		zapcore.NewMultiWriteSyncer(zapcore.AddSync(&hook)), // 打印到控制台和文件
-		atomicLevel, // 日志级别
+		zapcore.NewConsoleEncoder(encoderConfig), // 编码器配置
+		zapcore.NewMultiWriteSyncer(ws...),       // 打印到控制台和文件
+		atomicLevel,                              // 日志级别
 	)
 
 	return zap.New(core)
 }
 
+func (loggerFactory *LoggerFactory) RegisterLogger(channel string, logger *zap.Logger) {
+	loggerFactory.loggerMap[channel] = logger
+}
+
 func (loggerFactory *LoggerFactory) Register(maps map[string]Config) {
 	for key, value := range maps {
-		loggerFactory.loggerMap[key] = loggerFactory.MakeLogger(value)
+		loggerFactory.loggerMap[key] = loggerFactory.MakeLogger(value, loggerFactory.MakeFileWriteSyncer(value))
 	}
 }
