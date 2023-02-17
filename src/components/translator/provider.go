@@ -14,8 +14,6 @@ type TranslatorProvider struct {
 }
 
 func (translatorProvider *TranslatorProvider) Register() {
-	translatorProvider.GetConfig().SetDefault("app.lang", "zh")
-
 	uni := ut.New(zh.New())
 	translator, _ := uni.GetTranslator(translatorProvider.GetConfig().GetString("app.lang"))
 	_ = zh_translations.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), translator)

@@ -32,6 +32,7 @@ type DatabaseFactory struct {
 	dbMap             map[string]*gorm.DB
 	logger            *zap.Logger
 	once              sync.Once
+	debug             bool
 }
 
 func NewDatabaseFactory() *DatabaseFactory {
@@ -44,6 +45,10 @@ func NewDatabaseFactory() *DatabaseFactory {
 	databaseFactory.RegisterDriverResolver("mysql", databaseFactory.MakeMysqlDriver)
 
 	return databaseFactory
+}
+
+func (databaseFactory *DatabaseFactory) SetDebug() {
+	databaseFactory.debug = true
 }
 
 func (databaseFactory *DatabaseFactory) SetLogger(logger *zap.Logger) {
@@ -106,6 +111,10 @@ func (databaseFactory *DatabaseFactory) MakeDb(databaseConfig Config, driver gor
 
 	dbDriver.SetMaxIdleConns(databaseConfig.MaxIdleConn)
 	dbDriver.SetMaxOpenConns(databaseConfig.MaxConn)
+
+	if databaseFactory.debug {
+		db = db.Debug()
+	}
 
 	return db
 }

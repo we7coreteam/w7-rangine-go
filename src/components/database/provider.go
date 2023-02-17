@@ -21,6 +21,9 @@ func (databaseProvider *DatabaseProvider) Register() {
 		dbFactory.SetLogger(logger)
 	}
 	dbFactory.Register(dbConfigMap)
+	if databaseProvider.GetConfig().GetString("app.env") == "debug" {
+		dbFactory.SetDebug()
+	}
 
 	err = databaseProvider.GetContainer().NamedSingleton("db-factory", func() *DatabaseFactory {
 		return dbFactory

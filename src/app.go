@@ -53,6 +53,9 @@ func (app *App) InitConfig() {
 	}
 
 	app.config = conf
+
+	app.config.SetDefault("app.env", "release")
+	app.config.SetDefault("app.lang", "zh")
 }
 
 func (app *App) GetConfig() *viper.Viper {

@@ -24,7 +24,6 @@ func NewHttpSerer(app *app.App) *Server {
 }
 
 func (server *Server) initGinEngine() {
-	server.App.GetConfig().SetDefault("app.env", "release")
 	gin.SetMode(server.App.GetConfig().GetString("app.env"))
 	server.GinEngine = gin.Default()
 }
