@@ -8,7 +8,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 )
 
-type ProviderInterface interface {
+type Interface interface {
 	Register()
 	SetContainer(container container.Container)
 	GetContainer() container.Container
@@ -16,8 +16,8 @@ type ProviderInterface interface {
 	GetConfig() *viper.Viper
 	SetConsole(console *console.Console)
 	GetConsole() *console.Console
-	SetLoggerFactory(loggerFactory *logger.LoggerFactory)
-	GetLoggerFactory() *logger.LoggerFactory
+	SetLoggerFactory(loggerFactory *logger.Factory)
+	GetLoggerFactory() *logger.Factory
 	SetEvent(event EventBus.Bus)
 	GetEvent() EventBus.Bus
 }

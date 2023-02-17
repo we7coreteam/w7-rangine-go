@@ -10,15 +10,15 @@ import (
 type Facades struct {
 }
 
-func (facade Facades) GetRedisFactory() *redis.RedisFactory {
-	var redisFactory *redis.RedisFactory
+func (facade Facades) GetRedisFactory() *redis.Factory {
+	var redisFactory *redis.Factory
 	_ = app.GApp.GetContainer().NamedResolve(&redisFactory, "redis-factory")
 
 	return redisFactory
 }
 
-func (facade Facades) GetDbFactory() *database.DatabaseFactory {
-	var dbFactory *database.DatabaseFactory
+func (facade Facades) GetDbFactory() *database.Factory {
+	var dbFactory *database.Factory
 	_ = app.GApp.GetContainer().NamedResolve(&dbFactory, "db-factory")
 
 	return dbFactory

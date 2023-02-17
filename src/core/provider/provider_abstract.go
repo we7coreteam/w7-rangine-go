@@ -8,51 +8,51 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 )
 
-type ProviderAbstract struct {
-	ProviderInterface
+type Abstract struct {
+	Interface
 	container     container.Container
 	config        *viper.Viper
 	console       *console.Console
-	loggerFactory *logger.LoggerFactory
+	loggerFactory *logger.Factory
 	event         EventBus.Bus
 }
 
-func (providerAbstract *ProviderAbstract) SetContainer(container container.Container) {
-	providerAbstract.container = container
+func (abstract *Abstract) SetContainer(container container.Container) {
+	abstract.container = container
 }
 
-func (providerAbstract *ProviderAbstract) GetContainer() container.Container {
-	return providerAbstract.container
+func (abstract *Abstract) GetContainer() container.Container {
+	return abstract.container
 }
 
-func (providerAbstract *ProviderAbstract) SetConfig(config *viper.Viper) {
-	providerAbstract.config = config
+func (abstract *Abstract) SetConfig(config *viper.Viper) {
+	abstract.config = config
 }
 
-func (providerAbstract *ProviderAbstract) GetConfig() *viper.Viper {
-	return providerAbstract.config
+func (abstract *Abstract) GetConfig() *viper.Viper {
+	return abstract.config
 }
 
-func (providerAbstract *ProviderAbstract) SetConsole(console *console.Console) {
-	providerAbstract.console = console
+func (abstract *Abstract) SetConsole(console *console.Console) {
+	abstract.console = console
 }
 
-func (providerAbstract *ProviderAbstract) GetConsole() *console.Console {
-	return providerAbstract.console
+func (abstract *Abstract) GetConsole() *console.Console {
+	return abstract.console
 }
 
-func (providerAbstract *ProviderAbstract) SetLoggerFactory(loggerFactory *logger.LoggerFactory) {
-	providerAbstract.loggerFactory = loggerFactory
+func (abstract *Abstract) SetLoggerFactory(loggerFactory *logger.Factory) {
+	abstract.loggerFactory = loggerFactory
 }
 
-func (providerAbstract *ProviderAbstract) GetLoggerFactory() *logger.LoggerFactory {
-	return providerAbstract.loggerFactory
+func (abstract *Abstract) GetLoggerFactory() *logger.Factory {
+	return abstract.loggerFactory
 }
 
-func (providerAbstract *ProviderAbstract) SetEvent(event EventBus.Bus) {
-	providerAbstract.event = event
+func (abstract *Abstract) SetEvent(event EventBus.Bus) {
+	abstract.event = event
 }
 
-func (providerAbstract *ProviderAbstract) GetEvent() EventBus.Bus {
-	return providerAbstract.event
+func (abstract *Abstract) GetEvent() EventBus.Bus {
+	return abstract.event
 }

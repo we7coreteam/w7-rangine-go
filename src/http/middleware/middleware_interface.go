@@ -2,6 +2,6 @@ package middleware
 
 import "github.com/gin-gonic/gin"
 
-type MiddlewareInterface interface {
+type Interface interface {
 	Process(ctx *gin.Context)
 }

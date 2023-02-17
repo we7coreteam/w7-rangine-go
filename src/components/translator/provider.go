@@ -9,16 +9,16 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
 )
 
-type TranslatorProvider struct {
-	provider.ProviderAbstract
+type Provider struct {
+	provider.Abstract
 }
 
-func (translatorProvider *TranslatorProvider) Register() {
+func (provider *Provider) Register() {
 	uni := ut.New(zh.New())
-	translator, _ := uni.GetTranslator(translatorProvider.GetConfig().GetString("app.lang"))
+	translator, _ := uni.GetTranslator(provider.GetConfig().GetString("app.lang"))
 	_ = zh_translations.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), translator)
 
-	err := translatorProvider.GetContainer().NamedSingleton("translator", func() ut.Translator {
+	err := provider.GetContainer().NamedSingleton("translator", func() ut.Translator {
 		return translator
 	})
 	if err != nil {

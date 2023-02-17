@@ -19,9 +19,9 @@ type App struct {
 	Version         string
 	config          *viper.Viper
 	container       container.Container
-	loggerFactory   *logger.LoggerFactory
+	loggerFactory   *logger.Factory
 	event           EventBus.Bus
-	providerManager *provider.ProviderManager
+	providerManager *provider.Manager
 	console         *console.Console
 }
 
@@ -82,7 +82,7 @@ func (app *App) InitLoggerFactory() {
 	app.loggerFactory.Register(loggerConfigMap)
 }
 
-func (app *App) GetLoggerFactory() *logger.LoggerFactory {
+func (app *App) GetLoggerFactory() *logger.Factory {
 	return app.loggerFactory
 }
 
@@ -98,14 +98,14 @@ func (app *App) InitProviderManager() {
 	app.providerManager = provider.NewProviderManager(app.container, app.config, app.loggerFactory, app.event, app.console)
 }
 
-func (app *App) GetProviderManager() *provider.ProviderManager {
+func (app *App) GetProviderManager() *provider.Manager {
 	return app.providerManager
 }
 
 func (app *App) RegisterProviders() {
-	app.providerManager.RegisterProvider(new(translator.TranslatorProvider)).Register()
-	app.providerManager.RegisterProvider(new(database.DatabaseProvider)).Register()
-	app.providerManager.RegisterProvider(new(redis.RedisProvider)).Register()
+	app.providerManager.RegisterProvider(new(translator.Provider)).Register()
+	app.providerManager.RegisterProvider(new(database.Provider)).Register()
+	app.providerManager.RegisterProvider(new(redis.Provider)).Register()
 }
 
 func (app *App) InitConsole() {

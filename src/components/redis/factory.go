@@ -7,18 +7,18 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type RedisFactory struct {
+type Factory struct {
 	channelMap map[string]*redis.Client
 }
 
-func NewRedisFactory() *RedisFactory {
-	return &RedisFactory{
+func NewRedisFactory() *Factory {
+	return &Factory{
 		channelMap: make(map[string]*redis.Client),
 	}
 }
 
-func (redisFactory *RedisFactory) Channel(channel string) (*redis.Client, error) {
-	redis, exists := redisFactory.channelMap[channel]
+func (factory *Factory) Channel(channel string) (*redis.Client, error) {
+	redis, exists := factory.channelMap[channel]
 	if !exists {
 		return nil, errors.New("redis channel " + channel + " not exists")
 	}
@@ -26,7 +26,7 @@ func (redisFactory *RedisFactory) Channel(channel string) (*redis.Client, error)
 	return redis, nil
 }
 
-func (redisFactory *RedisFactory) MakeRedis(redisConfig Config) *redis.Client {
+func (factory *Factory) MakeRedis(redisConfig Config) *redis.Client {
 	return redis.NewClient(&redis.Options{
 		Addr:     redisConfig.Host + ":" + strconv.Itoa(redisConfig.Port),
 		Username: redisConfig.Username,
@@ -36,12 +36,12 @@ func (redisFactory *RedisFactory) MakeRedis(redisConfig Config) *redis.Client {
 	})
 }
 
-func (redisFactory *RedisFactory) RegisterRedis(channel string, client *redis.Client) {
-	redisFactory.channelMap[channel] = client
+func (factory *Factory) RegisterRedis(channel string, client *redis.Client) {
+	factory.channelMap[channel] = client
 }
 
-func (redisFactory *RedisFactory) Register(maps map[string]Config) {
+func (factory *Factory) Register(maps map[string]Config) {
 	for key, value := range maps {
-		redisFactory.RegisterRedis(key, redisFactory.MakeRedis(value))
+		factory.RegisterRedis(key, factory.MakeRedis(value))
 	}
 }

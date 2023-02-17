@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	session "github.com/we7coreteam/w7-rangine-go/src/http/session"
+	"github.com/we7coreteam/w7-rangine-go/src/http/session"
 )
 
 type SessionMiddleware struct {
-	MiddlewareAbstract
+	Abstract
 	session *session.Session
 }
 

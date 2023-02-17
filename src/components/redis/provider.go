@@ -4,22 +4,22 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
 )
 
-type RedisProvider struct {
-	provider.ProviderAbstract
+type Provider struct {
+	provider.Abstract
 }
 
-func (redisProvider *RedisProvider) Register() {
+func (provider *Provider) Register() {
 	var redisConfigMap map[string]Config
-	err := redisProvider.GetConfig().Unmarshal(&redisConfigMap)
+	err := provider.GetConfig().Unmarshal(&redisConfigMap)
 	if err != nil {
 		panic(err)
 	}
 
-	redisFactory := NewRedisFactory()
-	redisFactory.Register(redisConfigMap)
+	factory := NewRedisFactory()
+	factory.Register(redisConfigMap)
 
-	err = redisProvider.GetContainer().NamedSingleton("redis-factory", func() *RedisFactory {
-		return redisFactory
+	err = provider.GetContainer().NamedSingleton("redis-factory", func() *Factory {
+		return factory
 	})
 	if err != nil {
 		panic(err)

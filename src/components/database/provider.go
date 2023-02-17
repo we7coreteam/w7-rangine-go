@@ -4,28 +4,28 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
 )
 
-type DatabaseProvider struct {
-	provider.ProviderAbstract
+type Provider struct {
+	provider.Abstract
 }
 
-func (databaseProvider *DatabaseProvider) Register() {
+func (provider *Provider) Register() {
 	var dbConfigMap map[string]Config
-	err := databaseProvider.GetConfig().Unmarshal(&dbConfigMap)
+	err := provider.GetConfig().Unmarshal(&dbConfigMap)
 	if err != nil {
 		panic(err)
 	}
 
 	dbFactory := NewDatabaseFactory()
-	logger, err := databaseProvider.GetLoggerFactory().Channel("default")
+	logger, err := provider.GetLoggerFactory().Channel("default")
 	if err == nil {
 		dbFactory.SetLogger(logger)
 	}
 	dbFactory.Register(dbConfigMap)
-	if databaseProvider.GetConfig().GetString("app.env") == "debug" {
+	if provider.GetConfig().GetString("app.env") == "debug" {
 		dbFactory.SetDebug()
 	}
 
-	err = databaseProvider.GetContainer().NamedSingleton("db-factory", func() *DatabaseFactory {
+	err = provider.GetContainer().NamedSingleton("db-factory", func() *Factory {
 		return dbFactory
 	})
 	if err != nil {

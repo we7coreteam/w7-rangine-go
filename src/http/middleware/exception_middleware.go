@@ -17,7 +17,7 @@ func (exceptionRecoverLogger *ExceptionRecoverLogger) Write(p []byte) (n int, er
 }
 
 type ExceptionMiddleware struct {
-	MiddlewareAbstract
+	Abstract
 }
 
 func (exceptionMiddleware ExceptionMiddleware) Process(ctx *gin.Context) {
