@@ -33,11 +33,10 @@ func NewApp() *App {
 
 	app.InitConfig()
 	app.InitContainer()
-	app.InitEvent()
 	app.InitLoggerFactory()
+	app.InitEvent()
 	app.InitConsole()
 	app.InitProviderManager()
-	app.RegisterProviders()
 
 	GApp = app
 
@@ -96,20 +95,20 @@ func (app *App) GetEvent() EventBus.Bus {
 
 func (app *App) InitProviderManager() {
 	app.providerManager = provider.NewProviderManager(app.container, app.config, app.loggerFactory, app.event, app.console)
+
+	app.providerManager.RegisterProvider(new(translator.Provider)).Register()
+	app.providerManager.RegisterProvider(new(database.Provider)).Register()
+	app.providerManager.RegisterProvider(new(redis.Provider)).Register()
 }
 
 func (app *App) GetProviderManager() *provider.Manager {
 	return app.providerManager
 }
 
-func (app *App) RegisterProviders() {
-	app.providerManager.RegisterProvider(new(translator.Provider)).Register()
-	app.providerManager.RegisterProvider(new(database.Provider)).Register()
-	app.providerManager.RegisterProvider(new(redis.Provider)).Register()
-}
-
 func (app *App) InitConsole() {
 	app.console = console.NewConsole()
+
+	app.console.RegisterCommand(new(console.VersionCommand))
 }
 
 func (app *App) GetConsole() *console.Console {

@@ -13,8 +13,6 @@ func NewConsole() *Console {
 		},
 	}
 
-	console.RegisterCommand(new(VersionCommand))
-
 	return console
 }
 
