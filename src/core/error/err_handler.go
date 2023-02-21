@@ -42,10 +42,12 @@ func Try(err error) *ErrHandler {
 	return &ErrHandler{err: err}
 }
 
-func (errHandler ErrHandler) Catch(err error, handler ErrCustomerHandler) {
+func (errHandler ErrHandler) Catch(err error, handler ErrCustomerHandler) ErrHandler {
 	if errors.Is(errHandler.err, err) {
 		handler(errHandler.err)
 	}
+
+	return errHandler
 }
 
 func (errHandler ErrHandler) Finally(handler FinallyHandler) {
