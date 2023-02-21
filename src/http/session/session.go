@@ -84,13 +84,13 @@ func (session *Session) Start(ctx *gin.Context) error {
 	return nil
 }
 
-func (session *Session) Set(ctx *gin.Context, key string, value interface{}) error {
+func (session *Session) Set(ctx *gin.Context, key string, value any) error {
 	session.Put(session.getContext(ctx), key, value)
 
 	return session.saveAndResponse(ctx, false)
 }
 
-func (session *Session) Get(ctx *gin.Context, key string) interface{} {
+func (session *Session) Get(ctx *gin.Context, key string) any {
 	return session.SessionManager.Get(session.getContext(ctx), key)
 }
 

@@ -36,7 +36,7 @@ func NewErrHandlerMiddleware(Reporter func(err error)) *ErrHandlerMiddleware {
 func (handlerMiddleware ErrHandlerMiddleware) Process(ctx *gin.Context) {
 	gin.CustomRecoveryWithWriter(&ErrRecoverLogger{
 		Reporter: handlerMiddleware.Reporter,
-	}, func(ctx *gin.Context, err interface{}) {
+	}, func(ctx *gin.Context, err any) {
 		handlerMiddleware.Response.JsonResponseWithError(ctx, errorhandler.Throw(err.(error).Error(), err.(error)), http.StatusInternalServerError)
 	})
 }

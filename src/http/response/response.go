@@ -10,9 +10,9 @@ import (
 	"net/http"
 )
 
-type Formatter func(ctx *gin.Context, data interface{}, error error, statusCode int) map[string]any
+type Formatter func(ctx *gin.Context, data any, error error, statusCode int) map[string]any
 
-var responseFormatter Formatter = func(ctx *gin.Context, data interface{}, err error, statusCode int) map[string]any {
+var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, statusCode int) map[string]any {
 	errMsg := ""
 	if errorhandler.Found(err) {
 		errorhandler.Try(err).Catch(errorhandler.ResponseError{}, func(err error) {
@@ -50,7 +50,7 @@ func (response *Response) JsonSuccessResponse(ctx *gin.Context) {
 	response.JsonResponseWithoutError(ctx, "success")
 }
 
-func (response *Response) JsonResponseWithoutError(ctx *gin.Context, data interface{}) {
+func (response *Response) JsonResponseWithoutError(ctx *gin.Context, data any) {
 	response.JsonResponse(ctx, data, nil, http.StatusOK)
 }
 
@@ -62,7 +62,7 @@ func (response *Response) JsonResponseWithError(ctx *gin.Context, err error, sta
 	response.JsonResponse(ctx, "", err, statusCode)
 }
 
-func (response *Response) JsonResponse(ctx *gin.Context, data interface{}, error error, statusCode int) {
+func (response *Response) JsonResponse(ctx *gin.Context, data any, error error, statusCode int) {
 	if errorhandler.Found(error) {
 		logger, _ := app.GApp.GetLoggerFactory().Channel("default")
 		if logger != nil {

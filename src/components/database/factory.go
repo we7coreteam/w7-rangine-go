@@ -17,7 +17,7 @@ type DbLogger struct {
 	logger *zap.Logger
 }
 
-func (dbLogger *DbLogger) Printf(info string, vs ...interface{}) {
+func (dbLogger *DbLogger) Printf(info string, vs ...any) {
 	var _vs []zap.Field
 	for k, v := range vs {
 		_vs = append(_vs, zap.Reflect(string(rune(k)), v))
