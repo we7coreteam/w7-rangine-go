@@ -46,23 +46,23 @@ func GetResponseFormatter() Formatter {
 type Response struct {
 }
 
-func (response *Response) JsonSuccessResponse(ctx *gin.Context) {
+func (response Response) JsonSuccessResponse(ctx *gin.Context) {
 	response.JsonResponseWithoutError(ctx, "success")
 }
 
-func (response *Response) JsonResponseWithoutError(ctx *gin.Context, data any) {
+func (response Response) JsonResponseWithoutError(ctx *gin.Context, data any) {
 	response.JsonResponse(ctx, data, nil, http.StatusOK)
 }
 
-func (response *Response) JsonResponseWithServerError(ctx *gin.Context, err error) {
+func (response Response) JsonResponseWithServerError(ctx *gin.Context, err error) {
 	response.JsonResponseWithError(ctx, err, http.StatusInternalServerError)
 }
 
-func (response *Response) JsonResponseWithError(ctx *gin.Context, err error, statusCode int) {
+func (response Response) JsonResponseWithError(ctx *gin.Context, err error, statusCode int) {
 	response.JsonResponse(ctx, "", err, statusCode)
 }
 
-func (response *Response) JsonResponse(ctx *gin.Context, data any, error error, statusCode int) {
+func (response Response) JsonResponse(ctx *gin.Context, data any, error error, statusCode int) {
 	if errorhandler.Found(error) {
 		logger, _ := app.GApp.GetLoggerFactory().Channel("default")
 		if logger != nil {
@@ -70,10 +70,6 @@ func (response *Response) JsonResponse(ctx *gin.Context, data any, error error, 
 				Type:      zapcore.ErrorType,
 				Interface: error,
 				Key:       "err",
-			}, zap.Field{
-				Type:      zapcore.UnknownType,
-				Interface: ctx.Request,
-				Key:       "request",
 			})
 		}
 	}
