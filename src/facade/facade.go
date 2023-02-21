@@ -5,6 +5,7 @@ import (
 	app "github.com/we7coreteam/w7-rangine-go/src"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
+	httpserver "github.com/we7coreteam/w7-rangine-go/src/http/server"
 )
 
 type Facades struct {
@@ -29,6 +30,13 @@ func (facade Facades) GetTranslator() ut.Translator {
 	_ = app.GApp.GetContainer().NamedResolve(&translator, "translator")
 
 	return translator
+}
+
+func (facade Facades) GetHttpServer() *httpserver.Server {
+	var server *httpserver.Server
+	_ = app.GApp.GetContainer().NamedResolve(&server, "http-server")
+
+	return server
 }
 
 var Facade = new(Facades)
