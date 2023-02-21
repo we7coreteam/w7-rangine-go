@@ -2,21 +2,20 @@ package response
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	app "github.com/we7coreteam/w7-rangine-go/src"
-	error_handler "github.com/we7coreteam/w7-rangine-go/src/core/error"
+	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/error"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 type Formatter func(ctx *gin.Context, data interface{}, error error, statusCode int) map[string]any
 
 var responseFormatter Formatter = func(ctx *gin.Context, data interface{}, err error, statusCode int) map[string]any {
 	errMsg := ""
-	if error_handler.Found(err) {
-		error_handler.Try(err).Catch(error_handler.ResponseError{}, func(err error) {
+	if errorhandler.Found(err) {
+		errorhandler.Try(err).Catch(errorhandler.ResponseError{}, func(err error) {
 			errMsg = err.Error()
 		}).Finally(func(err error) {
 			if errMsg == "" {
@@ -64,7 +63,7 @@ func (response *Response) JsonResponseWithError(ctx *gin.Context, err error, sta
 }
 
 func (response *Response) JsonResponse(ctx *gin.Context, data interface{}, error error, statusCode int) {
-	if error_handler.Found(error) {
+	if errorhandler.Found(error) {
 		logger, _ := app.GApp.GetLoggerFactory().Channel("default")
 		if logger != nil {
 			logger.Debug(error.Error(), zap.Field{

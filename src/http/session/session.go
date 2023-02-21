@@ -2,12 +2,11 @@ package session
 
 import (
 	"context"
-	"net/http"
-	"time"
-
 	"github.com/alexedwards/scs/v2"
 	"github.com/alexedwards/scs/v2/memstore"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"time"
 )
 
 type Session struct {

@@ -1,10 +1,9 @@
 package middleware
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/we7coreteam/w7-rangine-go/src/http/session"
+	"net/http"
 )
 
 type SessionMiddleware struct {
@@ -13,7 +12,6 @@ type SessionMiddleware struct {
 }
 
 func NewSessionMiddleware(appSession *session.Session) *SessionMiddleware {
-	appSession.Init()
 	return &SessionMiddleware{session: appSession}
 }
 

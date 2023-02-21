@@ -2,9 +2,8 @@ package redis
 
 import (
 	"errors"
-	"strconv"
-
 	"github.com/go-redis/redis/v8"
+	"strconv"
 )
 
 type Factory struct {
