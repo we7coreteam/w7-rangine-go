@@ -11,15 +11,6 @@ type ErrHandler struct {
 type ErrCustomerHandler func(err error)
 type FinallyHandler func(err error)
 
-func (errHandler ErrHandler) Is(target ...error) bool {
-	for _, arg := range target {
-		if errors.Is(errHandler.err, arg) {
-			return true
-		}
-	}
-	return false
-}
-
 func Throw(message string, previous error) error {
 	var err error
 	if previous == nil {
@@ -31,8 +22,8 @@ func Throw(message string, previous error) error {
 	return err
 }
 
-func (errHandler ErrHandler) Found() bool {
-	if errHandler.err != nil {
+func Found(err error) bool {
+	if err != nil {
 		return true
 	}
 	return false
@@ -40,6 +31,15 @@ func (errHandler ErrHandler) Found() bool {
 
 func Try(err error) *ErrHandler {
 	return &ErrHandler{err: err}
+}
+
+func (errHandler ErrHandler) Is(target ...error) bool {
+	for _, arg := range target {
+		if errors.Is(errHandler.err, arg) {
+			return true
+		}
+	}
+	return false
 }
 
 func (errHandler ErrHandler) Catch(err error, handler ErrCustomerHandler) ErrHandler {
