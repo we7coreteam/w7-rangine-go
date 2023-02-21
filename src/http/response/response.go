@@ -19,7 +19,7 @@ var responseFormatter Formatter = func(ctx *gin.Context, data interface{}, err e
 		error_handler.Try(err).Catch(error_handler.ResponseError{}, func(err error) {
 			errMsg = err.Error()
 		}).Finally(func(err error) {
-			if errMsg != "" {
+			if errMsg == "" {
 				if gin.Mode() == gin.DebugMode {
 					errMsg = fmt.Errorf("%+v", err).Error()
 				} else {
