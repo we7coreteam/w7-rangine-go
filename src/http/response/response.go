@@ -3,10 +3,7 @@ package response
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	app "github.com/we7coreteam/w7-rangine-go/src"
 	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/error"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"net/http"
 )
 
@@ -63,17 +60,6 @@ func (response Response) JsonResponseWithError(ctx *gin.Context, err error, stat
 }
 
 func (response Response) JsonResponse(ctx *gin.Context, data any, error error, statusCode int) {
-	if errorhandler.Found(error) {
-		logger, _ := app.GApp.GetLoggerFactory().Channel("default")
-		if logger != nil {
-			logger.Debug(error.Error(), zap.Field{
-				Type:      zapcore.ErrorType,
-				Interface: error,
-				Key:       "err",
-			})
-		}
-	}
-
 	ctx.JSON(statusCode, GetResponseFormatter()(ctx, data, error, statusCode))
 	ctx.Abort()
 }
