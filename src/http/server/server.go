@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	app "github.com/we7coreteam/w7-rangine-go/src"
+	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go/src/http/session"
 	"log"
 	"net/http"
@@ -13,24 +13,27 @@ import (
 	"time"
 )
 
+var GHttpServer *Server
+
 type Server struct {
-	App *app.App
+	config *viper.Viper
 
 	GinEngine *gin.Engine
 	Session   *session.Session
 }
 
-func NewHttpSerer(app *app.App) *Server {
+func NewHttpSerer(config *viper.Viper) *Server {
 	server := &Server{
-		App: app,
+		config: config,
 	}
 	server.initGinEngine()
+	GHttpServer = server
 
 	return server
 }
 
 func (server *Server) initGinEngine() {
-	gin.SetMode(server.App.GetConfig().GetString("app.env"))
+	gin.SetMode(server.config.GetString("app.env"))
 	server.GinEngine = gin.Default()
 }
 
@@ -41,7 +44,7 @@ func (server *Server) RegisterRouters(register func(engine *gin.Engine)) *Server
 
 func (server *Server) Start() {
 	var serverConfig Config
-	err := server.App.GetConfig().Unmarshal(&serverConfig)
+	err := server.config.Unmarshal(&serverConfig)
 	if err != nil {
 		panic(err)
 	}

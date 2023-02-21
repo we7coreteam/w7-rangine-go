@@ -10,6 +10,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/console"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
+	"github.com/we7coreteam/w7-rangine-go/src/http"
 )
 
 var GApp *App
@@ -73,7 +74,7 @@ func (app *App) InitLoggerFactory() {
 	app.loggerFactory = logger.NewLoggerFactory()
 
 	var loggerConfigMap map[string]logger.Config
-	err := app.config.Unmarshal(&loggerConfigMap)
+	err := app.config.UnmarshalKey("log", &loggerConfigMap)
 	if err != nil {
 		panic(err)
 	}
@@ -99,6 +100,7 @@ func (app *App) InitProviderManager() {
 	app.providerManager.RegisterProvider(new(translator.Provider)).Register()
 	app.providerManager.RegisterProvider(new(database.Provider)).Register()
 	app.providerManager.RegisterProvider(new(redis.Provider)).Register()
+	app.providerManager.RegisterProvider(new(http.Provider)).Register()
 }
 
 func (app *App) GetProviderManager() *provider.Manager {

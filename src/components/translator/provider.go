@@ -14,11 +14,10 @@ type Provider struct {
 }
 
 func (provider *Provider) Register() {
-	uni := ut.New(zh.New())
-	translator, _ := uni.GetTranslator(provider.GetConfig().GetString("app.lang"))
-	_ = translational.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), translator)
-
 	err := provider.GetContainer().NamedSingleton("translator", func() ut.Translator {
+		uni := ut.New(zh.New())
+		translator, _ := uni.GetTranslator(provider.GetConfig().GetString("app.lang"))
+		_ = translational.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), translator)
 		return translator
 	})
 	if err != nil {

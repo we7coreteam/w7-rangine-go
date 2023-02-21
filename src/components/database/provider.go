@@ -9,23 +9,23 @@ type Provider struct {
 }
 
 func (provider *Provider) Register() {
-	var dbConfigMap map[string]Config
-	err := provider.GetConfig().Unmarshal(&dbConfigMap)
-	if err != nil {
-		panic(err)
-	}
+	err := provider.GetContainer().NamedSingleton("db-factory", func() *Factory {
+		var dbConfigMap map[string]Config
+		err := provider.GetConfig().UnmarshalKey("database", &dbConfigMap)
+		if err != nil {
+			panic(err)
+		}
 
-	dbFactory := NewDatabaseFactory()
-	logger, err := provider.GetLoggerFactory().Channel("default")
-	if err == nil {
-		dbFactory.SetLogger(logger)
-	}
-	dbFactory.Register(dbConfigMap)
-	if provider.GetConfig().GetString("app.env") == "debug" {
-		dbFactory.SetDebug()
-	}
+		dbFactory := NewDatabaseFactory()
+		logger, err := provider.GetLoggerFactory().Channel("default")
+		if err == nil {
+			dbFactory.SetLogger(logger)
+		}
+		dbFactory.Register(dbConfigMap)
+		if provider.GetConfig().GetString("app.env") == "debug" {
+			dbFactory.SetDebug()
+		}
 
-	err = provider.GetContainer().NamedSingleton("db-factory", func() *Factory {
 		return dbFactory
 	})
 	if err != nil {
