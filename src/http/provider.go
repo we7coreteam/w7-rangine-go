@@ -13,6 +13,7 @@ type Provider struct {
 
 func (provider *Provider) Register() {
 	provider.GetConsole().RegisterCommand(new(command.ServerStartCommand))
+	provider.GetConsole().RegisterCommand(new(command.RouteListCommand))
 
 	err := provider.GetContainer().NamedSingleton("http-server", func() *httpserver.Server {
 		var sessionConfig session.SessionConf
