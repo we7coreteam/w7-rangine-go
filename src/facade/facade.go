@@ -1,7 +1,10 @@
 package facade
 
 import (
+	"github.com/asaskevich/EventBus"
 	ut "github.com/go-playground/universal-translator"
+	"github.com/golobby/container/v3/pkg/container"
+	"github.com/spf13/viper"
 	app "github.com/we7coreteam/w7-rangine-go/src"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
@@ -10,6 +13,18 @@ import (
 )
 
 type Facades struct {
+}
+
+func (facade Facades) GetContainer() container.Container {
+	return app.GApp.GetContainer()
+}
+
+func (facade Facades) GetConfig() *viper.Viper {
+	return app.GApp.GetConfig()
+}
+
+func (facade Facades) GetEvent() EventBus.Bus {
+	return app.GApp.GetEvent()
 }
 
 func (facade Facades) GetLoggerFactory() *logger.Factory {

@@ -102,7 +102,7 @@ func (factory *Factory) MakeLogger(level zapcore.Level, ws ...zapcore.WriteSynce
 		atomicLevel,                           // 日志级别
 	)
 
-	return zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2), zap.AddStacktrace(zap.FatalLevel+1))
+	return zap.New(core, zap.AddCaller(), zap.AddCallerSkip(4), zap.AddStacktrace(zap.FatalLevel+1))
 }
 
 func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
