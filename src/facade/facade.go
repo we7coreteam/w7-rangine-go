@@ -5,10 +5,15 @@ import (
 	app "github.com/we7coreteam/w7-rangine-go/src"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
+	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 	httpserver "github.com/we7coreteam/w7-rangine-go/src/http/server"
 )
 
 type Facades struct {
+}
+
+func (facade Facades) GetLoggerFactory() *logger.Factory {
+	return app.GApp.GetLoggerFactory()
 }
 
 func (facade Facades) GetRedisFactory() *redis.Factory {
