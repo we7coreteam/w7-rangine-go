@@ -3,12 +3,12 @@ package database
 import (
 	"errors"
 	"go.uber.org/zap"
+	"golang.org/x/sync/singleflight"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -26,19 +26,19 @@ func (dbLogger *DbLogger) Printf(info string, vs ...any) {
 }
 
 type Factory struct {
-	driverResolverMap map[string]func(config Config) gorm.Dialector
-	dbResolverMap     map[string]func() *gorm.DB
+	driverResolverMap map[string]func(config Config) (gorm.Dialector, error)
+	dbResolverMap     map[string]func() (*gorm.DB, error)
 	dbMap             map[string]*gorm.DB
 	logger            *zap.Logger
-	once              sync.Once
+	once              singleflight.Group
 	debug             bool
 }
 
 func NewDatabaseFactory() *Factory {
 	factory := &Factory{
 		dbMap:             make(map[string]*gorm.DB),
-		dbResolverMap:     make(map[string]func() *gorm.DB),
-		driverResolverMap: make(map[string]func(config Config) gorm.Dialector),
+		dbResolverMap:     make(map[string]func() (*gorm.DB, error)),
+		driverResolverMap: make(map[string]func(config Config) (gorm.Dialector, error)),
 	}
 
 	factory.RegisterDriverResolver("mysql", factory.MakeMysqlDriver)
@@ -54,25 +54,25 @@ func (factory *Factory) SetLogger(logger *zap.Logger) {
 	factory.logger = logger
 }
 
-func (factory *Factory) MakeMysqlDriver(databaseConfig Config) gorm.Dialector {
+func (factory *Factory) MakeMysqlDriver(databaseConfig Config) (gorm.Dialector, error) {
 	dns := databaseConfig.User + ":" + databaseConfig.Password + "@tcp(" + databaseConfig.Host + ":" + strconv.Itoa(databaseConfig.Port) + ")/" + databaseConfig.DbName + "?charset=" + databaseConfig.Charset + "&parseTime=True&loc=Local"
 
 	return mysql.New(mysql.Config{
 		DSN:                       dns,   // data source name
 		SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
-	})
+	}), nil
 }
 
-func (factory *Factory) MakeDriver(databaseConfig Config) gorm.Dialector {
+func (factory *Factory) MakeDriver(databaseConfig Config) (gorm.Dialector, error) {
 	driverResolver, exists := factory.driverResolverMap[databaseConfig.Driver]
 	if !exists {
-		panic("db driver " + databaseConfig.Driver + " not exists")
+		return nil, errors.New("db driver " + databaseConfig.Driver + " not exists")
 	}
 
 	return driverResolver(databaseConfig)
 }
 
-func (factory *Factory) MakeDb(databaseConfig Config, driver gorm.Dialector) *gorm.DB {
+func (factory *Factory) MakeDb(databaseConfig Config, driver gorm.Dialector) (*gorm.DB, error) {
 	//可根据配置开启日志
 	var dbLogger logger.Interface = nil
 	if factory.logger != nil {
@@ -100,12 +100,12 @@ func (factory *Factory) MakeDb(databaseConfig Config, driver gorm.Dialector) *go
 		Logger: dbLogger,
 	})
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	dbDriver, err := db.DB()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	dbDriver.SetMaxIdleConns(databaseConfig.MaxIdleConn)
@@ -115,7 +115,7 @@ func (factory *Factory) MakeDb(databaseConfig Config, driver gorm.Dialector) *go
 		db = db.Debug()
 	}
 
-	return db
+	return db, nil
 }
 
 func (factory *Factory) Channel(channel string) (*gorm.DB, error) {
@@ -124,15 +124,18 @@ func (factory *Factory) Channel(channel string) (*gorm.DB, error) {
 		return db, nil
 	}
 
-	var err error = nil
-	factory.once.Do(func() {
+	_, err, _ := factory.once.Do(channel, func() (interface{}, error) {
 		dbResolver, exists := factory.dbResolverMap[channel]
 		if !exists {
-			err = errors.New("db channel " + channel + " not exists")
-			return
+			return nil, errors.New("db channel " + channel + " not exists")
 		}
 
-		factory.dbMap[channel] = dbResolver()
+		db, err := dbResolver()
+		if err == nil {
+			factory.dbMap[channel] = db
+		}
+
+		return db, err
 	})
 	if err != nil {
 		return nil, err
@@ -141,19 +144,23 @@ func (factory *Factory) Channel(channel string) (*gorm.DB, error) {
 	return factory.dbMap[channel], nil
 }
 
-func (factory *Factory) RegisterDriverResolver(driver string, resolver func(config Config) gorm.Dialector) {
+func (factory *Factory) RegisterDriverResolver(driver string, resolver func(config Config) (gorm.Dialector, error)) {
 	factory.driverResolverMap[driver] = resolver
 }
 
-func (factory *Factory) RegisterDb(channel string, dbResolver func() *gorm.DB) {
+func (factory *Factory) RegisterDb(channel string, dbResolver func() (*gorm.DB, error)) {
 	factory.dbResolverMap[channel] = dbResolver
 }
 
 func (factory *Factory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		func(channel string, config Config) {
-			factory.RegisterDb(channel, func() *gorm.DB {
-				return factory.MakeDb(config, factory.MakeDriver(config))
+			factory.RegisterDb(channel, func() (*gorm.DB, error) {
+				driver, err := factory.MakeDriver(config)
+				if err != nil {
+					return nil, err
+				}
+				return factory.MakeDb(config, driver)
 			})
 		}(key, value)
 

@@ -4,22 +4,22 @@ import (
 	"errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"golang.org/x/sync/singleflight"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"sync"
 )
 
 type Factory struct {
-	driverResolverMap map[string]func(config Config) zapcore.WriteSyncer
-	loggerResolverMap map[string]func() *zap.Logger
+	driverResolverMap map[string]func(config Config) (zapcore.WriteSyncer, error)
+	loggerResolverMap map[string]func() (*zap.Logger, error)
 	loggerMap         map[string]*zap.Logger
-	once              sync.Once
+	once              singleflight.Group
 }
 
 func NewLoggerFactory() *Factory {
 	factory := &Factory{
 		loggerMap:         make(map[string]*zap.Logger),
-		loggerResolverMap: make(map[string]func() *zap.Logger),
-		driverResolverMap: make(map[string]func(config Config) zapcore.WriteSyncer),
+		loggerResolverMap: make(map[string]func() (*zap.Logger, error)),
+		driverResolverMap: make(map[string]func(config Config) (zapcore.WriteSyncer, error)),
 	}
 
 	factory.RegisterDriverResolver("file", factory.MakeFileDriver)
@@ -46,7 +46,7 @@ func (factory *Factory) ConvertLevel(level string) zapcore.Level {
 	}
 }
 
-func (factory *Factory) MakeFileDriver(config Config) zapcore.WriteSyncer {
+func (factory *Factory) MakeFileDriver(config Config) (zapcore.WriteSyncer, error) {
 	if config.MaxSize <= 0 {
 		config.MaxSize = 2
 	}
@@ -64,13 +64,13 @@ func (factory *Factory) MakeFileDriver(config Config) zapcore.WriteSyncer {
 		Compress:   false,
 	}
 
-	return zapcore.AddSync(&hook)
+	return zapcore.AddSync(&hook), nil
 }
 
-func (factory *Factory) MakeDriver(config Config) zapcore.WriteSyncer {
+func (factory *Factory) MakeDriver(config Config) (zapcore.WriteSyncer, error) {
 	driverResolver, exists := factory.driverResolverMap[config.Driver]
 	if !exists {
-		panic("logger driver " + config.Driver + " not exists")
+		return nil, errors.New("logger driver " + config.Driver + " not exists")
 	}
 
 	return driverResolver(config)
@@ -111,15 +111,18 @@ func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
 		return logger, nil
 	}
 
-	var err error = nil
-	factory.once.Do(func() {
+	_, err, _ := factory.once.Do(channel, func() (interface{}, error) {
 		loggerResolver, exists := factory.loggerResolverMap[channel]
 		if !exists {
-			err = errors.New("logger channel " + channel + " not exists")
-			return
+			return nil, errors.New("logger channel " + channel + " not exists")
 		}
 
-		factory.loggerMap[channel] = loggerResolver()
+		logger, err := loggerResolver()
+		if err == nil {
+			factory.loggerMap[channel] = logger
+		}
+
+		return logger, err
 	})
 	if err != nil {
 		return nil, err
@@ -128,19 +131,23 @@ func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
 	return factory.loggerMap[channel], nil
 }
 
-func (factory *Factory) RegisterDriverResolver(driver string, resolver func(config Config) zapcore.WriteSyncer) {
+func (factory *Factory) RegisterDriverResolver(driver string, resolver func(config Config) (zapcore.WriteSyncer, error)) {
 	factory.driverResolverMap[driver] = resolver
 }
 
-func (factory *Factory) RegisterLogger(channel string, loggerResolver func() *zap.Logger) {
+func (factory *Factory) RegisterLogger(channel string, loggerResolver func() (*zap.Logger, error)) {
 	factory.loggerResolverMap[channel] = loggerResolver
 }
 
 func (factory *Factory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		func(channel string, config Config) {
-			factory.RegisterLogger(channel, func() *zap.Logger {
-				return factory.MakeLogger(factory.ConvertLevel(config.Level), factory.MakeDriver(config))
+			factory.RegisterLogger(channel, func() (*zap.Logger, error) {
+				driver, err := factory.MakeDriver(config)
+				if err != nil {
+					return nil, err
+				}
+				return factory.MakeLogger(factory.ConvertLevel(config.Level), driver), nil
 			})
 		}(key, value)
 	}

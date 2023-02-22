@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/error"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
@@ -33,10 +34,16 @@ func NewErrHandlerMiddleware(Reporter func(err error)) *ErrHandlerMiddleware {
 	}
 }
 
-func (handlerMiddleware ErrHandlerMiddleware) Process(ctx *gin.Context) {
-	gin.CustomRecoveryWithWriter(&ErrRecoverLogger{
+func (handlerMiddleware ErrHandlerMiddleware) GetProcess() gin.HandlerFunc {
+	return gin.CustomRecoveryWithWriter(&ErrRecoverLogger{
 		Reporter: handlerMiddleware.Reporter,
 	}, func(ctx *gin.Context, err any) {
-		handlerMiddleware.Response.JsonResponseWithError(ctx, errorhandler.Throw(err.(error).Error(), err.(error)), http.StatusInternalServerError)
+		var recoverErr error
+		if _, ok := err.(error); !ok {
+			recoverErr = errors.New(err.(string))
+		} else {
+			recoverErr = err.(error)
+		}
+		handlerMiddleware.Response.JsonResponseWithError(ctx, errorhandler.Throw(recoverErr.Error(), recoverErr), http.StatusInternalServerError)
 	})
 }
