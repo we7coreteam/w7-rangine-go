@@ -18,7 +18,7 @@ func (abstract Abstract) TranslateValidationError(err error) error {
 	} else {
 		errStr := ""
 		for _, e := range validationErrors {
-			errStr += e.Translate(facade.Facade.GetTranslator()) + ";"
+			errStr += e.Translate(facade.GetTranslator()) + ";"
 		}
 
 		return errors.New(errStr)

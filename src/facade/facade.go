@@ -12,51 +12,46 @@ import (
 	httpserver "github.com/we7coreteam/w7-rangine-go/src/http/server"
 )
 
-type Facades struct {
-}
-
-func (facade Facades) GetContainer() container.Container {
+func GetContainer() container.Container {
 	return app.GApp.GetContainer()
 }
 
-func (facade Facades) GetConfig() *viper.Viper {
+func GetConfig() *viper.Viper {
 	return app.GApp.GetConfig()
 }
 
-func (facade Facades) GetEvent() EventBus.Bus {
+func GetEvent() EventBus.Bus {
 	return app.GApp.GetEvent()
 }
 
-func (facade Facades) GetLoggerFactory() *logger.Factory {
+func GetLoggerFactory() *logger.Factory {
 	return app.GApp.GetLoggerFactory()
 }
 
-func (facade Facades) GetRedisFactory() *redis.Factory {
+func GetRedisFactory() *redis.Factory {
 	var redisFactory *redis.Factory
 	_ = app.GApp.GetContainer().NamedResolve(&redisFactory, "redis-factory")
 
 	return redisFactory
 }
 
-func (facade Facades) GetDbFactory() *database.Factory {
+func GetDbFactory() *database.Factory {
 	var dbFactory *database.Factory
 	_ = app.GApp.GetContainer().NamedResolve(&dbFactory, "db-factory")
 
 	return dbFactory
 }
 
-func (facade Facades) GetTranslator() ut.Translator {
+func GetTranslator() ut.Translator {
 	var translator ut.Translator
 	_ = app.GApp.GetContainer().NamedResolve(&translator, "translator")
 
 	return translator
 }
 
-func (facade Facades) GetHttpServer() *httpserver.Server {
+func GetHttpServer() *httpserver.Server {
 	var server *httpserver.Server
 	_ = app.GApp.GetContainer().NamedResolve(&server, "http-server")
 
 	return server
 }
-
-var Facade = new(Facades)
