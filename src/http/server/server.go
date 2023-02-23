@@ -28,7 +28,7 @@ func NewHttpSerer(config *viper.Viper) *Server {
 
 func (server *Server) initGinEngine() {
 	gin.SetMode(server.config.GetString("app.env"))
-	server.GinEngine = gin.Default()
+	server.GinEngine = gin.New()
 }
 
 func (server *Server) RegisterRouters(register func(engine *gin.Engine)) *Server {
