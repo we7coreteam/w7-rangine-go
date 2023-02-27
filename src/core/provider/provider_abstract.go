@@ -15,6 +15,11 @@ type Abstract struct {
 	console       *console.Console
 	loggerFactory *logger.Factory
 	event         EventBus.Bus
+	PackageName   string
+}
+
+func (abstract *Abstract) GetPackageName() string {
+	return abstract.PackageName
 }
 
 func (abstract *Abstract) SetContainer(container container.Container) {

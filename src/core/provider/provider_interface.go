@@ -9,6 +9,7 @@ import (
 )
 
 type Interface interface {
+	GetPackageName() string
 	Register()
 	SetContainer(container container.Container)
 	GetContainer() container.Container
