@@ -119,6 +119,7 @@ func (factory *Factory) MakeDb(databaseConfig Config, driver gorm.Dialector) (*g
 }
 
 func (factory *Factory) Channel(channel string) (*gorm.DB, error) {
+	//map非线程安全  https://github.com/golang/go/blob/master/src/runtime/map.go#L579
 	// double check rlock  https://launchdarkly.com/blog/golang-pearl-thread-safe-writes-and-double-checked-locking-in-go/
 	factory.lock.RLock()
 	db, exists := factory.dbMap[channel]
