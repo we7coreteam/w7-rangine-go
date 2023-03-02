@@ -1,10 +1,11 @@
 package controller
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	responder "github.com/we7coreteam/w7-rangine-go/src/core/error"
 	"github.com/we7coreteam/w7-rangine-go/src/facade"
+	httperf "github.com/we7coreteam/w7-rangine-go/src/http/error"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
 )
 
@@ -21,7 +22,12 @@ func (abstract Abstract) TranslateValidationError(err error) error {
 			errStr += e.Translate(facade.GetTranslator()) + ";"
 		}
 
-		return errors.New(errStr)
+		return httperf.ValidateErr{
+			ValidateErrs: validationErrors,
+			ResponseError: responder.ResponseError{
+				Msg: errStr,
+			},
+		}
 	}
 }
 
