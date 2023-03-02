@@ -12,7 +12,6 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golobby/container/v3 v3.0.2
 	github.com/jedib0t/go-pretty/v6 v6.4.4
-	github.com/onsi/gomega v1.18.1
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0

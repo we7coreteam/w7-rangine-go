@@ -3,12 +3,12 @@ package database
 import (
 	"errors"
 	"go.uber.org/zap"
-	"golang.org/x/sync/singleflight"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -30,7 +30,7 @@ type Factory struct {
 	dbResolverMap     map[string]func() (*gorm.DB, error)
 	dbMap             map[string]*gorm.DB
 	logger            *zap.Logger
-	once              singleflight.Group
+	lock              sync.RWMutex
 	debug             bool
 }
 
@@ -119,29 +119,33 @@ func (factory *Factory) MakeDb(databaseConfig Config, driver gorm.Dialector) (*g
 }
 
 func (factory *Factory) Channel(channel string) (*gorm.DB, error) {
+	// double check rlock  https://launchdarkly.com/blog/golang-pearl-thread-safe-writes-and-double-checked-locking-in-go/
+	factory.lock.RLock()
 	db, exists := factory.dbMap[channel]
+	factory.lock.RUnlock()
 	if exists {
 		return db, nil
 	}
 
-	_, err, _ := factory.once.Do(channel, func() (interface{}, error) {
+	factory.lock.Lock()
+	defer factory.lock.Unlock()
+
+	db, exists = factory.dbMap[channel]
+	if !exists {
 		dbResolver, exists := factory.dbResolverMap[channel]
 		if !exists {
 			return nil, errors.New("db channel " + channel + " not exists")
 		}
 
-		db, err := dbResolver()
-		if err == nil {
-			factory.dbMap[channel] = db
+		var err error = nil
+		db, err = dbResolver()
+		if err != nil {
+			return nil, err
 		}
-
-		return db, err
-	})
-	if err != nil {
-		return nil, err
+		factory.dbMap[channel] = db
 	}
 
-	return factory.dbMap[channel], nil
+	return db, nil
 }
 
 func (factory *Factory) RegisterDriverResolver(driver string, resolver func(config Config) (gorm.Dialector, error)) {

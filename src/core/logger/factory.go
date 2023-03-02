@@ -4,15 +4,15 @@ import (
 	"errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"golang.org/x/sync/singleflight"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"sync"
 )
 
 type Factory struct {
 	driverResolverMap map[string]func(config Config) (zapcore.WriteSyncer, error)
 	loggerResolverMap map[string]func() (*zap.Logger, error)
 	loggerMap         map[string]*zap.Logger
-	once              singleflight.Group
+	lock              sync.RWMutex
 }
 
 func NewLoggerFactory() *Factory {
@@ -106,29 +106,32 @@ func (factory *Factory) MakeLogger(level zapcore.Level, ws ...zapcore.WriteSynce
 }
 
 func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
+	factory.lock.RLock()
 	logger, exists := factory.loggerMap[channel]
+	factory.lock.RUnlock()
 	if exists {
 		return logger, nil
 	}
 
-	_, err, _ := factory.once.Do(channel, func() (interface{}, error) {
+	factory.lock.Lock()
+	defer factory.lock.Unlock()
+
+	logger, exists = factory.loggerMap[channel]
+	if !exists {
 		loggerResolver, exists := factory.loggerResolverMap[channel]
 		if !exists {
 			return nil, errors.New("logger channel " + channel + " not exists")
 		}
 
-		logger, err := loggerResolver()
-		if err == nil {
-			factory.loggerMap[channel] = logger
+		var err error = nil
+		logger, err = loggerResolver()
+		if err != nil {
+			return nil, err
 		}
-
-		return logger, err
-	})
-	if err != nil {
-		return nil, err
+		factory.loggerMap[channel] = logger
 	}
 
-	return factory.loggerMap[channel], nil
+	return logger, nil
 }
 
 func (factory *Factory) RegisterDriverResolver(driver string, resolver func(config Config) (zapcore.WriteSyncer, error)) {
