@@ -60,5 +60,8 @@ func (response Response) JsonResponseWithError(ctx *gin.Context, err error, stat
 }
 
 func (response Response) JsonResponse(ctx *gin.Context, data any, error error, statusCode int) {
+	ctx.Set("response_data", data)
+	ctx.Set("response_err", error)
+	ctx.Set("response_code", statusCode)
 	ctx.JSON(statusCode, GetResponseFormatter()(ctx, data, error, statusCode))
 }
