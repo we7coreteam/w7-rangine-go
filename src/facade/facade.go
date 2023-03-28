@@ -9,7 +9,6 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
-	httpserver "github.com/we7coreteam/w7-rangine-go/src/http/server"
 )
 
 func GetContainer() container.Container {
@@ -47,11 +46,4 @@ func GetTranslator() ut.Translator {
 	_ = app.GApp.GetContainer().NamedResolve(&translator, "translator")
 
 	return translator
-}
-
-func GetHttpServer() *httpserver.Server {
-	var server *httpserver.Server
-	_ = app.GApp.GetContainer().NamedResolve(&server, "http-server")
-
-	return server
 }
