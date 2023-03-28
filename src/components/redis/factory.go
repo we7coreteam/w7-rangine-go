@@ -7,16 +7,16 @@ import (
 )
 
 type Factory struct {
-	channelMap map[string]*redis.Client
+	channelMap map[string]redis.Cmdable
 }
 
 func NewRedisFactory() *Factory {
 	return &Factory{
-		channelMap: make(map[string]*redis.Client),
+		channelMap: make(map[string]redis.Cmdable),
 	}
 }
 
-func (factory *Factory) Channel(channel string) (*redis.Client, error) {
+func (factory *Factory) Channel(channel string) (redis.Cmdable, error) {
 	redis, exists := factory.channelMap[channel]
 	if !exists {
 		return nil, errors.New("redis channel " + channel + " not exists")
@@ -25,7 +25,7 @@ func (factory *Factory) Channel(channel string) (*redis.Client, error) {
 	return redis, nil
 }
 
-func (factory *Factory) MakeRedis(redisConfig Config) *redis.Client {
+func (factory *Factory) MakeRedis(redisConfig Config) redis.Cmdable {
 	return redis.NewClient(&redis.Options{
 		Addr:     redisConfig.Host + ":" + strconv.Itoa(redisConfig.Port),
 		Username: redisConfig.Username,
@@ -35,7 +35,7 @@ func (factory *Factory) MakeRedis(redisConfig Config) *redis.Client {
 	})
 }
 
-func (factory *Factory) RegisterRedis(channel string, client *redis.Client) {
+func (factory *Factory) RegisterRedis(channel string, client redis.Cmdable) {
 	factory.channelMap[channel] = client
 }
 
