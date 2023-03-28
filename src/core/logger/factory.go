@@ -139,6 +139,11 @@ func (factory *Factory) RegisterDriverResolver(driver string, resolver func(conf
 }
 
 func (factory *Factory) RegisterLogger(channel string, loggerResolver func() (*zap.Logger, error)) {
+	_, exists := factory.loggerMap[channel]
+	if exists {
+		delete(factory.loggerMap, channel)
+	}
+
 	factory.loggerResolverMap[channel] = loggerResolver
 }
 
