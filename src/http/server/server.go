@@ -2,7 +2,6 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	app "github.com/we7coreteam/w7-rangine-go/src"
 	"github.com/we7coreteam/w7-rangine-go/src/http/session"
 	"strconv"
@@ -11,7 +10,7 @@ import (
 var GHttpServer *Server
 
 type Server struct {
-	config *viper.Viper
+	App *app.App
 
 	GinEngine *gin.Engine
 	Session   *session.Session
@@ -37,7 +36,7 @@ func NewHttpDefaultServer(app *app.App) *Server {
 
 func NewServer(app *app.App) *Server {
 	server := &Server{
-		config: app.GetConfig(),
+		App: app,
 	}
 	server.initGinEngine()
 	GHttpServer = server
@@ -46,7 +45,7 @@ func NewServer(app *app.App) *Server {
 }
 
 func (server *Server) initGinEngine() {
-	gin.SetMode(server.config.GetString("app.env"))
+	gin.SetMode(server.App.GetConfig().GetString("app.env"))
 	server.GinEngine = gin.New()
 }
 
@@ -57,7 +56,7 @@ func (server *Server) RegisterRouters(register func(engine *gin.Engine)) *Server
 
 func (server *Server) Start() {
 	var serverConfig Config
-	err := server.config.UnmarshalKey("http_server", &serverConfig)
+	err := server.App.GetConfig().UnmarshalKey("http_server", &serverConfig)
 	if err != nil {
 		panic(err)
 	}
