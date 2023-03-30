@@ -43,7 +43,7 @@ func (errHandler ErrHandler) Is(target ...error) bool {
 }
 
 func (errHandler ErrHandler) Catch(err error, handler ErrCustomerHandler) ErrHandler {
-	if errHandler.Is(err) {
+	if errors.As(errHandler.err, &err) {
 		handler(errHandler.err)
 	}
 

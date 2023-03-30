@@ -16,21 +16,19 @@ var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, st
 		"msg":  "",
 	}
 
-	errMsg := ""
 	if errorhandler.Found(err) {
-		errorhandler.Try(err).Catch(errorhandler.ResponseError{}, func(err error) {
+		errMsg := ""
+		if _, ok := err.(errorhandler.ResponseErrI); ok {
 			errMsg = err.Error()
-		}).Finally(func(err error) {
-			if errMsg == "" {
-				if gin.Mode() == gin.DebugMode {
-					errMsg = err.Error()
-					responseJson["err_strace"] = fmt.Sprintf("%+v \n ", err)
-				} else {
-					errMsg = "系统内部错误"
-				}
-				responseJson["msg"] = errMsg
+		} else {
+			if gin.Mode() == gin.DebugMode {
+				errMsg = err.Error()
+				responseJson["err_strace"] = fmt.Sprintf("%+v \n ", err)
+			} else {
+				errMsg = "系统内部错误"
 			}
-		})
+		}
+		responseJson["msg"] = errMsg
 	}
 
 	return responseJson
@@ -68,4 +66,5 @@ func (response Response) JsonResponse(ctx *gin.Context, data any, error error, s
 	ctx.Set("response_err", error)
 	ctx.Set("response_code", statusCode)
 	ctx.JSON(statusCode, GetResponseFormatter()(ctx, data, error, statusCode))
+	ctx.Abort()
 }
