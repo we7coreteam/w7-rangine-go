@@ -22,19 +22,19 @@ func (errRecoverLogger *ErrRecoverLogger) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-type ErrHandlerMiddleware struct {
+type PanicHandlerMiddleware struct {
 	Abstract
 	response.Response
 	Reporter func(err error)
 }
 
-func NewErrHandlerMiddleware(Reporter func(err error)) *ErrHandlerMiddleware {
-	return &ErrHandlerMiddleware{
+func NewPanicHandlerMiddleware(Reporter func(err error)) *PanicHandlerMiddleware {
+	return &PanicHandlerMiddleware{
 		Reporter: Reporter,
 	}
 }
 
-func (handlerMiddleware ErrHandlerMiddleware) GetProcess() gin.HandlerFunc {
+func (handlerMiddleware PanicHandlerMiddleware) GetProcess() gin.HandlerFunc {
 	return gin.CustomRecoveryWithWriter(&ErrRecoverLogger{
 		Reporter: handlerMiddleware.Reporter,
 	}, func(ctx *gin.Context, err any) {

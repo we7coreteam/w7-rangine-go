@@ -10,6 +10,12 @@ import (
 type Formatter func(ctx *gin.Context, data any, error error, statusCode int) map[string]any
 
 var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, statusCode int) map[string]any {
+	responseJson := map[string]interface{}{
+		"data": data,
+		"code": statusCode,
+		"msg":  "",
+	}
+
 	errMsg := ""
 	if errorhandler.Found(err) {
 		errorhandler.Try(err).Catch(errorhandler.ResponseError{}, func(err error) {
@@ -17,19 +23,17 @@ var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, st
 		}).Finally(func(err error) {
 			if errMsg == "" {
 				if gin.Mode() == gin.DebugMode {
-					errMsg = fmt.Errorf("%+v", err).Error()
+					errMsg = err.Error()
+					responseJson["err_strace"] = fmt.Sprintf("%+v \n ", err)
 				} else {
 					errMsg = "系统内部错误"
 				}
+				responseJson["msg"] = errMsg
 			}
 		})
 	}
 
-	return gin.H{
-		"data": data,
-		"code": statusCode,
-		"msg":  errMsg,
-	}
+	return responseJson
 }
 
 func SetResponseFormatter(formatter Formatter) {
