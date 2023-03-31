@@ -24,7 +24,7 @@ func (abstract Abstract) TranslateValidationError(err error) error {
 
 		return httperf.ValidateErr{
 			ValidateErrs: validationErrors,
-			ResponseError: errorhandler.ResponseError{
+			Err: errorhandler.ResponseError{
 				Msg: errStr,
 			},
 		}

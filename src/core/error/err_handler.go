@@ -42,8 +42,8 @@ func (errHandler ErrHandler) Is(target ...error) bool {
 	return false
 }
 
-func (errHandler ErrHandler) Catch(err error, handler ErrCustomerHandler) ErrHandler {
-	if errors.As(errHandler.err, &err) {
+func (errHandler ErrHandler) Catch(err any, handler ErrCustomerHandler) ErrHandler {
+	if errors.As(errHandler.err, err) {
 		handler(errHandler.err)
 	}
 
