@@ -42,7 +42,7 @@ func (abstract Abstract) ValidateFormPost(ctx *gin.Context, request interface{})
 }
 
 func (abstract Abstract) ValidateQuery(ctx *gin.Context, request interface{}) bool {
-	err := ctx.BindQuery(request)
+	err := ctx.ShouldBindQuery(request)
 	if err != nil {
 		abstract.JsonResponseWithServerError(ctx, abstract.TranslateValidationError(err))
 		return false
@@ -52,7 +52,7 @@ func (abstract Abstract) ValidateQuery(ctx *gin.Context, request interface{}) bo
 }
 
 func (abstract Abstract) ValidateUri(ctx *gin.Context, request interface{}) bool {
-	err := ctx.BindUri(request)
+	err := ctx.ShouldBindUri(request)
 	if err != nil {
 		abstract.JsonResponseWithServerError(ctx, abstract.TranslateValidationError(err))
 		return false
