@@ -7,9 +7,9 @@ import (
 	"net/http"
 )
 
-type Formatter func(ctx *gin.Context, data any, error error, statusCode int) map[string]any
+type Formatter func(ctx *gin.Context, data any, error error, statusCode int) any
 
-var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, statusCode int) map[string]any {
+var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, statusCode int) any {
 	responseJson := map[string]interface{}{
 		"data": data,
 		"code": statusCode,
