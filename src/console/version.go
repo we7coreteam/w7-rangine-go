@@ -1,6 +1,7 @@
 package console
 
 import (
+	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 )
 
@@ -21,5 +22,5 @@ func (versionCommand *VersionCommand) Configure(command *cobra.Command) {
 }
 
 func (versionCommand *VersionCommand) Handle(cmd *cobra.Command, args []string) {
-	print("v1.0.0")
+	color.Infoln("version: 1.0.0")
 }

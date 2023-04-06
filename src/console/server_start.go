@@ -1,6 +1,7 @@
 package console
 
 import (
+	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"github.com/we7coreteam/w7-rangine-go/src/core/server"
 )
@@ -20,7 +21,8 @@ func (serverCommand *ServerStartCommand) GetDescription() string {
 func (serverCommand *ServerStartCommand) Handle(cmd *cobra.Command, args []string) {
 	for serverName, server := range server.GetServers() {
 		go server.Start()
-		cmd.OutOrStdout().Write(([]byte)("server " + serverName + " start"))
+
+		color.Greenln("server " + serverName + " start success")
 	}
 
 	select {}
