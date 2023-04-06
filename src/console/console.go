@@ -36,10 +36,6 @@ func (console *Console) RegisterCommand(command Interface) {
 }
 
 func (console *Console) Run() {
-	console.RegisterCommand(new(MakeModuleCommand))
-	console.RegisterCommand(new(ServerStartCommand))
-	console.RegisterCommand(new(VersionCommand))
-
 	err := console.handler.Execute()
 	if err != nil {
 		panic(err)

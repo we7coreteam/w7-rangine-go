@@ -71,9 +71,19 @@ func (server Server) GetServerName() string {
 	return "http"
 }
 
+func (server Server) GetOptions() map[string]string {
+	var serverConfig Config
+	server.config.UnmarshalKey("server.http", &serverConfig)
+
+	return map[string]string{
+		"Host": serverConfig.Host,
+		"Port": strconv.Itoa(serverConfig.Port),
+	}
+}
+
 func (server Server) Start() {
 	var serverConfig Config
-	err := server.config.UnmarshalKey("http_server", &serverConfig)
+	err := server.config.UnmarshalKey("server.http", &serverConfig)
 	if err != nil {
 		panic(err)
 	}

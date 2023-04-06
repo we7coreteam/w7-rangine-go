@@ -106,5 +106,9 @@ func (app *App) GetProviderManager() *provider.Manager {
 }
 
 func (app *App) RunConsole() {
+	console.GetConsole().RegisterCommand(new(console.MakeModuleCommand))
+	console.GetConsole().RegisterCommand(console.NewServerStartCommand(app.config))
+	console.GetConsole().RegisterCommand(new(console.VersionCommand))
+
 	console.GetConsole().Run()
 }
