@@ -6,6 +6,11 @@ func RegisterServer(server Interface) {
 	servers[server.GetServerName()] = server
 }
 
-func GetServers() map[string]Interface {
-	return servers
+func GetServer(serverName string) Interface {
+	server, exists := servers[serverName]
+	if !exists {
+		return nil
+	}
+
+	return server
 }
