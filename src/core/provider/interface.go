@@ -4,7 +4,7 @@ import (
 	"github.com/asaskevich/EventBus"
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/src/core/console"
+	"github.com/we7coreteam/w7-rangine-go/src/console"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 )
 

@@ -7,9 +7,10 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
 	"github.com/we7coreteam/w7-rangine-go/src/components/translator"
-	"github.com/we7coreteam/w7-rangine-go/src/core/console"
+	"github.com/we7coreteam/w7-rangine-go/src/console"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
+	"github.com/we7coreteam/w7-rangine-go/src/http"
 )
 
 var GApp *App
@@ -22,7 +23,6 @@ type App struct {
 	loggerFactory   *logger.Factory
 	event           EventBus.Bus
 	providerManager *provider.Manager
-	console         *console.Console
 }
 
 func NewApp() *App {
@@ -35,7 +35,6 @@ func NewApp() *App {
 	app.InitContainer()
 	app.InitLoggerFactory()
 	app.InitEvent()
-	app.InitConsole()
 	app.InitProviderManager()
 
 	GApp = app
@@ -94,27 +93,18 @@ func (app *App) GetEvent() EventBus.Bus {
 }
 
 func (app *App) InitProviderManager() {
-	app.providerManager = provider.NewProviderManager(app.container, app.config, app.loggerFactory, app.event, app.console)
+	app.providerManager = provider.NewProviderManager(app.container, app.config, app.loggerFactory, app.event, console.GetConsole())
 
 	app.providerManager.RegisterProvider(new(translator.Provider)).Register()
 	app.providerManager.RegisterProvider(new(database.Provider)).Register()
 	app.providerManager.RegisterProvider(new(redis.Provider)).Register()
+	app.providerManager.RegisterProvider(new(http.Provider)).Register()
 }
 
 func (app *App) GetProviderManager() *provider.Manager {
 	return app.providerManager
 }
 
-func (app *App) InitConsole() {
-	app.console = console.NewConsole()
-
-	app.console.RegisterCommand(new(console.VersionCommand))
-}
-
-func (app *App) GetConsole() *console.Console {
-	return app.console
-}
-
 func (app *App) RunConsole() {
-	app.console.Run()
+	console.GetConsole().Run()
 }

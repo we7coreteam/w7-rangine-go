@@ -2,41 +2,58 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	app "github.com/we7coreteam/w7-rangine-go/src"
+	"github.com/spf13/viper"
+	"github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/http/session"
 	"strconv"
 )
 
 var GHttpServer *Server
 
-type Server struct {
-	App *app.App
+func Use(middleware ...gin.HandlerFunc) gin.IRouter {
+	GHttpServer.Engine.Use(middleware...)
 
-	GinEngine *gin.Engine
-	Session   *session.Session
+	return GHttpServer.Engine
 }
 
-func NewHttpDefaultServer(app *app.App) *Server {
+func RegisterRouters(register func(engine *gin.Engine)) *Server {
+	register(GHttpServer.Engine)
+	return GHttpServer
+}
+
+func GetSession() *session.Session {
+	return GHttpServer.Session
+}
+
+type Server struct {
+	server.Interface
+	config *viper.Viper
+
+	Engine  *gin.Engine
+	Session *session.Session
+}
+
+func NewHttpDefaultServer(config *viper.Viper) *Server {
 	var sessionConfig session.SessionConf
 	var cookieConfig session.Cookie
-	err := app.GetConfig().UnmarshalKey("session", &sessionConfig)
+	err := config.UnmarshalKey("session", &sessionConfig)
 	if err != nil {
 		panic(err)
 	}
-	err = app.GetConfig().UnmarshalKey("cookie", &cookieConfig)
+	err = config.UnmarshalKey("cookie", &cookieConfig)
 	if err != nil {
 		panic(err)
 	}
 
-	server := NewServer(app)
+	server := NewServer(config)
 	server.Session = session.NewSession(sessionConfig, cookieConfig)
 
 	return server
 }
 
-func NewServer(app *app.App) *Server {
+func NewServer(config *viper.Viper) *Server {
 	server := &Server{
-		App: app,
+		config: config,
 	}
 	server.initGinEngine()
 	GHttpServer = server
@@ -45,22 +62,22 @@ func NewServer(app *app.App) *Server {
 }
 
 func (server *Server) initGinEngine() {
-	gin.SetMode(server.App.GetConfig().GetString("app.env"))
-	server.GinEngine = gin.New()
+	gin.SetMode("release")
+	server.Engine = gin.New()
+	server.Engine.Routes()
 }
 
-func (server *Server) RegisterRouters(register func(engine *gin.Engine)) *Server {
-	register(server.GinEngine)
-	return server
+func (server Server) GetServerName() string {
+	return "http"
 }
 
-func (server *Server) Start() {
+func (server Server) Start() {
 	var serverConfig Config
-	err := server.App.GetConfig().UnmarshalKey("http_server", &serverConfig)
+	err := server.config.UnmarshalKey("http_server", &serverConfig)
 	if err != nil {
 		panic(err)
 	}
-	err = server.GinEngine.Run(serverConfig.Host + ":" + strconv.Itoa(serverConfig.Port))
+	err = server.Engine.Run(serverConfig.Host + ":" + strconv.Itoa(serverConfig.Port))
 
 	panic(err)
 }

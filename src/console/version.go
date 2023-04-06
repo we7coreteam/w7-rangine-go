@@ -1,9 +1,11 @@
 package console
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/spf13/cobra"
+)
 
 type VersionCommand struct {
-	CommandAbstract
+	Abstract
 }
 
 func (versionCommand *VersionCommand) GetName() string {

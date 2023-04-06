@@ -1,10 +1,9 @@
-package command
+package console
 
 import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/src/core/console"
 	"html/template"
 	"os"
 	"strings"
@@ -21,7 +20,7 @@ type TemplateData struct {
 var argsValue commandArgs
 
 type MakeModuleCommand struct {
-	console.CommandAbstract
+	Abstract
 }
 
 func (self *MakeModuleCommand) GetName() string {

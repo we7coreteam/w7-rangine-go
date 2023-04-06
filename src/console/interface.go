@@ -2,7 +2,7 @@ package console
 
 import "github.com/spf13/cobra"
 
-type CommandInterface interface {
+type Interface interface {
 	GetName() string
 	GetDescription() string
 	Configure(command *cobra.Command)

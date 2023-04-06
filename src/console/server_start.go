@@ -1,13 +1,12 @@
-package command
+package console
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/src/core/console"
-	"github.com/we7coreteam/w7-rangine-go/src/http/server"
+	"github.com/we7coreteam/w7-rangine-go/src/core/server"
 )
 
 type ServerStartCommand struct {
-	console.CommandAbstract
+	Abstract
 }
 
 func (serverCommand *ServerStartCommand) GetName() string {
@@ -19,6 +18,10 @@ func (serverCommand *ServerStartCommand) GetDescription() string {
 }
 
 func (serverCommand *ServerStartCommand) Handle(cmd *cobra.Command, args []string) {
-	//app.GApp.GetConfig()
-	server.GHttpServer.Start()
+	for serverName, server := range server.GetServers() {
+		go server.Start()
+		cmd.OutOrStdout().Write(([]byte)("server " + serverName + " start"))
+	}
+
+	select {}
 }
