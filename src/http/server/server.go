@@ -10,6 +10,10 @@ import (
 
 var GHttpServer *Server
 
+func GetServer() *Server {
+	return GHttpServer
+}
+
 func Use(middleware ...gin.HandlerFunc) gin.IRouter {
 	GHttpServer.Engine.Use(middleware...)
 

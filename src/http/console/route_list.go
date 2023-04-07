@@ -25,7 +25,7 @@ func (listCommand *RouteListCommand) Handle(cmd *cobra.Command, args []string) {
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"#", "Path", "Method", "Handler"})
 	t.AppendSeparator()
-	for index, route := range server.GHttpServer.Engine.Routes() {
+	for index, route := range server.GetServer().Engine.Routes() {
 		t.AppendRow([]interface{}{index, route.Path, route.Method, route.Handler})
 	}
 	t.Render()
