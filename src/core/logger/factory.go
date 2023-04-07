@@ -22,7 +22,7 @@ func NewLoggerFactory() *Factory {
 		driverResolverMap: make(map[string]func(config Config) (zapcore.WriteSyncer, error)),
 	}
 
-	factory.RegisterDriverResolver("file", factory.MakeFileDriver)
+	factory.RegisterDriverResolver("stream", factory.MakeFileStreamDriver)
 
 	return factory
 }
@@ -46,7 +46,7 @@ func (factory *Factory) ConvertLevel(level string) zapcore.Level {
 	}
 }
 
-func (factory *Factory) MakeFileDriver(config Config) (zapcore.WriteSyncer, error) {
+func (factory *Factory) MakeFileStreamDriver(config Config) (zapcore.WriteSyncer, error) {
 	if config.MaxSize <= 0 {
 		config.MaxSize = 2
 	}
