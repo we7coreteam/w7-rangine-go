@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/http/session"
-	"strconv"
 )
 
 var GHttpServer *Server
@@ -76,22 +75,15 @@ func (server Server) GetServerName() string {
 }
 
 func (server Server) GetOptions() map[string]string {
-	var serverConfig Config
-	server.config.UnmarshalKey("server.http", &serverConfig)
-
 	return map[string]string{
-		"Host": serverConfig.Host,
-		"Port": strconv.Itoa(serverConfig.Port),
+		"Host": server.config.GetString("server.http.host"),
+		"Port": server.config.GetString("server.http.port"),
 	}
 }
 
 func (server Server) Start() {
-	var serverConfig Config
-	err := server.config.UnmarshalKey("server.http", &serverConfig)
+	err := server.Engine.Run(server.config.GetString("server.http.host") + ":" + server.config.GetString("server.http.port"))
 	if err != nil {
 		panic(err)
 	}
-	err = server.Engine.Run(serverConfig.Host + ":" + strconv.Itoa(serverConfig.Port))
-
-	panic(err)
 }
