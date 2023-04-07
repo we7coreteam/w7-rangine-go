@@ -26,20 +26,18 @@ type App struct {
 }
 
 func NewApp() *App {
-	app := &App{
+	GApp = &App{
 		Name:    "rangine",
 		Version: "1.0.0",
 	}
 
-	app.InitConfig()
-	app.InitContainer()
-	app.InitLoggerFactory()
-	app.InitEvent()
-	app.InitProviderManager()
+	GApp.InitConfig()
+	GApp.InitContainer()
+	GApp.InitLoggerFactory()
+	GApp.InitEvent()
+	GApp.InitProviderManager()
 
-	GApp = app
-
-	return app
+	return GApp
 }
 
 func (app *App) InitConfig() {

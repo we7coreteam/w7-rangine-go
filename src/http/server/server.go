@@ -55,13 +55,12 @@ func NewHttpDefaultServer(config *viper.Viper) *Server {
 }
 
 func NewServer(config *viper.Viper) *Server {
-	server := &Server{
+	GHttpServer = &Server{
 		config: config,
 	}
-	server.initGinEngine()
-	GHttpServer = server
+	GHttpServer.initGinEngine()
 
-	return server
+	return GHttpServer
 }
 
 func (server *Server) initGinEngine() {
