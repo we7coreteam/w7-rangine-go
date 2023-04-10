@@ -106,7 +106,7 @@ type Test struct {
 }
 
 func (test Test) GetName() string {
-	return "test"
+	return "{{.Name}}:test"
 }
 
 func (test Test) GetDescription() string {
@@ -114,7 +114,7 @@ func (test Test) GetDescription() string {
 }
 
 func (test Test) Handle(cmd *cobra.Command, args []string) {
-	color.Infoln("test")
+	color.Infoln("{{.Name}} test")
 }`,
 		"http/controller/home.go": "" +
 			"package controller\n\n" +
