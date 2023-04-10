@@ -53,7 +53,7 @@ func (self *MakeModuleCommand) Handle(cmd *cobra.Command, args []string) {
 		path := fmt.Sprintf("%s/app/%s/%s", baseDir, argsValue.name, fileName)
 		file, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0755)
 		if err != nil {
-			panic(errors.New("error make template file"))
+			panic(errors.New("error make template file " + err.Error()))
 		}
 
 		templateParser := template.New(fileName)
@@ -73,7 +73,12 @@ func (self MakeModuleCommand) templateCode() map[string]string {
 package {{.Name}}
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
+	http_server "github.com/we7coreteam/w7-rangine-go/src/http/server"
+	"github.com/we7coreteam/w7api/app/{{.Name}}/command"
+	"github.com/we7coreteam/w7api/app/{{.Name}}/http/controller"
+			
 )
 
 type Provider struct {
@@ -81,19 +86,48 @@ type Provider struct {
 }
 
 func (provider *Provider) Register() {
-	
+	provider.GetConsole().RegisterCommand(new(command.Test))
+
+	http_server.RegisterRouters(func(engine *gin.Engine) {
+		engine.GET("/{{.Name}}/index", new(controller.Home).Index)
+	})
 }`,
-		"command/command.go": "" +
-			"package attach\n\n" +
+		"command/test.go": `
+package command
+
+import (
+	"github.com/gookit/color"
+	"github.com/spf13/cobra"
+	"github.com/we7coreteam/w7-rangine-go/src/console"
+)
+
+type Test struct {
+	console.Abstract
+}
+
+func (test Test) GetName() string {
+	return "test"
+}
+
+func (test Test) GetDescription() string {
+	return "test command"
+}
+
+func (test Test) Handle(cmd *cobra.Command, args []string) {
+	color.Infoln("test")
+}`,
+		"http/controller/home.go": "" +
+			"package controller\n\n" +
 			"import (\n" +
-			"\t\"github.com/we7coreteam/w7-rangine-go/src/core/provider\"" +
+			"\t\"github.com/gin-gonic/gin\"" +
+			"\n\t\"github.com/we7coreteam/w7-rangine-go/src/http/controller\"" +
 			"\n)\n\n" +
-			"type Provider struct {\n" +
-			"\tprovider.Abstract\n" +
+			"type Home struct {\n" +
+			"\tcontroller.Abstract\n" +
 			"}\n\n" +
-			"func (provider *Provider) Register() {" +
-			"\n\t\n" +
-			"}\n",
+			"func (home Home) Index(ctx *gin.Context) {" +
+			"\n\thome.JsonResponseWithoutError(ctx, \"hello world!\")" +
+			"\n}\n",
 	}
 }
 
