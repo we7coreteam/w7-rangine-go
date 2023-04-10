@@ -36,8 +36,5 @@ func (console *Console) RegisterCommand(command Interface) {
 }
 
 func (console *Console) Run() {
-	err := console.handler.Execute()
-	if err != nil {
-		panic(err)
-	}
+	console.handler.Execute()
 }
