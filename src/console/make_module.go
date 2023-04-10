@@ -78,6 +78,7 @@ import (
 	http_server "github.com/we7coreteam/w7-rangine-go/src/http/server"
 	"github.com/we7coreteam/w7api/app/{{.Name}}/command"
 	"github.com/we7coreteam/w7api/app/{{.Name}}/http/controller"
+	"github.com/we7coreteam/w7api/app/{{.Name}}/http/middleware"
 			
 )
 
@@ -89,7 +90,7 @@ func (provider *Provider) Register() {
 	provider.GetConsole().RegisterCommand(new(command.Test))
 
 	http_server.RegisterRouters(func(engine *gin.Engine) {
-		engine.GET("/{{.Name}}/index", new(controller.Home).Index)
+		engine.GET("/{{.Name}}/index", new(middleware.Home).Process, new(controller.Home).Index)
 	})
 }`,
 		"command/test.go": `
@@ -116,18 +117,41 @@ func (test Test) GetDescription() string {
 func (test Test) Handle(cmd *cobra.Command, args []string) {
 	color.Infoln("{{.Name}} test")
 }`,
-		"http/controller/home.go": "" +
-			"package controller\n\n" +
-			"import (\n" +
-			"\t\"github.com/gin-gonic/gin\"" +
-			"\n\t\"github.com/we7coreteam/w7-rangine-go/src/http/controller\"" +
-			"\n)\n\n" +
-			"type Home struct {\n" +
-			"\tcontroller.Abstract\n" +
-			"}\n\n" +
-			"func (home Home) Index(ctx *gin.Context) {" +
-			"\n\thome.JsonResponseWithoutError(ctx, \"hello world!\")" +
-			"\n}\n",
+		"http/controller/home.go": `
+package controller
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/we7coreteam/w7-rangine-go/src/http/controller"
+)
+
+type Home struct {
+	controller.Abstract
+}
+
+func (home Home) Index(ctx *gin.Context) {
+	home.JsonResponseWithoutError(ctx, "hello world!")
+}`,
+		"http/middleware/home.go": `
+package middleware
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/we7coreteam/w7-rangine-go/src/facade"
+	"github.com/we7coreteam/w7-rangine-go/src/http/middleware"
+	"time"
+)
+
+type Home struct {
+	middleware.Abstract
+}
+
+func (home Home) Process(ctx *gin.Context) {
+	log, _ := facade.GetLoggerFactory().Channel("default")
+	log.Info("route middleware test, req time: " + time.Now().String())
+
+	ctx.Next()
+}`,
 	}
 }
 
