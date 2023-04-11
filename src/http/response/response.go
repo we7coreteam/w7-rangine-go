@@ -3,10 +3,11 @@ package response
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	app "github.com/we7coreteam/w7-rangine-go/src"
 	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/error"
 	"net/http"
 )
+
+var Env = "release"
 
 type Formatter func(ctx *gin.Context, data any, error error, statusCode int) any
 
@@ -23,7 +24,7 @@ var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, st
 			errMsg = err.Error()
 		}).Finally(func(err error) {
 			if errMsg == "" {
-				if app.GApp.GetConfig().GetString("app.env") == "debug" {
+				if Env == "debug" {
 					errMsg = err.Error()
 					responseJson["err_strace"] = fmt.Sprintf("%+v \n ", err)
 				} else {
