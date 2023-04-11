@@ -24,14 +24,14 @@ func (provider *Provider) Register() {
 	httpServer.Engine.NoRoute(func(context *gin.Context) {
 		responseObj.JsonResponseWithError(context, httperf.NotFoundErr{
 			Err: errorhandler.ResponseError{
-				Msg: "route not found, " + context.Request.URL.Path,
+				Msg: "Route not found, " + context.Request.URL.Path,
 			},
 		}, http.StatusNotFound)
 	})
 	httpServer.Engine.NoMethod(func(context *gin.Context) {
 		responseObj.JsonResponseWithError(context, httperf.NotAllowErr{
 			Err: errorhandler.ResponseError{
-				Msg: "route not allow, " + context.Request.URL.Path,
+				Msg: "Route not allow, " + context.Request.URL.Path,
 			},
 		}, http.StatusNotFound)
 	})
