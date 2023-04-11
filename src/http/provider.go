@@ -33,7 +33,7 @@ func (provider *Provider) Register() {
 			Err: errorhandler.ResponseError{
 				Msg: "Route not allow, " + context.Request.URL.Path,
 			},
-		}, http.StatusNotFound)
+		}, http.StatusMethodNotAllowed)
 	})
 
 	server.RegisterServer(httpServer)
