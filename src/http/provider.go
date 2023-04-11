@@ -21,6 +21,7 @@ func (provider *Provider) Register() {
 	responseObj := response.Response{}
 
 	httpServer := httpserver.NewHttpDefaultServer(provider.GetConfig())
+	httpServer.Engine.HandleMethodNotAllowed = true
 	httpServer.Engine.NoRoute(func(context *gin.Context) {
 		responseObj.JsonResponseWithError(context, httperf.NotFoundErr{
 			Err: errorhandler.ResponseError{
