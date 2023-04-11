@@ -3,6 +3,7 @@ package console
 import (
 	"errors"
 	"fmt"
+	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"html/template"
 	"os"
@@ -65,6 +66,11 @@ func (self *MakeModuleCommand) Handle(cmd *cobra.Command, args []string) {
 			Name: argsValue.name,
 		})
 	}
+
+	color.Println("Please copy the register provider code to the 'main.go' file.")
+	color.Println("********************************************************************")
+	color.Printf(" app.GetProviderManager().RegisterProvider(new(%s.Provider)).Register() \n", argsValue.name)
+	color.Println("********************************************************************")
 }
 
 func (self MakeModuleCommand) templateCode() map[string]string {
@@ -90,7 +96,7 @@ func (provider *Provider) Register() {
 	provider.GetConsole().RegisterCommand(new(command.Test))
 
 	http_server.RegisterRouters(func(engine *gin.Engine) {
-		engine.GET("/{{.Name}}/index", new(middleware.Home).Process, new(controller.Home).Index)
+		engine.GET("/{{.Name}}/index", middleware.Home{}.Process, controller.Home{}.Index)
 	})
 }`,
 		"command/test.go": `
