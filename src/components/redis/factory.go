@@ -17,12 +17,12 @@ func NewRedisFactory() *Factory {
 }
 
 func (factory *Factory) Channel(channel string) (redis.Cmdable, error) {
-	redis, exists := factory.channelMap[channel]
+	cmdAble, exists := factory.channelMap[channel]
 	if !exists {
 		return nil, errors.New("redis channel " + channel + " not exists")
 	}
 
-	return redis, nil
+	return cmdAble, nil
 }
 
 func (factory *Factory) MakeRedis(redisConfig Config) redis.Cmdable {

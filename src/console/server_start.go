@@ -23,15 +23,15 @@ func NewServerStartCommand(config *viper.Viper) *ServerStartCommand {
 	}
 }
 
-func (serverCommand *ServerStartCommand) GetName() string {
+func (serverCommand ServerStartCommand) GetName() string {
 	return "server:start"
 }
 
-func (serverCommand *ServerStartCommand) GetDescription() string {
+func (serverCommand ServerStartCommand) GetDescription() string {
 	return "server start"
 }
 
-func (serverCommand *ServerStartCommand) Handle(cmd *cobra.Command, args []string) {
+func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string) {
 	servers := ""
 	if len(args) == 0 {
 		servers = serverCommand.config.GetString("app.server")
