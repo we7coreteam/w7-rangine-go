@@ -1,4 +1,4 @@
-package prof_server
+package prof
 
 import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"

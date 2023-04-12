@@ -1,4 +1,4 @@
-package prof_server
+package prof
 
 import (
 	"encoding/json"
@@ -41,20 +41,20 @@ func (server *Server) registerRoutes() {
 }
 
 func (server *Server) GetServerName() string {
-	return "prof-server"
+	return "prof"
 }
 
 func (server *Server) GetOptions() map[string]string {
 	return map[string]string{
-		"Host": server.config.GetString("server.prof-server.host"),
-		"Port": server.config.GetString("server.prof-server.port"),
+		"Host": server.config.GetString("server.prof.host"),
+		"Port": server.config.GetString("server.prof.port"),
 	}
 }
 
 func (server *Server) Start() {
 	server.registerRoutes()
 
-	addr := fmt.Sprintf("%s:%s", server.config.GetString("server.prof-server.host"), server.config.GetString("server.prof-server.port"))
+	addr := fmt.Sprintf("%s:%s", server.config.GetString("server.prof.host"), server.config.GetString("server.prof.port"))
 	err := http.ListenAndServe(addr, server.server)
 	if err != nil {
 		panic(err)
