@@ -11,13 +11,11 @@ type Console struct {
 }
 
 func NewConsole() *Console {
-	console := &Console{
+	return &Console{
 		handler: &cobra.Command{
 			Use: "",
 		},
 	}
-
-	return console
 }
 
 func GetConsole() *Console {

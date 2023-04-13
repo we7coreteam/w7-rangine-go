@@ -12,15 +12,15 @@ type RouteListCommand struct {
 	console.Abstract
 }
 
-func (listCommand *RouteListCommand) GetName() string {
+func (listCommand RouteListCommand) GetName() string {
 	return "route:list"
 }
 
-func (listCommand *RouteListCommand) GetDescription() string {
+func (listCommand RouteListCommand) GetDescription() string {
 	return "route list"
 }
 
-func (listCommand *RouteListCommand) Handle(cmd *cobra.Command, args []string) {
+func (listCommand RouteListCommand) Handle(cmd *cobra.Command, args []string) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"#", "Path", "Method", "Handler"})

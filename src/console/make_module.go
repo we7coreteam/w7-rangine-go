@@ -24,20 +24,20 @@ type MakeModuleCommand struct {
 	Abstract
 }
 
-func (self *MakeModuleCommand) GetName() string {
+func (makeModuleCommand MakeModuleCommand) GetName() string {
 	return "make:module"
 }
 
-func (self *MakeModuleCommand) GetDescription() string {
+func (makeModuleCommand MakeModuleCommand) GetDescription() string {
 	return "Make business module skeleton"
 }
 
-func (self MakeModuleCommand) Configure(cmd *cobra.Command) {
+func (makeModuleCommand MakeModuleCommand) Configure(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&argsValue.name, "name", "", "Created module name")
 	cmd.MarkFlagRequired("name")
 }
 
-func (self *MakeModuleCommand) Handle(cmd *cobra.Command, args []string) {
+func (makeModuleCommand MakeModuleCommand) Handle(cmd *cobra.Command, args []string) {
 	baseDir, _ := os.Getwd()
 
 	exist, err := os.Stat(fmt.Sprintf("%s/app/%s", baseDir, argsValue.name))
@@ -45,12 +45,12 @@ func (self *MakeModuleCommand) Handle(cmd *cobra.Command, args []string) {
 		panic(errors.New("module is exists"))
 	}
 	//创建目录
-	for _, dir := range self.templateDir() {
+	for _, dir := range makeModuleCommand.templateDir() {
 		os.MkdirAll(fmt.Sprintf("%s/app/%s/%s", baseDir, argsValue.name, dir), 0755)
 	}
 
 	//创建文件
-	for fileName, code := range self.templateCode() {
+	for fileName, code := range makeModuleCommand.templateCode() {
 		path := fmt.Sprintf("%s/app/%s/%s", baseDir, argsValue.name, fileName)
 		file, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0755)
 		if err != nil {
@@ -73,7 +73,7 @@ func (self *MakeModuleCommand) Handle(cmd *cobra.Command, args []string) {
 	color.Println("********************************************************************")
 }
 
-func (self MakeModuleCommand) templateCode() map[string]string {
+func (makeModuleCommand MakeModuleCommand) templateCode() map[string]string {
 	return map[string]string{
 		"provider.go": `
 package {{.Name}}
@@ -161,7 +161,7 @@ func (home Home) Process(ctx *gin.Context) {
 	}
 }
 
-func (self MakeModuleCommand) templateDir() []string {
+func (makeModuleCommand MakeModuleCommand) templateDir() []string {
 	return []string{
 		"command",
 		"http/controller",

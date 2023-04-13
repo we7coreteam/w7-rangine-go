@@ -48,10 +48,10 @@ func NewHttpDefaultServer(config *viper.Viper) *Server {
 		panic(err)
 	}
 
-	server := NewServer(config)
-	server.Session = session.NewSession(sessionConfig, cookieConfig)
+	newServer := NewServer(config)
+	newServer.Session = session.NewSession(sessionConfig, cookieConfig)
 
-	return server
+	return newServer
 }
 
 func NewServer(config *viper.Viper) *Server {
@@ -69,18 +69,18 @@ func (server *Server) initGinEngine() {
 	server.Engine.Routes()
 }
 
-func (server Server) GetServerName() string {
+func (server *Server) GetServerName() string {
 	return "http"
 }
 
-func (server Server) GetOptions() map[string]string {
+func (server *Server) GetOptions() map[string]string {
 	return map[string]string{
 		"Host": server.config.GetString("server.http.host"),
 		"Port": server.config.GetString("server.http.port"),
 	}
 }
 
-func (server Server) Start() {
+func (server *Server) Start() {
 	err := server.Engine.Run(server.config.GetString("server.http.host") + ":" + server.config.GetString("server.http.port"))
 	if err != nil {
 		panic(err)

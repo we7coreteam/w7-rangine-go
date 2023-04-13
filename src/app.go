@@ -11,6 +11,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
 	"github.com/we7coreteam/w7-rangine-go/src/http"
+	"github.com/we7coreteam/w7-rangine-go/src/prof"
 )
 
 var GApp *App
@@ -97,6 +98,7 @@ func (app *App) InitProviderManager() {
 	app.providerManager.RegisterProvider(new(database.Provider)).Register()
 	app.providerManager.RegisterProvider(new(redis.Provider)).Register()
 	app.providerManager.RegisterProvider(new(http.Provider)).Register()
+	app.providerManager.RegisterProvider(new(prof.Provider)).Register()
 }
 
 func (app *App) GetProviderManager() *provider.Manager {
