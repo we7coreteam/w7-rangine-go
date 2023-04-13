@@ -57,7 +57,7 @@ func (factory *Factory) MakeFileStreamDriver(config Config) (zapcore.WriteSyncer
 		config.MaxBackups = 1
 	}
 	hook := lumberjack.Logger{
-		Filename:   "./runtimes/logs/" + config.Path,
+		Filename:   "./runtime/logs/" + config.Path,
 		MaxSize:    config.MaxSize,
 		MaxBackups: config.MaxBackups,
 		MaxAge:     config.MaxDays,
