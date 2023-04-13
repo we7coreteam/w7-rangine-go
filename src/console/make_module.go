@@ -69,7 +69,7 @@ func (self *MakeModuleCommand) Handle(cmd *cobra.Command, args []string) {
 
 	color.Println("Please copy the register provider code to the 'main.go' file.")
 	color.Println("********************************************************************")
-	color.Printf(" app.GetProviderManager().RegisterProvider(new(%s.Provider)).Register() \n", argsValue.name)
+	color.Red.Printf(" app.GetProviderManager().RegisterProvider(new(%s.Provider)).Register() \n", argsValue.name)
 	color.Println("********************************************************************")
 }
 
