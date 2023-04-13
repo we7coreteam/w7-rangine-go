@@ -81,6 +81,10 @@ func (server *Server) GetOptions() map[string]string {
 }
 
 func (server *Server) Start() {
+	if server.Session != nil {
+		server.Session.Init()
+	}
+
 	err := server.Engine.Run(server.config.GetString("server.http.host") + ":" + server.config.GetString("server.http.port"))
 	if err != nil {
 		panic(err)
