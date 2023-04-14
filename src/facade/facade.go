@@ -2,6 +2,7 @@ package facade
 
 import (
 	"github.com/asaskevich/EventBus"
+	"github.com/gin-gonic/gin/binding"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
@@ -46,4 +47,8 @@ func GetTranslator() ut.Translator {
 	_ = app.GApp.GetContainer().NamedResolve(&translator, "translator")
 
 	return translator
+}
+
+func GetValidator() binding.StructValidator {
+	return binding.Validator
 }

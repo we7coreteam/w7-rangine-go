@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/we7coreteam/w7-rangine-go/src/components/validator/bind"
 	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/error"
 	"github.com/we7coreteam/w7-rangine-go/src/facade"
 	httperf "github.com/we7coreteam/w7-rangine-go/src/http/error"
@@ -31,28 +32,8 @@ func (abstract Abstract) TranslateValidationError(err error) error {
 	}
 }
 
-func (abstract Abstract) ValidateFormPost(ctx *gin.Context, request interface{}) bool {
-	err := ctx.ShouldBind(request)
-	if err != nil {
-		abstract.JsonResponseWithServerError(ctx, abstract.TranslateValidationError(err))
-		return false
-	}
-
-	return true
-}
-
-func (abstract Abstract) ValidateQuery(ctx *gin.Context, request interface{}) bool {
-	err := ctx.ShouldBindQuery(request)
-	if err != nil {
-		abstract.JsonResponseWithServerError(ctx, abstract.TranslateValidationError(err))
-		return false
-	}
-
-	return true
-}
-
-func (abstract Abstract) ValidateUri(ctx *gin.Context, request interface{}) bool {
-	err := ctx.ShouldBindUri(request)
+func (abstract Abstract) Validate(ctx *gin.Context, requestData interface{}) bool {
+	err := ctx.ShouldBindWith(requestData, bind.NewCompositeBind(ctx.ContentType()))
 	if err != nil {
 		abstract.JsonResponseWithServerError(ctx, abstract.TranslateValidationError(err))
 		return false
