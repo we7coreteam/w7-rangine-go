@@ -19,7 +19,7 @@ func NewCompositeBind(contentType string) Composite {
 }
 
 func (Composite) Name() string {
-	return "form"
+	return "composite"
 }
 
 func (c Composite) Bind(req *http.Request, obj any) error {
