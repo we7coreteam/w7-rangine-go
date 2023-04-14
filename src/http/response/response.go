@@ -13,9 +13,9 @@ type Formatter func(ctx *gin.Context, data any, error error, statusCode int) any
 
 var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, statusCode int) any {
 	responseJson := map[string]interface{}{
-		"data": data,
-		"code": statusCode,
-		"msg":  "",
+		"data":  data,
+		"code":  statusCode,
+		"error": "",
 	}
 
 	errMsg := ""
@@ -31,7 +31,7 @@ var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, st
 			}
 		}
 	})
-	responseJson["msg"] = errMsg
+	responseJson["error"] = errMsg
 
 	return responseJson
 }
