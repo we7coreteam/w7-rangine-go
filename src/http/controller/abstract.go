@@ -16,7 +16,11 @@ type Abstract struct {
 
 func (abstract Abstract) TranslateValidationError(err error) error {
 	if validationErrors, ok := err.(validator.ValidationErrors); !ok {
-		return err
+		return httperf.ValidateErr{
+			Err: errorhandler.ResponseError{
+				Msg: "参数数据格式错误",
+			},
+		}
 	} else {
 		errStr := ""
 		for _, e := range validationErrors {
