@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/we7coreteam/w7-rangine-go/src/components/validator/bind"
-	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/error"
+	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
 	"github.com/we7coreteam/w7-rangine-go/src/facade"
 	httperf "github.com/we7coreteam/w7-rangine-go/src/http/error"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
@@ -37,7 +37,7 @@ func (abstract Abstract) TranslateValidationError(err error) error {
 }
 
 func (abstract Abstract) Validate(ctx *gin.Context, requestData interface{}) bool {
-	err := ctx.ShouldBindWith(requestData, bind.NewCompositeBind(ctx.ContentType()))
+	err := ctx.ShouldBindWith(requestData, bind.NewCompositeBind(ctx.ContentType(), ctx.Params))
 	if err != nil {
 		abstract.JsonResponseWithServerError(ctx, abstract.TranslateValidationError(err))
 		return false

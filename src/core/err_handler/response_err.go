@@ -1,4 +1,4 @@
-package error
+package err_handler
 
 type ResponseError struct {
 	Msg string

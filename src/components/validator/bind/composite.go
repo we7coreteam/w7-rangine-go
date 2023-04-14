@@ -2,6 +2,7 @@ package bind
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"net/http"
 )
@@ -10,11 +11,13 @@ const defaultMemory = 32 << 20
 
 type Composite struct {
 	contentType string
+	uriParams   gin.Params
 }
 
-func NewCompositeBind(contentType string) Composite {
+func NewCompositeBind(contentType string, uriParams gin.Params) Composite {
 	return Composite{
 		contentType: contentType,
+		uriParams:   uriParams,
 	}
 }
 
@@ -31,6 +34,15 @@ func (c Composite) Bind(req *http.Request, obj any) error {
 	}
 	if err := binding.MapFormWithTag(obj, req.Form, "form"); err != nil {
 		return err
+	}
+	if c.uriParams != nil {
+		m := make(map[string][]string)
+		for _, v := range c.uriParams {
+			m[v.Key] = []string{v.Value}
+		}
+		if err := binding.MapFormWithTag(obj, m, "uri"); err != nil {
+			return err
+		}
 	}
 
 	switch c.contentType {
