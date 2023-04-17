@@ -66,7 +66,6 @@ func NewServer(config *viper.Viper) *Server {
 func (server *Server) initGinEngine() {
 	gin.SetMode("release")
 	server.Engine = gin.New()
-	server.Engine.Routes()
 }
 
 func (server *Server) GetServerName() string {
