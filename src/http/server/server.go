@@ -66,6 +66,7 @@ func NewServer(config *viper.Viper) *Server {
 func (server *Server) initGinEngine() {
 	gin.SetMode("release")
 	server.Engine = gin.New()
+	server.Engine.RedirectTrailingSlash = false
 }
 
 func (server *Server) GetServerName() string {
