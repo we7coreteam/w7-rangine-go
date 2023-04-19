@@ -1,7 +1,8 @@
 package redis
 
 import (
-	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
+	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
+	"github.com/we7coreteam/w7-rangine-go-support/src/redis"
 )
 
 type Provider struct {
@@ -18,7 +19,7 @@ func (provider *Provider) Register() {
 	factory := NewRedisFactory()
 	factory.Register(redisConfigMap)
 
-	err = provider.GetContainer().NamedSingleton("redis-factory", func() *Factory {
+	err = provider.GetContainer().NamedSingleton("redis-factory", func() redis.Factory {
 		return factory
 	})
 	if err != nil {

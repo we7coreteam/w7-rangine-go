@@ -3,7 +3,7 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/src/core/server"
+	"github.com/we7coreteam/w7-rangine-go-support/src/server"
 	"github.com/we7coreteam/w7-rangine-go/src/http/session"
 )
 
@@ -29,7 +29,7 @@ func GetSession() *session.Session {
 }
 
 type Server struct {
-	server.Interface
+	server.Server
 	config *viper.Viper
 
 	Engine  *gin.Engine

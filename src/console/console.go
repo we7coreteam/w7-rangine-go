@@ -2,6 +2,7 @@ package console
 
 import (
 	"github.com/spf13/cobra"
+	command "github.com/we7coreteam/w7-rangine-go-support/src/console"
 )
 
 var console = NewConsole()
@@ -22,7 +23,7 @@ func GetConsole() *Console {
 	return console
 }
 
-func (console *Console) RegisterCommand(command Interface) {
+func (console *Console) RegisterCommand(command command.Command) {
 	handler := &cobra.Command{
 		Use:   command.GetName(),
 		Short: command.GetDescription(),

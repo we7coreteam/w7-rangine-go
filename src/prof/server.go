@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/src/core/server"
+	"github.com/we7coreteam/w7-rangine-go/src/http/server"
 	"net/http"
 	"net/http/pprof"
 )
 
 type Server struct {
-	server.Interface
+	server.Server
 
 	config *viper.Viper
 	server *http.ServeMux

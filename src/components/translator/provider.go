@@ -6,7 +6,7 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	translational "github.com/go-playground/validator/v10/translations/zh"
-	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
+	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
 )
 
 type Provider struct {

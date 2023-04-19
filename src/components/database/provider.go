@@ -1,7 +1,8 @@
 package database
 
 import (
-	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
+	"github.com/we7coreteam/w7-rangine-go-support/src/database"
+	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
 )
 
 type Provider struct {
@@ -25,7 +26,7 @@ func (provider *Provider) Register() {
 		dbFactory.SetDebug()
 	}
 
-	err = provider.GetContainer().NamedSingleton("db-factory", func() *Factory {
+	err = provider.GetContainer().NamedSingleton("db-factory", func() database.Factory {
 		return dbFactory
 	})
 	if err != nil {

@@ -4,6 +4,8 @@ import (
 	"github.com/asaskevich/EventBus"
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
+	"github.com/we7coreteam/w7-rangine-go-support/src"
+	log "github.com/we7coreteam/w7-rangine-go-support/src/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
 	"github.com/we7coreteam/w7-rangine-go/src/components/translator"
@@ -12,16 +14,18 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
 	"github.com/we7coreteam/w7-rangine-go/src/http"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
+	"go.uber.org/zap"
 )
 
 var GApp *App
 
 type App struct {
+	support.App
 	Name            string
 	Version         string
 	config          *viper.Viper
 	container       container.Container
-	loggerFactory   *logger.Factory
+	loggerFactory   log.Factory
 	event           EventBus.Bus
 	providerManager *provider.Manager
 }
@@ -68,7 +72,7 @@ func (app *App) GetContainer() container.Container {
 }
 
 func (app *App) InitLoggerFactory() {
-	app.loggerFactory = logger.NewLoggerFactory()
+	factory := logger.NewLoggerFactory()
 
 	var loggerConfigMap map[string]logger.Config
 	err := app.config.UnmarshalKey("log", &loggerConfigMap)
@@ -76,10 +80,22 @@ func (app *App) InitLoggerFactory() {
 		panic(err)
 	}
 
-	app.loggerFactory.Register(loggerConfigMap)
+	for key, value := range loggerConfigMap {
+		func(channel string, config logger.Config) {
+			factory.RegisterLogger(channel, func() (*zap.Logger, error) {
+				driver, err := factory.MakeDriver(config)
+				if err != nil {
+					return nil, err
+				}
+				return factory.MakeLogger(factory.ConvertLevel(config.Level), driver), nil
+			})
+		}(key, value)
+	}
+
+	app.loggerFactory = factory
 }
 
-func (app *App) GetLoggerFactory() *logger.Factory {
+func (app *App) GetLoggerFactory() log.Factory {
 	return app.loggerFactory
 }
 

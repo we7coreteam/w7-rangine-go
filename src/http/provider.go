@@ -2,9 +2,8 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
 	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
-	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
-	"github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/http/console"
 	httperf "github.com/we7coreteam/w7-rangine-go/src/http/error"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
@@ -37,7 +36,7 @@ func (provider *Provider) Register() {
 		}, http.StatusMethodNotAllowed)
 	})
 
-	server.RegisterServer(httpServer)
+	provider.RegisterServer(httpServer)
 
 	provider.GetConsole().RegisterCommand(new(console.RouteListCommand))
 }

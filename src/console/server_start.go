@@ -4,7 +4,7 @@ import (
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/src/core/server"
+	"github.com/we7coreteam/w7-rangine-go-support/src/server"
 	"os"
 	"os/signal"
 	"strings"
