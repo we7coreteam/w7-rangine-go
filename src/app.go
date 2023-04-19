@@ -5,6 +5,7 @@ import (
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go-support/src"
+	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
 	log "github.com/we7coreteam/w7-rangine-go-support/src/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
@@ -41,6 +42,8 @@ func NewApp() *App {
 	GApp.InitLoggerFactory()
 	GApp.InitEvent()
 	GApp.InitProviderManager()
+
+	facade.SetApp(GApp)
 
 	return GApp
 }
