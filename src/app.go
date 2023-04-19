@@ -37,13 +37,13 @@ func NewApp() *App {
 		Version: "1.0.0",
 	}
 
+	facade.SetApp(GApp)
+
 	GApp.InitConfig()
 	GApp.InitContainer()
 	GApp.InitLoggerFactory()
 	GApp.InitEvent()
 	GApp.InitProviderManager()
-
-	facade.SetApp(GApp)
 
 	return GApp
 }
