@@ -3,7 +3,6 @@ package prof
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go/src/http/server"
 	"net/http"
 	"net/http/pprof"
@@ -12,12 +11,12 @@ import (
 type Server struct {
 	server.Server
 
-	config *viper.Viper
+	config Config
 	server *http.ServeMux
 	routes []string
 }
 
-func NewProfServer(config *viper.Viper) *Server {
+func NewProfServer(config Config) *Server {
 	return &Server{
 		server: http.NewServeMux(),
 		config: config,
@@ -46,15 +45,15 @@ func (server *Server) GetServerName() string {
 
 func (server *Server) GetOptions() map[string]string {
 	return map[string]string{
-		"Host": server.config.GetString("server.prof.host"),
-		"Port": server.config.GetString("server.prof.port"),
+		"Host": server.config.Host,
+		"Port": server.config.Port,
 	}
 }
 
 func (server *Server) Start() {
 	server.registerRoutes()
 
-	addr := fmt.Sprintf("%s:%s", server.config.GetString("server.prof.host"), server.config.GetString("server.prof.port"))
+	addr := fmt.Sprintf("%s:%s", server.config.Host, server.config.Port)
 	err := http.ListenAndServe(addr, server.server)
 	if err != nil {
 		panic(err)

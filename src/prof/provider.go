@@ -10,5 +10,11 @@ type Provider struct {
 }
 
 func (provider *Provider) Register() {
-	facade.RegisterServer(NewProfServer(facade.GetConfig()))
+	var serverConfig Config
+	err := facade.GetConfig().UnmarshalKey("server.prof", &serverConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	facade.RegisterServer(NewProfServer(serverConfig))
 }

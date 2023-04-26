@@ -9,7 +9,7 @@ import (
 
 type Server struct {
 	server.Server
-	config *viper.Viper
+	config Config
 
 	Engine  *gin.Engine
 	Session *session.Session
@@ -18,7 +18,12 @@ type Server struct {
 func NewHttpDefaultServer(config *viper.Viper) *Server {
 	var sessionConfig session.SessionConf
 	var cookieConfig session.Cookie
-	err := config.UnmarshalKey("session", &sessionConfig)
+	var serverConfig Config
+	err := config.UnmarshalKey("server.http", &serverConfig)
+	if err != nil {
+		panic(err)
+	}
+	err = config.UnmarshalKey("session", &sessionConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -27,13 +32,13 @@ func NewHttpDefaultServer(config *viper.Viper) *Server {
 		panic(err)
 	}
 
-	httpServer := NewServer(config)
+	httpServer := NewServer(serverConfig)
 	httpServer.Session = session.NewSession(sessionConfig, cookieConfig)
 
 	return httpServer
 }
 
-func NewServer(config *viper.Viper) *Server {
+func NewServer(config Config) *Server {
 	httpServer := &Server{
 		config: config,
 	}
@@ -69,8 +74,8 @@ func (server *Server) GetServerName() string {
 
 func (server *Server) GetOptions() map[string]string {
 	return map[string]string{
-		"Host": server.config.GetString("server.http.host"),
-		"Port": server.config.GetString("server.http.port"),
+		"Host": server.config.Host,
+		"Port": server.config.Port,
 	}
 }
 
@@ -79,7 +84,7 @@ func (server *Server) Start() {
 		server.Session.Init()
 	}
 
-	err := server.Engine.Run(server.config.GetString("server.http.host") + ":" + server.config.GetString("server.http.port"))
+	err := server.Engine.Run(server.config.Host + ":" + server.config.Port)
 	if err != nil {
 		panic(err)
 	}
