@@ -1,6 +1,7 @@
 package prof
 
 import (
+	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
 	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
 )
 
@@ -9,5 +10,5 @@ type Provider struct {
 }
 
 func (provider *Provider) Register() {
-	provider.RegisterServer(NewProfServer(provider.GetConfig()))
+	facade.RegisterServer(NewProfServer(facade.GetConfig()))
 }

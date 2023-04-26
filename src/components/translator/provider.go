@@ -6,6 +6,7 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	translational "github.com/go-playground/validator/v10/translations/zh"
+	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
 	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
 )
 
@@ -15,10 +16,10 @@ type Provider struct {
 
 func (provider *Provider) Register() {
 	uni := ut.New(zh.New())
-	translator, _ := uni.GetTranslator(provider.GetConfig().GetString("app.lang"))
+	translator, _ := uni.GetTranslator(facade.GetConfig().GetString("app.lang"))
 	_ = translational.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), translator)
 
-	err := provider.GetContainer().NamedSingleton("translator", func() ut.Translator {
+	err := facade.GetContainer().NamedSingleton("translator", func() ut.Translator {
 		return translator
 	})
 	if err != nil {

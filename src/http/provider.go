@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
 	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
 	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
 	"github.com/we7coreteam/w7-rangine-go/src/http/console"
@@ -16,10 +17,10 @@ type Provider struct {
 }
 
 func (provider *Provider) Register() {
-	response.Env = provider.GetConfig().GetString("app.env")
+	response.Env = facade.GetConfig().GetString("app.env")
 	responseObj := response.Response{}
 
-	httpServer := httpserver.NewHttpDefaultServer(provider.GetConfig())
+	httpServer := httpserver.NewHttpDefaultServer(facade.GetConfig())
 	httpServer.Engine.HandleMethodNotAllowed = true
 	httpServer.Engine.NoRoute(func(context *gin.Context) {
 		responseObj.JsonResponseWithError(context, httperf.NotFoundErr{
@@ -36,7 +37,7 @@ func (provider *Provider) Register() {
 		}, http.StatusMethodNotAllowed)
 	})
 
-	provider.RegisterServer(httpServer)
+	facade.RegisterServer(httpServer)
 
-	provider.GetConsole().RegisterCommand(new(console.RouteListCommand))
+	facade.GetConsole().RegisterCommand(new(console.RouteListCommand))
 }

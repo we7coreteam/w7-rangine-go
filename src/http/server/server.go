@@ -7,25 +7,25 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/http/session"
 )
 
-var GHttpServer *Server
+var DefaultHttpServer *Server
 
 func GetServer() *Server {
-	return GHttpServer
+	return DefaultHttpServer
 }
 
 func Use(middleware ...gin.HandlerFunc) gin.IRouter {
-	GHttpServer.Engine.Use(middleware...)
+	DefaultHttpServer.Engine.Use(middleware...)
 
-	return GHttpServer.Engine
+	return DefaultHttpServer.Engine
 }
 
 func RegisterRouters(register func(engine *gin.Engine)) *Server {
-	register(GHttpServer.Engine)
-	return GHttpServer
+	register(DefaultHttpServer.Engine)
+	return DefaultHttpServer
 }
 
 func GetSession() *session.Session {
-	return GHttpServer.Session
+	return DefaultHttpServer.Session
 }
 
 type Server struct {
@@ -48,19 +48,19 @@ func NewHttpDefaultServer(config *viper.Viper) *Server {
 		panic(err)
 	}
 
-	newServer := NewServer(config)
-	newServer.Session = session.NewSession(sessionConfig, cookieConfig)
+	DefaultHttpServer = NewServer(config)
+	DefaultHttpServer.Session = session.NewSession(sessionConfig, cookieConfig)
 
-	return newServer
+	return DefaultHttpServer
 }
 
 func NewServer(config *viper.Viper) *Server {
-	GHttpServer = &Server{
+	httpServer := &Server{
 		config: config,
 	}
-	GHttpServer.initGinEngine()
+	httpServer.initGinEngine()
 
-	return GHttpServer
+	return httpServer
 }
 
 func (server *Server) initGinEngine() {

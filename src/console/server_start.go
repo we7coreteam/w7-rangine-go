@@ -4,7 +4,7 @@ import (
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go-support/src/server"
+	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
 	"os"
 	"os/signal"
 	"strings"
@@ -46,7 +46,7 @@ func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string
 	color.Println("********************************************************************")
 
 	for _, serverName := range strings.Split(servers, "|") {
-		serverObj := server.GetServer(serverName)
+		serverObj := facade.GetServer(serverName)
 		if serverObj == nil {
 			color.Errorln("server " + serverName + " not exists!")
 			return

@@ -5,6 +5,7 @@ import (
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go-support/src"
+	cons "github.com/we7coreteam/w7-rangine-go-support/src/console"
 	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
 	log "github.com/we7coreteam/w7-rangine-go-support/src/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
@@ -13,7 +14,6 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/console"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
-	"github.com/we7coreteam/w7-rangine-go/src/http"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
 	"go.uber.org/zap"
 )
@@ -29,6 +29,7 @@ type App struct {
 	loggerFactory   log.Factory
 	event           EventBus.Bus
 	providerManager *provider.Manager
+	console         cons.Console
 }
 
 func NewApp() *App {
@@ -43,6 +44,7 @@ func NewApp() *App {
 	GApp.InitContainer()
 	GApp.InitLoggerFactory()
 	GApp.InitEvent()
+	GApp.InitConsole()
 	GApp.InitProviderManager()
 
 	return GApp
@@ -111,23 +113,30 @@ func (app *App) GetEvent() EventBus.Bus {
 }
 
 func (app *App) InitProviderManager() {
-	app.providerManager = provider.NewProviderManager(app.container, app.config, app.loggerFactory, app.event, console.GetConsole())
+	app.providerManager = provider.NewProviderManager()
 
-	app.providerManager.RegisterProvider(new(translator.Provider)).Register()
-	app.providerManager.RegisterProvider(new(database.Provider)).Register()
-	app.providerManager.RegisterProvider(new(redis.Provider)).Register()
-	app.providerManager.RegisterProvider(new(http.Provider)).Register()
-	app.providerManager.RegisterProvider(new(prof.Provider)).Register()
+	app.providerManager.RegisterProvider(new(translator.Provider))
+	app.providerManager.RegisterProvider(new(database.Provider))
+	app.providerManager.RegisterProvider(new(redis.Provider))
+	app.providerManager.RegisterProvider(new(prof.Provider))
 }
 
 func (app *App) GetProviderManager() *provider.Manager {
 	return app.providerManager
 }
 
-func (app *App) RunConsole() {
-	console.GetConsole().RegisterCommand(new(console.MakeModuleCommand))
-	console.GetConsole().RegisterCommand(console.NewServerStartCommand(app.config))
-	console.GetConsole().RegisterCommand(new(console.VersionCommand))
+func (app *App) InitConsole() {
+	app.console = console.NewConsole()
 
-	console.GetConsole().Run()
+	app.console.RegisterCommand(new(console.MakeModuleCommand))
+	app.console.RegisterCommand(console.NewServerStartCommand(app.config))
+	app.console.RegisterCommand(new(console.VersionCommand))
+}
+
+func (app *App) GetConsole() cons.Console {
+	return app.console
+}
+
+func (app *App) RunConsole() {
+	app.console.Run()
 }
