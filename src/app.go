@@ -130,6 +130,7 @@ func (app *App) InitConsole() {
 
 	app.console.RegisterCommand(new(console.MakeModuleCommand))
 	app.console.RegisterCommand(console.NewServerStartCommand(app.config))
+	app.console.RegisterCommand(new(console.ServerListCommand))
 	app.console.RegisterCommand(new(console.VersionCommand))
 }
 

@@ -7,27 +7,6 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/http/session"
 )
 
-var DefaultHttpServer *Server
-
-func GetServer() *Server {
-	return DefaultHttpServer
-}
-
-func Use(middleware ...gin.HandlerFunc) gin.IRouter {
-	DefaultHttpServer.Engine.Use(middleware...)
-
-	return DefaultHttpServer.Engine
-}
-
-func RegisterRouters(register func(engine *gin.Engine)) *Server {
-	register(DefaultHttpServer.Engine)
-	return DefaultHttpServer
-}
-
-func GetSession() *session.Session {
-	return DefaultHttpServer.Session
-}
-
 type Server struct {
 	server.Server
 	config *viper.Viper
@@ -48,10 +27,10 @@ func NewHttpDefaultServer(config *viper.Viper) *Server {
 		panic(err)
 	}
 
-	DefaultHttpServer = NewServer(config)
-	DefaultHttpServer.Session = session.NewSession(sessionConfig, cookieConfig)
+	httpServer := NewServer(config)
+	httpServer.Session = session.NewSession(sessionConfig, cookieConfig)
 
-	return DefaultHttpServer
+	return httpServer
 }
 
 func NewServer(config *viper.Viper) *Server {
@@ -67,6 +46,21 @@ func (server *Server) initGinEngine() {
 	gin.SetMode("release")
 	server.Engine = gin.New()
 	server.Engine.RedirectTrailingSlash = false
+}
+
+func (server *Server) Use(middleware ...gin.HandlerFunc) gin.IRouter {
+	server.Engine.Use(middleware...)
+
+	return server.Engine
+}
+
+func (server *Server) RegisterRouters(register func(engine *gin.Engine)) *Server {
+	register(server.Engine)
+	return server
+}
+
+func (server *Server) GetSession() *session.Session {
+	return server.Session
 }
 
 func (server *Server) GetServerName() string {
