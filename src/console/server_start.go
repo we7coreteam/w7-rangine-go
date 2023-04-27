@@ -3,7 +3,6 @@ package console
 import (
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
 	"os"
 	"os/signal"
@@ -13,14 +12,6 @@ import (
 
 type ServerStartCommand struct {
 	Abstract
-
-	config *viper.Viper
-}
-
-func NewServerStartCommand(config *viper.Viper) *ServerStartCommand {
-	return &ServerStartCommand{
-		config: config,
-	}
 }
 
 func (serverCommand ServerStartCommand) GetName() string {
@@ -34,7 +25,7 @@ func (serverCommand ServerStartCommand) GetDescription() string {
 func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string) {
 	servers := ""
 	if len(args) == 0 {
-		servers = serverCommand.config.GetString("app.server")
+		servers = facade.GetConfig().GetString("app.server")
 	} else {
 		servers = args[0]
 	}
