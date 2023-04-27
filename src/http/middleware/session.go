@@ -1,26 +1,13 @@
 package middleware
 
 import (
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go/src/http/session"
-	"net/http"
+	"github.com/spf13/viper"
 )
 
-type SessionMiddleware struct {
-	Abstract
-	session *session.Session
-}
+func GetSessionMiddleware(config *viper.Viper, storeResolver func(*viper.Viper, ...[]byte) sessions.Store, keyPairs ...[]byte) gin.HandlerFunc {
+	config.SetDefault("session.name", "SESSIONID")
 
-func NewSessionMiddleware(appSession *session.Session) *SessionMiddleware {
-	return &SessionMiddleware{session: appSession}
-}
-
-func (sessionMiddleware SessionMiddleware) Process(ctx *gin.Context) {
-	err := sessionMiddleware.session.Start(ctx)
-	if err != nil {
-		sessionMiddleware.JsonResponseWithError(ctx, err, http.StatusInternalServerError)
-		return
-	}
-
-	ctx.Next()
+	return sessions.Sessions(config.GetString("session.name"), storeResolver(config, keyPairs...))
 }
