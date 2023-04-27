@@ -4,7 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go-support/src/server"
+	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
+	httperf "github.com/we7coreteam/w7-rangine-go/src/http/error"
+	"github.com/we7coreteam/w7-rangine-go/src/http/response"
 	"github.com/we7coreteam/w7-rangine-go/src/http/session"
+	"net/http"
 )
 
 type Server struct {
@@ -43,6 +47,23 @@ func NewServer(config Config) *Server {
 		config: config,
 	}
 	httpServer.initGinEngine()
+
+	responseObj := response.Response{}
+	httpServer.Engine.HandleMethodNotAllowed = true
+	httpServer.Engine.NoRoute(func(context *gin.Context) {
+		responseObj.JsonResponseWithError(context, httperf.NotFoundErr{
+			Err: errorhandler.ResponseError{
+				Msg: "Route not found, " + context.Request.URL.Path,
+			},
+		}, http.StatusNotFound)
+	})
+	httpServer.Engine.NoMethod(func(context *gin.Context) {
+		responseObj.JsonResponseWithError(context, httperf.NotAllowErr{
+			Err: errorhandler.ResponseError{
+				Msg: "Route not allow, " + context.Request.URL.Path,
+			},
+		}, http.StatusMethodNotAllowed)
+	})
 
 	return httpServer
 }
