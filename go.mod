@@ -16,7 +16,7 @@ require (
 	github.com/redis/go-redis/v9 v9.0.2
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
-	github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230426131024-0edf371c25b0
+	github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230427085455-634bcd0178b7
 	go.uber.org/zap v1.24.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.4.6

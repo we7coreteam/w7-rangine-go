@@ -28,7 +28,7 @@ func (serverCommand ServerListCommand) Handle(cmd *cobra.Command, args []string)
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"#"})
 	t.AppendSeparator()
-	for name, _ := range facade.GetAllServer() {
+	for name, _ := range facade.GetServerFactory().GetAllServer() {
 		t.AppendRow([]interface{}{name})
 	}
 	t.Render()

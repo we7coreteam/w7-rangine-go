@@ -2,8 +2,9 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
-	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
+	"github.com/spf13/viper"
+	support "github.com/we7coreteam/w7-rangine-go-support/src/console"
+	"github.com/we7coreteam/w7-rangine-go-support/src/server"
 	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
 	"github.com/we7coreteam/w7-rangine-go/src/http/console"
 	httperf "github.com/we7coreteam/w7-rangine-go/src/http/error"
@@ -13,14 +14,14 @@ import (
 )
 
 type Provider struct {
-	provider.Abstract
+	server *httpserver.Server
 }
 
-func (provider *Provider) Register() {
-	response.Env = facade.GetConfig().GetString("app.env")
+func (provider *Provider) Register(config *viper.Viper, consoleManager support.Console, serverFactory server.Factory) *Provider {
+	response.Env = config.GetString("app.env")
 	responseObj := response.Response{}
 
-	httpServer := httpserver.NewHttpDefaultServer(facade.GetConfig())
+	httpServer := httpserver.NewHttpDefaultServer(config)
 	httpServer.Engine.HandleMethodNotAllowed = true
 	httpServer.Engine.NoRoute(func(context *gin.Context) {
 		responseObj.JsonResponseWithError(context, httperf.NotFoundErr{
@@ -36,8 +37,17 @@ func (provider *Provider) Register() {
 			},
 		}, http.StatusMethodNotAllowed)
 	})
+	provider.server = httpServer
 
-	facade.RegisterServer(httpServer)
+	serverFactory.RegisterServer(httpServer)
 
-	facade.GetConsole().RegisterCommand(new(console.RouteListCommand))
+	consoleManager.RegisterCommand(&console.RouteListCommand{
+		Server: httpServer,
+	})
+
+	return provider
+}
+
+func (provider *Provider) Export() *httpserver.Server {
+	return provider.server
 }

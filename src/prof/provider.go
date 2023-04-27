@@ -1,20 +1,19 @@
 package prof
 
 import (
-	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
-	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
+	"github.com/spf13/viper"
+	"github.com/we7coreteam/w7-rangine-go-support/src/server"
 )
 
 type Provider struct {
-	provider.Abstract
 }
 
-func (provider *Provider) Register() {
+func (provider Provider) Register(config *viper.Viper, serverFactory server.Factory) {
 	var serverConfig Config
-	err := facade.GetConfig().UnmarshalKey("server.prof", &serverConfig)
+	err := config.UnmarshalKey("server.prof", &serverConfig)
 	if err != nil {
 		panic(err)
 	}
 
-	facade.RegisterServer(NewProfServer(serverConfig))
+	serverFactory.RegisterServer(NewProfServer(serverConfig))
 }

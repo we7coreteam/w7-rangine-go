@@ -1,18 +1,17 @@
 package redis
 
 import (
-	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
-	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
+	"github.com/golobby/container/v3/pkg/container"
+	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go-support/src/redis"
 )
 
 type Provider struct {
-	provider.Abstract
 }
 
-func (provider *Provider) Register() {
+func (provider Provider) Register(config *viper.Viper, container container.Container) {
 	var redisConfigMap map[string]Config
-	err := facade.GetConfig().UnmarshalKey("redis", &redisConfigMap)
+	err := config.UnmarshalKey("redis", &redisConfigMap)
 	if err != nil {
 		panic(err)
 	}
@@ -20,7 +19,7 @@ func (provider *Provider) Register() {
 	factory := NewRedisFactory()
 	factory.Register(redisConfigMap)
 
-	err = facade.GetContainer().NamedSingleton("redis-factory", func() redis.Factory {
+	err = container.NamedSingleton("redis-factory", func() redis.Factory {
 		return factory
 	})
 	if err != nil {
