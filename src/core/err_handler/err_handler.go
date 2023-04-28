@@ -1,4 +1,4 @@
-package error
+package err_handler
 
 import (
 	"github.com/pkg/errors"
@@ -34,6 +34,10 @@ func Try(err error) *ErrHandler {
 }
 
 func (errHandler ErrHandler) Is(target ...error) bool {
+	if !Found(errHandler.err) {
+		return false
+	}
+
 	for _, arg := range target {
 		if errors.Is(errHandler.err, arg) {
 			return true
@@ -43,7 +47,7 @@ func (errHandler ErrHandler) Is(target ...error) bool {
 }
 
 func (errHandler ErrHandler) Catch(err any, handler ErrCustomerHandler) ErrHandler {
-	if errors.As(errHandler.err, err) {
+	if Found(errHandler.err) && errors.As(errHandler.err, err) {
 		handler(errHandler.err)
 	}
 
@@ -51,5 +55,7 @@ func (errHandler ErrHandler) Catch(err any, handler ErrCustomerHandler) ErrHandl
 }
 
 func (errHandler ErrHandler) Finally(handler FinallyHandler) {
-	handler(errHandler.err)
+	if Found(errHandler.err) {
+		handler(errHandler.err)
+	}
 }

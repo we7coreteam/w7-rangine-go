@@ -80,8 +80,8 @@ package {{.Name}}
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
-	http_server "github.com/we7coreteam/w7-rangine-go/src/http/server"
+	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
+	httpserver "github.com/we7coreteam/w7-rangine-go/src/http/server"
 	"github.com/we7coreteam/w7api/app/{{.Name}}/command"
 	"github.com/we7coreteam/w7api/app/{{.Name}}/http/controller"
 	"github.com/we7coreteam/w7api/app/{{.Name}}/http/middleware"
@@ -95,7 +95,7 @@ type Provider struct {
 func (provider *Provider) Register() {
 	provider.GetConsole().RegisterCommand(new(command.Test))
 
-	http_server.RegisterRouters(func(engine *gin.Engine) {
+	httpserver.RegisterRouters(func(engine *gin.Engine) {
 		engine.GET("/{{.Name}}/index", middleware.Home{}.Process, controller.Home{}.Index)
 	})
 }`,
@@ -143,7 +143,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go/src/facade"
+	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
 	"github.com/we7coreteam/w7-rangine-go/src/http/middleware"
 	"time"
 )

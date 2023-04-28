@@ -6,6 +6,6 @@ type Config struct {
 	Level      string         `mapstructure:"level" json:"level" yaml:"level"`
 	MaxDays    int            `mapstructure:"max_days" json:"max_days" yaml:"max_days"`
 	MaxSize    int            `mapstructure:"max_size" json:"max_size" yaml:"max_size"`
-	Options    map[string]any `mapstructure:"options" json:"options" yaml:"options"`
 	MaxBackups int            `mapstructure:"max_backups" json:"max_backups" yaml:"max_backups"`
+	Options    map[string]any `mapstructure:"options" json:"options" yaml:"options"`
 }

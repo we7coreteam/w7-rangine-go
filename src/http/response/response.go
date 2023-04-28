@@ -3,7 +3,7 @@ package response
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/error"
+	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
 	"net/http"
 )
 
@@ -13,27 +13,25 @@ type Formatter func(ctx *gin.Context, data any, error error, statusCode int) any
 
 var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, statusCode int) any {
 	responseJson := map[string]interface{}{
-		"data": data,
-		"code": statusCode,
-		"msg":  "",
+		"data":  data,
+		"code":  statusCode,
+		"error": "",
 	}
 
 	errMsg := ""
-	if errorhandler.Found(err) {
-		errorhandler.Try(err).Catch(&errorhandler.ResponseError{}, func(err error) {
-			errMsg = err.Error()
-		}).Finally(func(err error) {
-			if errMsg == "" {
-				if Env == "debug" {
-					errMsg = err.Error()
-					responseJson["err_strace"] = fmt.Sprintf("%+v \n ", err)
-				} else {
-					errMsg = "系统内部错误"
-				}
+	errorhandler.Try(err).Catch(&errorhandler.ResponseError{}, func(err error) {
+		errMsg = err.Error()
+	}).Finally(func(err error) {
+		if errMsg == "" {
+			if Env == "debug" {
+				errMsg = err.Error()
+				responseJson["err_strace"] = fmt.Sprintf("%+v \n ", err)
+			} else {
+				errMsg = "系统内部错误"
 			}
-		})
-		responseJson["msg"] = errMsg
-	}
+		}
+	})
+	responseJson["error"] = errMsg
 
 	return responseJson
 }

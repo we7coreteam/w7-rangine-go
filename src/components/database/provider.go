@@ -1,31 +1,33 @@
 package database
 
 import (
-	"github.com/we7coreteam/w7-rangine-go/src/core/provider"
+	"github.com/golobby/container/v3/pkg/container"
+	"github.com/spf13/viper"
+	"github.com/we7coreteam/w7-rangine-go-support/src/database"
+	"github.com/we7coreteam/w7-rangine-go-support/src/logger"
 )
 
 type Provider struct {
-	provider.Abstract
 }
 
-func (provider *Provider) Register() {
+func (provider Provider) Register(config *viper.Viper, loggerFactory logger.Factory, container container.Container) {
 	var dbConfigMap map[string]Config
-	err := provider.GetConfig().UnmarshalKey("database", &dbConfigMap)
+	err := config.UnmarshalKey("database", &dbConfigMap)
 	if err != nil {
 		panic(err)
 	}
 
 	dbFactory := NewDatabaseFactory()
-	logger, err := provider.GetLoggerFactory().Channel("default")
+	logger, err := loggerFactory.Channel("default")
 	if err == nil {
 		dbFactory.SetLogger(logger)
 	}
 	dbFactory.Register(dbConfigMap)
-	if provider.GetConfig().GetString("app.env") == "debug" {
+	if config.GetString("app.env") == "debug" {
 		dbFactory.SetDebug()
 	}
 
-	err = provider.GetContainer().NamedSingleton("db-factory", func() *Factory {
+	err = container.NamedSingleton("db-factory", func() database.Factory {
 		return dbFactory
 	})
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 
 type RouteListCommand struct {
 	console.Abstract
+	Server *server.Server
 }
 
 func (listCommand RouteListCommand) GetName() string {
@@ -25,7 +26,7 @@ func (listCommand RouteListCommand) Handle(cmd *cobra.Command, args []string) {
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"#", "Path", "Method", "Handler"})
 	t.AppendSeparator()
-	for index, route := range server.GetServer().Engine.Routes() {
+	for index, route := range listCommand.Server.Engine.Routes() {
 		t.AppendRow([]interface{}{index, route.Path, route.Method, route.Handler})
 	}
 	t.Render()
