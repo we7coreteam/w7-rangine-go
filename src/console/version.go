@@ -22,5 +22,5 @@ func (versionCommand VersionCommand) Configure(command *cobra.Command) {
 }
 
 func (versionCommand VersionCommand) Handle(cmd *cobra.Command, args []string) {
-	color.Infoln("version: 1.0.0")
+	color.Infoln("version: 1.0")
 }
