@@ -37,7 +37,7 @@ func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string
 	color.Println("********************************************************************")
 
 	for _, serverName := range strings.Split(servers, "|") {
-		serverObj := facade.GetServerFactory().GetServer(serverName)
+		serverObj := facade.GetServerManager().GetServer(serverName)
 		if serverObj == nil {
 			color.Errorln("server " + serverName + " not exists!")
 			return
