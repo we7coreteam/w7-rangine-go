@@ -13,13 +13,13 @@ type Provider struct {
 	server *httpserver.Server
 }
 
-func (provider *Provider) Register(config *viper.Viper, consoleManager support.Console, serverFactory server.Factory) *Provider {
+func (provider *Provider) Register(config *viper.Viper, consoleManager support.Console, serverManager server.Manager) *Provider {
 	response.Env = config.GetString("app.env")
 
 	httpServer := httpserver.NewHttpDefaultServer(config)
 	provider.server = httpServer
 
-	serverFactory.RegisterServer(httpServer)
+	serverManager.RegisterServer(httpServer)
 
 	consoleManager.RegisterCommand(&console.RouteListCommand{
 		Server: httpServer,

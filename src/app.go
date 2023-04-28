@@ -14,7 +14,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/components/translator"
 	"github.com/we7coreteam/w7-rangine-go/src/console"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
-	sf "github.com/we7coreteam/w7-rangine-go/src/core/server"
+	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
 	"go.uber.org/zap"
 )
@@ -28,7 +28,7 @@ type App struct {
 	config        *viper.Viper
 	container     container.Container
 	loggerFactory log.Factory
-	serverFactory server.Factory
+	serverManager server.Manager
 	event         EventBus.Bus
 	console       cons.Console
 }
@@ -46,7 +46,7 @@ func NewApp() *App {
 	GApp.InitLoggerFactory()
 	GApp.InitEvent()
 	GApp.InitConsole()
-	GApp.InitServerFactory()
+	GApp.InitServerManager()
 	GApp.RegisterProviders()
 
 	return GApp
@@ -118,7 +118,7 @@ func (app *App) RegisterProviders() {
 	translator.Provider{}.Register(app.container)
 	database.Provider{}.Register(app.config, app.loggerFactory, app.container)
 	redis.Provider{}.Register(app.config, app.container)
-	prof.Provider{}.Register(app.config, app.GetServerFactory())
+	prof.Provider{}.Register(app.config, app.GetServerManager())
 }
 
 func (app *App) InitConsole() {
@@ -130,12 +130,12 @@ func (app *App) InitConsole() {
 	app.console.RegisterCommand(new(console.VersionCommand))
 }
 
-func (app *App) InitServerFactory() {
-	app.serverFactory = sf.NewDefaultServerFactory()
+func (app *App) InitServerManager() {
+	app.serverManager = sm.NewDefaultServerManager()
 }
 
-func (app *App) GetServerFactory() server.Factory {
-	return app.serverFactory
+func (app *App) GetServerManager() server.Manager {
+	return app.serverManager
 }
 
 func (app *App) GetConsole() cons.Console {

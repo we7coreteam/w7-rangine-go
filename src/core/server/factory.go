@@ -2,27 +2,27 @@ package server
 
 import "github.com/we7coreteam/w7-rangine-go-support/src/server"
 
-type Factory struct {
-	server.Factory
+type Manager struct {
+	server.Manager
 	servers map[string]server.Server
 }
 
-func NewDefaultServerFactory() *Factory {
-	return &Factory{
+func NewDefaultServerManager() *Manager {
+	return &Manager{
 		servers: make(map[string]server.Server),
 	}
 }
 
-func (sf *Factory) RegisterServer(server server.Server) {
-	sf.servers[server.GetServerName()] = server
+func (sm *Manager) RegisterServer(server server.Server) {
+	sm.servers[server.GetServerName()] = server
 }
 
-func (sf *Factory) GetAllServer() map[string]server.Server {
-	return sf.servers
+func (sm *Manager) GetAllServer() map[string]server.Server {
+	return sm.servers
 }
 
-func (sf *Factory) GetServer(serverName string) server.Server {
-	s, exists := sf.servers[serverName]
+func (sm *Manager) GetServer(serverName string) server.Server {
+	s, exists := sm.servers[serverName]
 	if !exists {
 		return nil
 	}
