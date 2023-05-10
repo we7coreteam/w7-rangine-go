@@ -24,6 +24,8 @@ require (
 	gorm.io/gorm v1.25.0
 )
 
+replace github.com/we7coreteam/w7-rangine-go-support => ../w7-rangine-go-support
+
 require (
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff // indirect
 	github.com/bytedance/sonic v1.8.0 // indirect

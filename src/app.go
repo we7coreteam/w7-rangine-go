@@ -126,6 +126,7 @@ func (app *App) InitConsole() {
 
 	app.console.RegisterCommand(new(console.MakeModuleCommand))
 	app.console.RegisterCommand(new(console.ServerStartCommand))
+	app.console.RegisterCommand(new(console.ServerStopCommand))
 	app.console.RegisterCommand(new(console.ServerListCommand))
 	app.console.RegisterCommand(new(console.VersionCommand))
 }
