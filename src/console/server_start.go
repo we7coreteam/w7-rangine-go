@@ -1,9 +1,12 @@
 package console
 
 import (
+	"errors"
 	"github.com/gookit/color"
+	"github.com/sevlyar/go-daemon"
 	"github.com/spf13/cobra"
 	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
+	"log"
 	"os"
 	"os/signal"
 	"strings"
@@ -16,6 +19,10 @@ type ServerStartCommand struct {
 
 func (serverCommand ServerStartCommand) GetName() string {
 	return "server:start"
+}
+
+func (serverCommand ServerStartCommand) Configure(cmd *cobra.Command) {
+	cmd.Flags().BoolP("d", "d", false, "daemon start server")
 }
 
 func (serverCommand ServerStartCommand) GetDescription() string {
@@ -34,12 +41,13 @@ func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string
 		return
 	}
 
-	facade.GetServerManager().Start(strings.Split(servers, "|"))
-
 	color.Println("********************************************************************")
 
 	for _, serverName := range strings.Split(servers, "|") {
 		serverObj := facade.GetServerManager().GetServer(serverName)
+		if serverObj == nil {
+			panic(errors.New("server " + serverName + " not found"))
+		}
 
 		color.Print(serverName + " | ")
 		for key, val := range serverObj.GetOptions() {
@@ -50,10 +58,29 @@ func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string
 
 	color.Println("********************************************************************")
 
+	isDaemon, _ := cmd.Flags().GetBool("d")
+	if isDaemon {
+		ctx := &daemon.Context{
+			WorkDir: "./",
+			Umask:   027,
+			Args:    []string{"", "server:start"},
+		}
+
+		d, err := ctx.Reborn()
+		if err != nil {
+			log.Fatal("Unable to run: ", err)
+		}
+		defer ctx.Release()
+		if d != nil {
+			return
+		}
+
+		return
+	}
+
+	facade.GetServerManager().Start(strings.Split(servers, "|"))
+
 	quit := make(chan os.Signal)
-	// kill (no param) default send syscall.SIGTERM
-	// kill -2 is syscall.SIGINT
-	// kill -9 is syscall.SIGKILL but can't be caught, so don't need to add it
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	color.Println("Shutting down server...")

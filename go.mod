@@ -14,6 +14,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.4.4
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.0.2
+	github.com/sevlyar/go-daemon v0.1.6
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
 	github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230428105720-aad263eb967a
@@ -45,6 +46,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
