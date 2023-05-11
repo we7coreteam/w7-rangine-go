@@ -4,7 +4,10 @@ import (
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 )
 
 type ServerStartCommand struct {
@@ -46,4 +49,12 @@ func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string
 	}
 
 	color.Println("********************************************************************")
+
+	quit := make(chan os.Signal)
+	// kill (no param) default send syscall.SIGTERM
+	// kill -2 is syscall.SIGINT
+	// kill -9 is syscall.SIGKILL but can't be caught, so don't need to add it
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	color.Println("Shutting down server...")
 }

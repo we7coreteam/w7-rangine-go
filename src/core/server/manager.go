@@ -76,4 +76,6 @@ func (sm *Manager) Stop(servers []string) {
 	if err != nil {
 		panic(err)
 	}
+
+	_ = os.Remove(pidPath)
 }
