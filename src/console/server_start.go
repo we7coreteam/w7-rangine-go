@@ -15,6 +15,7 @@ import (
 
 type ServerStartCommand struct {
 	Abstract
+	Name string
 }
 
 func (serverCommand ServerStartCommand) GetName() string {
@@ -63,7 +64,7 @@ func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string
 		ctx := &daemon.Context{
 			WorkDir: "./",
 			Umask:   027,
-			Args:    []string{"", "server:start"},
+			Args:    []string{serverCommand.Name, "server:start"},
 		}
 
 		d, err := ctx.Reborn()
