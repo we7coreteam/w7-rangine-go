@@ -350,6 +350,8 @@ github.com/ugorji/go/codec v1.2.9 h1:rmenucSohSTiyL09Y+l2OCk+FrMxGMzho2+tjr5ticU
 github.com/ugorji/go/codec v1.2.9/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
 github.com/wader/gormstore/v2 v2.0.3 h1:/29GWPauY8xZkpLnB8hsp+dZfP3ivA9fiDw1YVNTp6U=
 github.com/wader/gormstore/v2 v2.0.3/go.mod h1:sr3N3a8F1+PBc3fHoKaphFqDXLRJ9Oe6Yow0HxKFbbg=
+github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230428105720-aad263eb967a h1:/39LZsoSWr3Yl9ZR8DH0dlWJTYVK2PBZKV1M46Ee/rI=
+github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230428105720-aad263eb967a/go.mod h1:XHkctahxj7VWvv5IyRsXGoN9/OFJycWF3vxfzgksxdc=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 h1:QldyIu/L63oPpyvQmHgvgickp1Yw510KJOqX7H24mg8=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778/go.mod h1:2MuV+tbUrU1zIOPMxZ5EncGwgmMJsa+9ucAQZXxsObs=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
