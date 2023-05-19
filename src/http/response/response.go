@@ -1,6 +1,7 @@
 package response
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
@@ -19,18 +20,17 @@ var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, st
 	}
 
 	errMsg := ""
-	errorhandler.Try(err).Catch(&errorhandler.ResponseError{}, func(err error) {
+	if errors.As(err, &errorhandler.ResponseError{}) {
 		errMsg = err.Error()
-	}).Finally(func(err error) {
-		if errMsg == "" {
-			if Env == "debug" {
-				errMsg = err.Error()
-				responseJson["err_strace"] = fmt.Sprintf("%+v \n ", err)
-			} else {
-				errMsg = "系统内部错误"
-			}
+	}
+	if errMsg == "" {
+		if Env == "debug" {
+			errMsg = err.Error()
+			responseJson["err_strace"] = fmt.Sprintf("%+v \n ", err)
+		} else {
+			errMsg = "系统内部错误"
 		}
-	})
+	}
 	responseJson["error"] = errMsg
 
 	return responseJson
