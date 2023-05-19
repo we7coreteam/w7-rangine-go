@@ -4,7 +4,6 @@ import (
 	"errors"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
@@ -43,7 +42,6 @@ func NewDatabaseFactory() *Factory {
 	}
 
 	factory.RegisterDriverResolver("mysql", factory.MakeMysqlDriver)
-	factory.RegisterDriverResolver("sqlite", factory.MakeSqliteDriver)
 
 	return factory
 }
@@ -68,10 +66,6 @@ func (factory *Factory) MakeMysqlDriver(databaseConfig Config) (gorm.Dialector, 
 		DSN:                       dns,   // data source name
 		SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
 	}), nil
-}
-
-func (factory *Factory) MakeSqliteDriver(databaseConfig Config) (gorm.Dialector, error) {
-	return sqlite.Open(databaseConfig.DSN), nil
 }
 
 func (factory *Factory) MakeDriver(databaseConfig Config) (gorm.Dialector, error) {
