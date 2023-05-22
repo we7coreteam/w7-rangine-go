@@ -12,10 +12,19 @@ type Console struct {
 }
 
 func NewConsole() *Console {
-	return &Console{
-		handler: &cobra.Command{
-			Use: "",
+	rootCommandHandler := &RootCommand{}
+	handler := &cobra.Command{
+		Use:              rootCommandHandler.GetName(),
+		Short:            rootCommandHandler.GetDescription(),
+		PersistentPreRun: rootCommandHandler.Handle,
+		Run: func(cmd *cobra.Command, args []string) {
+			cmd.Usage()
 		},
+	}
+	rootCommandHandler.Configure(handler)
+
+	return &Console{
+		handler: handler,
 	}
 }
 
@@ -23,15 +32,19 @@ func GetConsole() *Console {
 	return console
 }
 
-func (console *Console) RegisterCommand(command command.Command) {
+func (console Console) GetFlagConfigFile(name string) (string, error) {
+	return console.handler.Flags().GetString("config-file")
+}
+
+func (console Console) RegisterCommand(command command.Command) {
 	handler := &cobra.Command{
 		Use:   command.GetName(),
 		Short: command.GetDescription(),
 		Run:   command.Handle,
 	}
 	command.Configure(handler)
-
 	console.handler.AddCommand(handler)
+
 }
 
 func (console *Console) Run() {
