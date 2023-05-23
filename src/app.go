@@ -17,6 +17,7 @@ import (
 	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
 	"go.uber.org/zap"
+	"os"
 )
 
 var GApp *App
@@ -41,11 +42,11 @@ func NewApp() *App {
 
 	facade.SetApp(GApp)
 
+	GApp.InitConsole()
 	GApp.InitConfig()
 	GApp.InitContainer()
 	GApp.InitLoggerFactory()
 	GApp.InitEvent()
-	GApp.InitConsole()
 	GApp.InitServerManager()
 	GApp.RegisterProviders()
 
@@ -53,14 +54,27 @@ func NewApp() *App {
 }
 
 func (app *App) InitConfig() {
-	conf := viper.New()
-	conf.SetConfigFile("./config.yaml")
+	app.config = viper.New()
+	app.config.AutomaticEnv()
 
-	if err := conf.ReadInConfig(); err != nil {
-		panic(err)
+	loadConfigFile := func(path string) {
+		if path == "" {
+			return
+		}
+
+		_, err := os.Stat(path)
+		if err != nil && os.IsNotExist(err) {
+			return
+		}
+
+		app.config.SetConfigFile(path)
+		if err := app.config.MergeInConfig(); err != nil {
+			panic(err)
+		}
 	}
 
-	app.config = conf
+	loadConfigFile("./config.yaml")
+	loadConfigFile(os.Getenv("RANGINE_CONFIG_FILE"))
 
 	app.config.SetDefault("app.env", "release")
 	app.config.SetDefault("app.lang", "zh")
@@ -121,6 +135,14 @@ func (app *App) RegisterProviders() {
 	prof.Provider{}.Register(app.config, app.GetServerManager())
 }
 
+func (app *App) InitServerManager() {
+	app.serverManager = sm.NewDefaultServerManager()
+}
+
+func (app *App) GetServerManager() server.Manager {
+	return app.serverManager
+}
+
 func (app *App) InitConsole() {
 	app.console = console.NewConsole()
 
@@ -131,14 +153,6 @@ func (app *App) InitConsole() {
 	app.console.RegisterCommand(new(console.ServerStopCommand))
 	app.console.RegisterCommand(new(console.ServerListCommand))
 	app.console.RegisterCommand(new(console.VersionCommand))
-}
-
-func (app *App) InitServerManager() {
-	app.serverManager = sm.NewDefaultServerManager()
-}
-
-func (app *App) GetServerManager() server.Manager {
-	return app.serverManager
 }
 
 func (app *App) GetConsole() cons.Console {

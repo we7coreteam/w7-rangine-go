@@ -3,9 +3,8 @@ package console
 import (
 	"github.com/spf13/cobra"
 	command "github.com/we7coreteam/w7-rangine-go-support/src/console"
+	"os"
 )
-
-var console = NewConsole()
 
 type Console struct {
 	handler *cobra.Command
@@ -14,26 +13,17 @@ type Console struct {
 func NewConsole() *Console {
 	rootCommandHandler := &RootCommand{}
 	handler := &cobra.Command{
-		Use:              rootCommandHandler.GetName(),
-		Short:            rootCommandHandler.GetDescription(),
-		PersistentPreRun: rootCommandHandler.Handle,
-		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Usage()
-		},
+		Use:   rootCommandHandler.GetName(),
+		Short: rootCommandHandler.GetDescription(),
 	}
 	rootCommandHandler.Configure(handler)
+	cmd, flags, _ := handler.Find(os.Args[1:])
+	_ = cmd.ParseFlags(flags)
+	rootCommandHandler.Handle(cmd, flags)
 
 	return &Console{
 		handler: handler,
 	}
-}
-
-func GetConsole() *Console {
-	return console
-}
-
-func (console Console) GetFlagConfigFile(name string) (string, error) {
-	return console.handler.Flags().GetString("config-file")
 }
 
 func (console Console) RegisterCommand(command command.Command) {
@@ -44,9 +34,8 @@ func (console Console) RegisterCommand(command command.Command) {
 	}
 	command.Configure(handler)
 	console.handler.AddCommand(handler)
-
 }
 
-func (console *Console) Run() {
-	console.handler.Execute()
+func (console Console) Run() {
+	_ = console.handler.Execute()
 }
