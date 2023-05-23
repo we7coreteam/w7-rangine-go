@@ -91,10 +91,11 @@ func (app *App) InitConfig() {
 		}
 	}
 	for _, env := range os.Environ() {
-		key, found := strings.CutPrefix(strings.Split(env, "=")[0], "RANGINE_")
-		if found {
-			path := strings.Split(strings.ToLower(key), ".")
-			maps.Copy(envMap, buildMap(path, strings.Split(env, "=")[1]))
+		keyVal := strings.Split(env, "=")
+		prefix := "RANGINE_"
+		if len(keyVal[0]) >= len(prefix) && keyVal[0][0:len(prefix)] == prefix {
+			path := strings.Split(strings.ToLower(keyVal[0][len(prefix):]), ".")
+			maps.Copy(envMap, buildMap(path, keyVal[1]))
 		}
 	}
 	err := app.config.MergeConfigMap(envMap)
