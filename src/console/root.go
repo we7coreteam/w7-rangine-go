@@ -27,6 +27,11 @@ func (rootCommand RootCommand) Handle(command *cobra.Command, args []string) {
 	// 将配置项写入配置中
 	configFile, _ := command.Flags().GetString("config-file")
 	if configFile != "" {
+		_, err := os.Stat(configFile)
+		if err != nil && os.IsNotExist(err) {
+			panic(err)
+		}
+
 		os.Setenv("RANGINE_CONFIG_FILE", configFile)
 	}
 	env, err := command.Flags().GetStringArray("env-var")
@@ -34,7 +39,7 @@ func (rootCommand RootCommand) Handle(command *cobra.Command, args []string) {
 		for _, val := range env {
 			if strings.Index(val, "=") >= 0 {
 				varArr := strings.Split(val, "=")
-				os.Setenv(varArr[0], varArr[1])
+				os.Setenv("RANGINE_"+varArr[0], varArr[1])
 			}
 		}
 	}

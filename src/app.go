@@ -17,7 +17,9 @@ import (
 	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
 	"go.uber.org/zap"
+	"golang.org/x/exp/maps"
 	"os"
+	"strings"
 )
 
 var GApp *App
@@ -72,9 +74,33 @@ func (app *App) InitConfig() {
 			panic(err)
 		}
 	}
-
 	loadConfigFile("./config.yaml")
 	loadConfigFile(os.Getenv("RANGINE_CONFIG_FILE"))
+
+	var root = make(map[string]interface{})
+	var buildMap func(path []string, value interface{}) map[string]interface{}
+	buildMap = func(path []string, value interface{}) map[string]interface{} {
+		if len(path) > 1 {
+			return map[string]interface{}{
+				path[0]: buildMap(path[1:], value),
+			}
+		}
+
+		return map[string]interface{}{
+			path[0]: value,
+		}
+	}
+	for _, env := range os.Environ() {
+		key, found := strings.CutPrefix(strings.Split(env, "=")[0], "RANGINE_")
+		if found {
+			path := strings.Split(strings.ToLower(key), ".")
+			maps.Copy(root, buildMap(path, strings.Split(env, "=")[1]))
+		}
+	}
+	err := app.config.MergeConfigMap(root)
+	if err != nil {
+		panic(err)
+	}
 
 	app.config.SetDefault("app.env", "release")
 	app.config.SetDefault("app.lang", "zh")
