@@ -20,7 +20,7 @@ func (rootCommand RootCommand) GetDescription() string {
 
 func (rootCommand RootCommand) Configure(command *cobra.Command) {
 	command.PersistentFlags().StringP("config-file", "f", "", "Set the configuration file path")
-	command.PersistentFlags().StringArrayP("env-var", "e", make([]string, 10), "Set environment variables")
+	command.PersistentFlags().StringArrayP("env-var", "e", make([]string, 0), "Set environment variables")
 }
 
 func (rootCommand RootCommand) Handle(command *cobra.Command, args []string) {
