@@ -42,7 +42,9 @@ func (makeModuleCommand MakeModuleCommand) Handle(cmd *cobra.Command, args []str
 
 	exist, err := os.Stat(fmt.Sprintf("%s/app/%s", baseDir, argsValue.name))
 	if err == nil && exist.IsDir() {
-		panic(errors.New("module is exists"))
+		cmd.PrintErrln("Error: Module is exists")
+		cmd.Usage()
+		return
 	}
 	//创建目录
 	for _, dir := range makeModuleCommand.templateDir() {
@@ -69,7 +71,7 @@ func (makeModuleCommand MakeModuleCommand) Handle(cmd *cobra.Command, args []str
 
 	color.Println("Please copy the register provider code to the 'main.go' file.")
 	color.Println("********************************************************************")
-	color.Red.Printf(" new(%s.Provider).Register() \n", argsValue.name)
+	color.Red.Printf(" new(%s.Provider).Register(httpServer, app.GetConsole()) \n", argsValue.name)
 	color.Println("********************************************************************")
 }
 
@@ -83,7 +85,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go-skeleton/app/{{.Name}}/command"
 	"github.com/we7coreteam/w7-rangine-go-skeleton/app/{{.Name}}/http/controller"
 	"github.com/we7coreteam/w7-rangine-go-skeleton/app/{{.Name}}/http/middleware"
-	"github.com/we7coreteam/w7-rangine-go/src/console"
+	"github.com/we7coreteam/w7-rangine-go-support/src/console"
 	http_server "github.com/we7coreteam/w7-rangine-go/src/http/server"
 			
 )
@@ -97,7 +99,7 @@ func (provider *Provider) Register(httpServer *http_server.Server, console conso
 
 	// 注册一些路由
 	httpServer.RegisterRouters(func(engine *gin.Engine) {
-		engine.GET("/home/index", middleware.Home{}.Process, controller.Home{}.Index)
+		engine.GET("/{{.Name}}/index", middleware.Home{}.Process, controller.Home{}.Index)
 	})
 }`,
 		"command/test.go": `
