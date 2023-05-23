@@ -77,7 +77,7 @@ func (app *App) InitConfig() {
 	loadConfigFile("./config.yaml")
 	loadConfigFile(os.Getenv("RANGINE_CONFIG_FILE"))
 
-	var root = make(map[string]interface{})
+	var envMap = make(map[string]interface{})
 	var buildMap func(path []string, value interface{}) map[string]interface{}
 	buildMap = func(path []string, value interface{}) map[string]interface{} {
 		if len(path) > 1 {
@@ -94,10 +94,10 @@ func (app *App) InitConfig() {
 		key, found := strings.CutPrefix(strings.Split(env, "=")[0], "RANGINE_")
 		if found {
 			path := strings.Split(strings.ToLower(key), ".")
-			maps.Copy(root, buildMap(path, strings.Split(env, "=")[1]))
+			maps.Copy(envMap, buildMap(path, strings.Split(env, "=")[1]))
 		}
 	}
-	err := app.config.MergeConfigMap(root)
+	err := app.config.MergeConfigMap(envMap)
 	if err != nil {
 		panic(err)
 	}
