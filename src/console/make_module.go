@@ -69,7 +69,7 @@ func (makeModuleCommand MakeModuleCommand) Handle(cmd *cobra.Command, args []str
 
 	color.Println("Please copy the register provider code to the 'main.go' file.")
 	color.Println("********************************************************************")
-	color.Red.Printf(" app.GetProviderManager().RegisterProvider(new(%s.Provider)).Register() \n", argsValue.name)
+	color.Red.Printf(" new(%s.Provider).Register() \n", argsValue.name)
 	color.Println("********************************************************************")
 }
 
@@ -80,23 +80,24 @@ package {{.Name}}
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go-support/src/provider"
-	httpserver "github.com/we7coreteam/w7-rangine-go/src/http/server"
-	"github.com/we7coreteam/w7api/app/{{.Name}}/command"
-	"github.com/we7coreteam/w7api/app/{{.Name}}/http/controller"
-	"github.com/we7coreteam/w7api/app/{{.Name}}/http/middleware"
+	"github.com/we7coreteam/w7-rangine-go-skeleton/app/{{.Name}}/command"
+	"github.com/we7coreteam/w7-rangine-go-skeleton/app/{{.Name}}/http/controller"
+	"github.com/we7coreteam/w7-rangine-go-skeleton/app/{{.Name}}/http/middleware"
+	"github.com/we7coreteam/w7-rangine-go/src/console"
+	http_server "github.com/we7coreteam/w7-rangine-go/src/http/server"
 			
 )
 
 type Provider struct {
-	provider.Abstract
 }
 
-func (provider *Provider) Register() {
-	provider.GetConsole().RegisterCommand(new(command.Test))
+func (provider *Provider) Register(httpServer *http_server.Server, console console.Console) {
+	// 注册一个 {{.Name}}:test 命令
+	console.RegisterCommand(new(command.Test))
 
-	httpserver.RegisterRouters(func(engine *gin.Engine) {
-		engine.GET("/{{.Name}}/index", middleware.Home{}.Process, controller.Home{}.Index)
+	// 注册一些路由
+	httpServer.RegisterRouters(func(engine *gin.Engine) {
+		engine.GET("/home/index", middleware.Home{}.Process, controller.Home{}.Index)
 	})
 }`,
 		"command/test.go": `
@@ -117,7 +118,7 @@ func (test Test) GetName() string {
 }
 
 func (test Test) GetDescription() string {
-	return "test command"
+	return "{{.Name}} command"
 }
 
 func (test Test) Handle(cmd *cobra.Command, args []string) {
