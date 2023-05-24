@@ -175,6 +175,8 @@ func (app *App) InitConsole() {
 
 	app.console.RegisterCommand(new(console.MakeModuleCommand))
 	app.console.RegisterCommand(new(console.MakeProjectCommand))
+	app.console.RegisterCommand(new(console.MakeModelCommand))
+	app.console.RegisterCommand(new(console.MakeCmdCommand))
 	app.console.RegisterCommand(&console.ServerStartCommand{
 		Name: app.Name,
 	})
