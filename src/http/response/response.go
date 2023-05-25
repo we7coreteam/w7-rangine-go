@@ -10,15 +10,10 @@ import (
 
 var Env = "release"
 
-type Formatter func(ctx *gin.Context, data any, error error, statusCode int) any
+type ErrFormatter func(ctx *gin.Context, err error) error
+type DataFormatter func(ctx *gin.Context, data any, err error, statusCode int) any
 
-var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, statusCode int) any {
-	responseJson := map[string]interface{}{
-		"data":  data,
-		"code":  statusCode,
-		"error": "",
-	}
-
+var responseErrFormatter ErrFormatter = func(ctx *gin.Context, err error) error {
 	if errorhandler.Found(err) {
 		errMsg := ""
 		if errors.As(err, &errorhandler.ResponseError{}) {
@@ -26,24 +21,39 @@ var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, st
 		}
 		if errMsg == "" {
 			if Env == "debug" {
-				errMsg = err.Error()
-				responseJson["err_strace"] = fmt.Sprintf("%+v \n ", err)
+				errMsg = fmt.Sprintf("%+v \n ", err)
 			} else {
 				errMsg = "系统内部错误"
 			}
 		}
-		responseJson["error"] = errMsg
+		return errors.New(errMsg)
 	}
 
-	return responseJson
+	return nil
 }
 
-func SetResponseFormatter(formatter Formatter) {
-	responseFormatter = formatter
+var responseDataFormatter DataFormatter = func(ctx *gin.Context, data any, err error, statusCode int) any {
+	return map[string]interface{}{
+		"data":  data,
+		"code":  statusCode,
+		"error": err,
+	}
 }
 
-func GetResponseFormatter() Formatter {
-	return responseFormatter
+func SetResponseErrFormatter(formatter ErrFormatter) {
+	responseErrFormatter = formatter
+}
+
+func SetResponseDataFormatter(formatter DataFormatter) {
+	responseDataFormatter = formatter
+}
+
+func GetResponseErrFormatter() ErrFormatter {
+	return responseErrFormatter
+}
+
+func GetResponseDataFormatter() DataFormatter {
+	return responseDataFormatter
 }
 
 type Response struct {
@@ -65,10 +75,10 @@ func (response Response) JsonResponseWithError(ctx *gin.Context, err error, stat
 	response.JsonResponse(ctx, "", err, statusCode)
 }
 
-func (response Response) JsonResponse(ctx *gin.Context, data any, error error, statusCode int) {
+func (response Response) JsonResponse(ctx *gin.Context, data any, err error, statusCode int) {
 	ctx.Set("response_data", data)
-	ctx.Set("response_err", error)
+	ctx.Set("response_err", err)
 	ctx.Set("response_code", statusCode)
-	ctx.JSON(statusCode, GetResponseFormatter()(ctx, data, error, statusCode))
+	ctx.JSON(statusCode, GetResponseDataFormatter()(ctx, data, GetResponseErrFormatter()(ctx, err), statusCode))
 	ctx.Abort()
 }

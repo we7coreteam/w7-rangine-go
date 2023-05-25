@@ -13,6 +13,6 @@ func (abstract Abstract) GetDescription() string {
 	return ""
 }
 
-func (abstract Abstract) Configure(command *cobra.Command) {
+func (abstract Abstract) Configure(cmd *cobra.Command) {
 
 }

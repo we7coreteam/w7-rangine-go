@@ -36,17 +36,17 @@ func NewServer(config Config) *Server {
 
 	responseObj := response.Response{}
 	httpServer.Engine.HandleMethodNotAllowed = true
-	httpServer.Engine.NoRoute(func(context *gin.Context) {
-		responseObj.JsonResponseWithError(context, httperf.NotFoundErr{
+	httpServer.Engine.NoRoute(func(ctx *gin.Context) {
+		responseObj.JsonResponseWithError(ctx, httperf.NotFoundErr{
 			Err: errorhandler.ResponseError{
-				Msg: "Route not found, " + context.Request.URL.Path,
+				Msg: "Route not found, " + ctx.Request.URL.Path,
 			},
 		}, http.StatusNotFound)
 	})
-	httpServer.Engine.NoMethod(func(context *gin.Context) {
-		responseObj.JsonResponseWithError(context, httperf.NotAllowErr{
+	httpServer.Engine.NoMethod(func(ctx *gin.Context) {
+		responseObj.JsonResponseWithError(ctx, httperf.NotAllowErr{
 			Err: errorhandler.ResponseError{
-				Msg: "Route not allow, " + context.Request.URL.Path,
+				Msg: "Route not allow, " + ctx.Request.URL.Path,
 			},
 		}, http.StatusMethodNotAllowed)
 	})

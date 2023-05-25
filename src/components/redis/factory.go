@@ -25,13 +25,13 @@ func (factory *Factory) Channel(channel string) (redis.Cmdable, error) {
 	return cmdAble, nil
 }
 
-func (factory *Factory) MakeRedis(redisConfig Config) redis.Cmdable {
+func (factory *Factory) MakeRedis(config Config) redis.Cmdable {
 	return redis.NewClient(&redis.Options{
-		Addr:     redisConfig.Host + ":" + strconv.Itoa(redisConfig.Port),
-		Username: redisConfig.Username,
-		Password: redisConfig.Password,
-		DB:       redisConfig.Db,
-		PoolSize: redisConfig.PoolSize,
+		Addr:     config.Host + ":" + strconv.Itoa(config.Port),
+		Username: config.Username,
+		Password: config.Password,
+		DB:       config.Db,
+		PoolSize: config.PoolSize,
 	})
 }
 
