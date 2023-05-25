@@ -75,13 +75,15 @@ func (app *App) InitConfig() {
 	app.config = viper.New()
 	app.config.AutomaticEnv()
 
-	if app.option.DefaultConfigLoader != nil {
-		app.option.DefaultConfigLoader(app.config)
-	} else {
+	envConfigPath := os.Getenv("RANGINE_CONFIG_FILE")
+	if envConfigPath == "" && app.option.DefaultConfigLoader == nil {
 		color.Warnln("The configuration file is missing. Confirm whether the configuration file is required and specify it")
 	}
 
-	envConfigPath := os.Getenv("RANGINE_CONFIG_FILE")
+	if app.option.DefaultConfigLoader != nil {
+		app.option.DefaultConfigLoader(app.config)
+	}
+
 	if envConfigPath != "" {
 		_, err := os.Stat(envConfigPath)
 		if err != nil && os.IsNotExist(err) {
