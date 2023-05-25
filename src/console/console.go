@@ -26,13 +26,13 @@ func NewConsole() *Console {
 	}
 }
 
-func (console Console) RegisterCommand(command command.Command) {
+func (console Console) RegisterCommand(cmd command.Command) {
 	handler := &cobra.Command{
-		Use:   command.GetName(),
-		Short: command.GetDescription(),
-		Run:   command.Handle,
+		Use:   cmd.GetName(),
+		Short: cmd.GetDescription(),
+		Run:   cmd.Handle,
 	}
-	command.Configure(handler)
+	cmd.Configure(handler)
 	console.handler.AddCommand(handler)
 }
 

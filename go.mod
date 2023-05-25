@@ -17,7 +17,7 @@ require (
 	github.com/sevlyar/go-daemon v0.1.6
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
-	github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230511075119-effd5b29debf
+	github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230525093042-4cb94960caa1
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1

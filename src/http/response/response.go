@@ -10,7 +10,7 @@ import (
 
 var Env = "release"
 
-type Formatter func(ctx *gin.Context, data any, error error, statusCode int) any
+type Formatter func(ctx *gin.Context, data any, err error, statusCode int) any
 
 var responseFormatter Formatter = func(ctx *gin.Context, data any, err error, statusCode int) any {
 	responseJson := map[string]interface{}{
@@ -65,10 +65,10 @@ func (response Response) JsonResponseWithError(ctx *gin.Context, err error, stat
 	response.JsonResponse(ctx, "", err, statusCode)
 }
 
-func (response Response) JsonResponse(ctx *gin.Context, data any, error error, statusCode int) {
+func (response Response) JsonResponse(ctx *gin.Context, data any, err error, statusCode int) {
 	ctx.Set("response_data", data)
-	ctx.Set("response_err", error)
+	ctx.Set("response_err", err)
 	ctx.Set("response_code", statusCode)
-	ctx.JSON(statusCode, GetResponseFormatter()(ctx, data, error, statusCode))
+	ctx.JSON(statusCode, GetResponseFormatter()(ctx, data, err, statusCode))
 	ctx.Abort()
 }

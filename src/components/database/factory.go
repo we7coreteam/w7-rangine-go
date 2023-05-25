@@ -54,12 +54,12 @@ func (factory *Factory) SetLogger(logger *zap.Logger) {
 	factory.logger = logger
 }
 
-func (factory *Factory) MakeMysqlDriver(databaseConfig Config) (gorm.Dialector, error) {
+func (factory *Factory) MakeMysqlDriver(config Config) (gorm.Dialector, error) {
 	var dns = ""
-	if databaseConfig.DSN != "" {
-		dns = databaseConfig.DSN
+	if config.DSN != "" {
+		dns = config.DSN
 	} else {
-		dns = databaseConfig.User + ":" + databaseConfig.Password + "@tcp(" + databaseConfig.Host + ":" + strconv.Itoa(databaseConfig.Port) + ")/" + databaseConfig.DbName + "?charset=" + databaseConfig.Charset + "&parseTime=True&loc=Local"
+		dns = config.Username + ":" + config.Password + "@tcp(" + config.Host + ":" + strconv.Itoa(config.Port) + ")/" + config.DbName + "?charset=" + config.Charset + "&parseTime=True&loc=Local"
 	}
 
 	return mysql.New(mysql.Config{
@@ -68,38 +68,38 @@ func (factory *Factory) MakeMysqlDriver(databaseConfig Config) (gorm.Dialector, 
 	}), nil
 }
 
-func (factory *Factory) MakeDriver(databaseConfig Config) (gorm.Dialector, error) {
-	driverResolver, exists := factory.driverResolverMap[databaseConfig.Driver]
+func (factory *Factory) MakeDriver(config Config) (gorm.Dialector, error) {
+	driverResolver, exists := factory.driverResolverMap[config.Driver]
 	if !exists {
-		return nil, errors.New("db driver " + databaseConfig.Driver + " not exists")
+		return nil, errors.New("db driver " + config.Driver + " not exists")
 	}
 
-	return driverResolver(databaseConfig)
+	return driverResolver(config)
 }
 
-func (factory *Factory) MakeDb(databaseConfig Config, driver gorm.Dialector) (*gorm.DB, error) {
+func (factory *Factory) MakeDb(config Config, driver gorm.Dialector) (*gorm.DB, error) {
 	//可根据配置开启日志
 	var dbLogger logger.Interface = nil
 	if factory.logger != nil {
-		if databaseConfig.SlowThreshold <= 0 {
-			databaseConfig.SlowThreshold = int64(200 * time.Millisecond)
+		if config.SlowThreshold <= 0 {
+			config.SlowThreshold = int64(200 * time.Millisecond)
 		}
 		dbLogger = logger.New(
 			&DbLogger{
 				logger: factory.logger,
 			},
 			logger.Config{
-				SlowThreshold:             time.Duration(databaseConfig.SlowThreshold), // Slow SQL threshold
-				LogLevel:                  logger.LogLevel(factory.logger.Level()),     // Log level
-				IgnoreRecordNotFoundError: true,                                        // Ignore ErrRecordNotFound error for logger
-				Colorful:                  false,                                       // Disable color
+				SlowThreshold:             time.Duration(config.SlowThreshold),     // Slow SQL threshold
+				LogLevel:                  logger.LogLevel(factory.logger.Level()), // Log level
+				IgnoreRecordNotFoundError: true,                                    // Ignore ErrRecordNotFound error for logger
+				Colorful:                  false,                                   // Disable color
 			},
 		)
 	}
 
 	db, err := gorm.Open(driver, &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   databaseConfig.Prefix,
+			TablePrefix:   config.Prefix,
 			SingularTable: true,
 		},
 		Logger: dbLogger,
@@ -113,8 +113,8 @@ func (factory *Factory) MakeDb(databaseConfig Config, driver gorm.Dialector) (*g
 		return nil, err
 	}
 
-	dbDriver.SetMaxIdleConns(databaseConfig.MaxIdleConn)
-	dbDriver.SetMaxOpenConns(databaseConfig.MaxConn)
+	dbDriver.SetMaxIdleConns(config.MaxIdleConn)
+	dbDriver.SetMaxOpenConns(config.MaxConn)
 
 	if factory.debug {
 		db = db.Debug()
