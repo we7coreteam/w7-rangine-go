@@ -1,7 +1,6 @@
 package app
 
 import (
-	"bytes"
 	"github.com/asaskevich/EventBus"
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/gookit/color"
@@ -26,31 +25,37 @@ import (
 
 var GApp *App
 
-type Option func(app *App)
-type ConfigProvider func()
+type Option struct {
+	Name                string
+	Version             string
+	DefaultConfigLoader func(config *viper.Viper)
+}
 
 type App struct {
 	support.App
+	option Option
 
-	Name            string
-	Version         string
-	configProviders []ConfigProvider
-	config          *viper.Viper
-	container       container.Container
-	loggerFactory   log.Factory
-	serverManager   server.Manager
-	event           EventBus.Bus
-	console         cons.Console
+	Name          string
+	Version       string
+	config        *viper.Viper
+	container     container.Container
+	loggerFactory log.Factory
+	serverManager server.Manager
+	event         EventBus.Bus
+	console       cons.Console
 }
 
-func NewApp(options ...Option) *App {
+func NewApp(option Option) *App {
 	GApp = &App{
-		Name:            "rangine",
-		Version:         "1.0.0",
-		configProviders: make([]ConfigProvider, 0),
+		Name:    "rangine",
+		Version: "1.0.0",
+		option:  option,
 	}
-	for _, option := range options {
-		option(GApp)
+	if option.Name != "" {
+		GApp.Name = option.Name
+	}
+	if option.Version != "" {
+		GApp.Version = option.Version
 	}
 
 	facade.SetApp(GApp)
@@ -66,30 +71,29 @@ func NewApp(options ...Option) *App {
 	return GApp
 }
 
-func (app *App) AddConfigProvider(provider ConfigProvider) {
-	app.configProviders = append(app.configProviders, provider)
-}
+func (app *App) InitConfig() {
+	app.config = viper.New()
+	app.config.AutomaticEnv()
 
-func (app *App) LoadConfigFromReader(configType string, reader *bytes.Reader) {
-	app.config.SetConfigType(configType)
-	if err := app.config.ReadConfig(reader); err != nil {
-		panic(err)
-	}
-}
-
-func (app *App) LoadConfigFromPath(path string) {
-	_, err := os.Stat(path)
-	if err != nil && os.IsNotExist(err) {
-		return
+	if app.option.DefaultConfigLoader != nil {
+		app.option.DefaultConfigLoader(app.config)
+	} else {
+		color.Warnln("The configuration file is missing. Confirm whether the configuration file is required and specify it")
 	}
 
-	app.config.SetConfigFile(path)
-	if err := app.config.MergeInConfig(); err != nil {
-		panic(err)
-	}
-}
+	envConfigPath := os.Getenv("RANGINE_CONFIG_FILE")
+	if envConfigPath != "" {
+		_, err := os.Stat(envConfigPath)
+		if err != nil && os.IsNotExist(err) {
+			return
+		}
 
-func (app *App) LoadConfigFromEnv() {
+		app.config.SetConfigFile(envConfigPath)
+		if err := app.config.MergeInConfig(); err != nil {
+			panic(err)
+		}
+	}
+
 	var envMap = make(map[string]interface{})
 	var buildMap func(path []string, value interface{}) map[string]interface{}
 	buildMap = func(path []string, value interface{}) map[string]interface{} {
@@ -114,27 +118,6 @@ func (app *App) LoadConfigFromEnv() {
 	err := app.config.MergeConfigMap(envMap)
 	if err != nil {
 		panic(err)
-	}
-}
-
-func (app *App) InitConfig() {
-	app.config = viper.New()
-	app.config.AutomaticEnv()
-
-	if os.Getenv("RANGINE_CONFIG_FILE") != "" {
-		app.AddConfigProvider(func() {
-			app.LoadConfigFromPath(os.Getenv("RANGINE_CONFIG_FILE"))
-		})
-	}
-	if len(app.configProviders) == 0 {
-		color.Warnln("The configuration file is missing. Confirm whether the configuration file is required and specify it")
-	}
-	app.AddConfigProvider(func() {
-		app.LoadConfigFromEnv()
-	})
-
-	for _, provider := range app.configProviders {
-		provider()
 	}
 
 	app.config.SetDefault("app.env", "release")
