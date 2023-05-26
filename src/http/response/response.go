@@ -28,7 +28,7 @@ var errResponseHandler ErrResponseHandler = func(ctx *gin.Context, env string, e
 		return
 	}
 
-	ctx.String(statusCode, "%s", fmt.Sprintf("[Err] %s\n%s", err.Error(), err_handler.Stack(3)))
+	ctx.String(statusCode, "%s", fmt.Sprintf("[Err] %s\n%s", err.Error(), err_handler.Stack(3, 0)))
 }
 
 var successResponseHandler SuccessResponseHandler = func(ctx *gin.Context, data any, statusCode int) {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/pkg/errors"
+	"math"
 	"os"
 	"runtime"
 )
@@ -16,13 +17,17 @@ var (
 )
 
 // stack returns a nicely formatted stack frame, skipping skip frames.
-func Stack(skip int) []byte {
+func Stack(skip int, until int) []byte {
 	buf := new(bytes.Buffer) // the returned data
 	// As we loop, we open files and read them. These variables record the currently
 	// loaded file.
 	var lines [][]byte
 	var lastFile string
-	for i := skip; ; i++ { // Skip the expected number of frames
+	if until <= 0 {
+		until = math.MaxInt16
+	}
+
+	for i := skip; i < until; i++ { // Skip the expected number of frames
 		pc, file, line, ok := runtime.Caller(i)
 		if !ok {
 			break
