@@ -21,7 +21,7 @@ var responseErrFormatter ErrFormatter = func(ctx *gin.Context, err error) error 
 		}
 		if errMsg == "" {
 			if Env == "debug" {
-				errMsg = fmt.Sprintf("%+v \n ", err)
+				errMsg = fmt.Sprintf("%+v", err)
 			} else {
 				errMsg = "系统内部错误"
 			}
@@ -33,11 +33,16 @@ var responseErrFormatter ErrFormatter = func(ctx *gin.Context, err error) error 
 }
 
 var responseDataFormatter DataFormatter = func(ctx *gin.Context, data any, err error, statusCode int) any {
-	return map[string]interface{}{
+	ret := map[string]interface{}{
 		"data":  data,
 		"code":  statusCode,
-		"error": err,
+		"error": "",
 	}
+	if err != nil {
+		ret["error"] = err.Error()
+	}
+
+	return ret
 }
 
 func SetResponseErrFormatter(formatter ErrFormatter) {
