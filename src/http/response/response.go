@@ -21,14 +21,14 @@ var errResponseHandler ErrResponseHandler = func(ctx *gin.Context, env string, e
 		return
 	}
 
-	errStr := ""
-	if env != "debug" {
-		errStr = "{\"error\":\"系统内部错误\"}"
-	} else {
-		errStr = fmt.Sprintf("[Err] %s\n%s", err.Error(), err_handler.Stack(3))
+	if env == "release" {
+		ctx.JSON(statusCode, map[string]interface{}{
+			"error": "系统内部错误",
+		})
+		return
 	}
 
-	ctx.String(statusCode, "%s", errStr)
+	ctx.String(statusCode, "%s", fmt.Sprintf("[Err] %s\n%s", err.Error(), err_handler.Stack(3)))
 }
 
 var successResponseHandler SuccessResponseHandler = func(ctx *gin.Context, data any, statusCode int) {
