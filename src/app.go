@@ -77,7 +77,7 @@ func (app *App) InitConfig() {
 
 	envConfigPath := os.Getenv("RANGINE_CONFIG_FILE")
 	if envConfigPath == "" && app.option.DefaultConfigLoader == nil {
-		color.Warnln("The configuration file is missing. Confirm whether the configuration file is required and specify it")
+		color.Warnln("Warning: The configuration file is missing. Confirm whether the configuration file is required and specify it")
 	}
 
 	if app.option.DefaultConfigLoader != nil {
