@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
-	"github.com/we7coreteam/w7-rangine-go/src/components/validator/bind"
-	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
+	"github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
+	"github.com/we7coreteam/w7-rangine-go/src/http/controller/validator/bind"
 	httperf "github.com/we7coreteam/w7-rangine-go/src/http/error"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
 )
@@ -17,7 +17,7 @@ type Abstract struct {
 func (abstract Abstract) TranslateValidationError(err error) error {
 	if validationErrors, ok := err.(validator.ValidationErrors); !ok {
 		return httperf.ValidateErr{
-			Err: errorhandler.ResponseError{
+			Err: err_handler.ResponseError{
 				Msg: "参数数据格式错误",
 			},
 		}
@@ -29,7 +29,7 @@ func (abstract Abstract) TranslateValidationError(err error) error {
 
 		return httperf.ValidateErr{
 			ValidateErrs: validationErrors,
-			Err: errorhandler.ResponseError{
+			Err: err_handler.ResponseError{
 				Msg: errStr,
 			},
 		}

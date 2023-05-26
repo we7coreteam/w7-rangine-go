@@ -4,61 +4,54 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	errorhandler "github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
+	"github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
 	"net/http"
 )
 
 var Env = "release"
 
-type ErrFormatter func(ctx *gin.Context, err error) error
-type DataFormatter func(ctx *gin.Context, data any, err error, statusCode int) any
+type ErrResponseHandler func(ctx *gin.Context, env string, err error, statusCode int)
+type SuccessResponseHandler func(ctx *gin.Context, data any, statusCode int)
 
-var responseErrFormatter ErrFormatter = func(ctx *gin.Context, err error) error {
-	if errorhandler.Found(err) {
-		errMsg := ""
-		if errors.As(err, &errorhandler.ResponseError{}) {
-			errMsg = err.Error()
-		}
-		if errMsg == "" {
-			if Env == "debug" {
-				errMsg = fmt.Sprintf("%+v", err)
-			} else {
-				errMsg = "系统内部错误"
-			}
-		}
-		return errors.New(errMsg)
+var errResponseHandler ErrResponseHandler = func(ctx *gin.Context, env string, err error, statusCode int) {
+	if errors.As(err, &err_handler.ResponseError{}) {
+		ctx.JSON(statusCode, map[string]interface{}{
+			"error": err.Error(),
+		})
+		return
 	}
 
-	return nil
-}
-
-var responseDataFormatter DataFormatter = func(ctx *gin.Context, data any, err error, statusCode int) any {
-	ret := map[string]interface{}{
-		"data":  data,
-		"code":  statusCode,
-		"error": "",
-	}
-	if err != nil {
-		ret["error"] = err.Error()
+	errStr := ""
+	if env != "debug" {
+		errStr = "{\"error\":\"系统内部错误\"}"
+	} else {
+		errStr = fmt.Sprintf("[Err] %s\n%s", err.Error(), err_handler.Stack(3))
 	}
 
-	return ret
+	ctx.String(statusCode, "%s", errStr)
 }
 
-func SetResponseErrFormatter(formatter ErrFormatter) {
-	responseErrFormatter = formatter
+var successResponseHandler SuccessResponseHandler = func(ctx *gin.Context, data any, statusCode int) {
+	ctx.JSON(statusCode, map[string]interface{}{
+		"data": data,
+		"code": statusCode,
+	})
 }
 
-func SetResponseDataFormatter(formatter DataFormatter) {
-	responseDataFormatter = formatter
+func SetErrResponseHandler(handler ErrResponseHandler) {
+	errResponseHandler = handler
 }
 
-func GetResponseErrFormatter() ErrFormatter {
-	return responseErrFormatter
+func SetSuccessResponseHandler(handler SuccessResponseHandler) {
+	successResponseHandler = handler
 }
 
-func GetResponseDataFormatter() DataFormatter {
-	return responseDataFormatter
+func GetErrResponseHandler() ErrResponseHandler {
+	return errResponseHandler
+}
+
+func GetSuccessResponseHandler() SuccessResponseHandler {
+	return successResponseHandler
 }
 
 type Response struct {
@@ -84,6 +77,11 @@ func (response Response) JsonResponse(ctx *gin.Context, data any, err error, sta
 	ctx.Set("response_data", data)
 	ctx.Set("response_err", err)
 	ctx.Set("response_code", statusCode)
-	ctx.JSON(statusCode, GetResponseDataFormatter()(ctx, data, GetResponseErrFormatter()(ctx, err), statusCode))
-	ctx.Abort()
+
+	if err != nil {
+		GetErrResponseHandler()(ctx, Env, err, statusCode)
+		return
+	}
+
+	GetSuccessResponseHandler()(ctx, data, statusCode)
 }

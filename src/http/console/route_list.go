@@ -3,14 +3,18 @@ package console
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/src/console"
+	command "github.com/we7coreteam/w7-rangine-go-support/src/console"
 	"github.com/we7coreteam/w7-rangine-go/src/http/server"
 	"os"
 )
 
 type RouteListCommand struct {
-	console.Abstract
+	command.Command
 	Server *server.Server
+}
+
+func (listCommand RouteListCommand) Configure(cmd *cobra.Command) {
+
 }
 
 func (listCommand RouteListCommand) GetName() string {
