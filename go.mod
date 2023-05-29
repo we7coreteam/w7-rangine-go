@@ -25,8 +25,6 @@ require (
 	gorm.io/gorm v1.25.0
 )
 
-replace github.com/we7coreteam/w7-rangine-go-support => ../w7-rangine-go-support
-
 require (
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/tools v0.2.0 // indirect
