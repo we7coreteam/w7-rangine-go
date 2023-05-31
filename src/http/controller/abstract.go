@@ -16,7 +16,7 @@ type Abstract struct {
 
 func (abstract Abstract) TranslateValidationError(err error) error {
 	if validationErrors, ok := err.(validator.ValidationErrors); !ok {
-		return httperf.ValidateErr{
+		return httperf.ValidateFail{
 			Err: err_handler.ResponseError{
 				Msg: "参数数据格式错误",
 			},
@@ -27,7 +27,7 @@ func (abstract Abstract) TranslateValidationError(err error) error {
 			errStr += e.Translate(facade.GetTranslator()) + ";"
 		}
 
-		return httperf.ValidateErr{
+		return httperf.ValidateFail{
 			ValidateErrs: validationErrors,
 			Err: err_handler.ResponseError{
 				Msg: errStr,
