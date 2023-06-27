@@ -86,7 +86,7 @@ func (self {{.Name}}) GetDescription() string {
 }
 
 func (self {{.Name}}) Configure(command *cobra.Command)  {
-	command.Flags().String("name", "default", "")
+	command.Flags().String("name", "test", "test name params")
 }
 
 func (self {{.Name}}) Handle(cmd *cobra.Command, args []string) {
