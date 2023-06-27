@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -26,32 +27,28 @@ func (self MakeProjectCommand) GetDescription() string {
 }
 
 func (self MakeProjectCommand) Configure(cmd *cobra.Command) {
-	cmd.Flags().String("target-dir", "", "Created project path")
-	//cmd.MarkFlagRequired("target-dir")
+	cmd.Flags().String("target-dir", "./", "Created project path, the default is the current directory")
+	cmd.Flags().String("name", "", "Project name, such as github.com/we7coreteam/w7-rangine-go-skeleton or w7-rangine-go-skeleton")
+	cmd.MarkFlagRequired("name")
 }
 
 func (self MakeProjectCommand) Handle(cmd *cobra.Command, args []string) {
-	projectName, _ := cmd.Flags().GetString("target-dir")
-	if projectName == "" && len(args) > 0 {
-		projectName = args[0]
-	}
-	if projectName == "" {
-		cmd.PrintErrln("Error: required flag(s) \"target-dir\" not set")
-		cmd.Usage()
-		return
-	}
-	projectName = strings.TrimRight(projectName, "/")
-	exist, err := os.Stat(fmt.Sprintf("%s", projectName))
-	println(projectName)
+	moduleName, _ := cmd.Flags().GetString("name")
+	projectPath, _ := cmd.Flags().GetString("target-dir")
+	projectPath, _ = filepath.Abs(projectPath)
+
+	projectPath = strings.TrimRight(projectPath, "/")
+	exist, err := os.Stat(fmt.Sprintf("%s", projectPath))
+
 	if err == nil && exist.IsDir() {
-		dir, _ := os.ReadDir(projectName)
+		dir, _ := os.ReadDir(projectPath)
 		if len(dir) > 0 {
 			cmd.PrintErrln("Error: target dir not empty")
 			cmd.Usage()
 			return
 		}
 	}
-	os.MkdirAll(fmt.Sprintf("%s", projectName), 0755)
+	os.MkdirAll(fmt.Sprintf("%s", projectPath), 0755)
 
 	response, _ := http.Get("https://codeload.github.com/we7coreteam/w7-rangine-go-skeleton/zip/refs/heads/main")
 	defer response.Body.Close()
@@ -71,7 +68,7 @@ func (self MakeProjectCommand) Handle(cmd *cobra.Command, args []string) {
 	for _, zipFile := range reader.File {
 		path := strings.Replace(zipFile.Name, "w7-rangine-go-skeleton-main/", "", -1)
 		if path != "" && zipFile.FileInfo().IsDir() {
-			os.MkdirAll(fmt.Sprintf("%s/%s", projectName, path), 0755)
+			os.MkdirAll(fmt.Sprintf("%s/%s", projectPath, path), 0755)
 			continue
 		}
 
@@ -79,15 +76,27 @@ func (self MakeProjectCommand) Handle(cmd *cobra.Command, args []string) {
 		defer file.Close()
 		content, _ := io.ReadAll(file)
 		if path != "" {
-			err = os.WriteFile(fmt.Sprintf("%s/%s", projectName, path), content, 0755)
+			err = os.WriteFile(fmt.Sprintf("%s/%s", projectPath, path), []byte(self.replaceFileContent(path, content, moduleName)), 0755)
 		}
 	}
 
 	color.Println("Please run command.")
 	color.Println("********************************************************************")
-	color.Red.Printf(" cd %s \n", projectName)
+	color.Red.Printf(" cd %s \n", projectPath)
 	color.Red.Printf(" go get -u && go mod tidy \n")
 	color.Red.Printf(" go build -o ./bin/rangine . \n")
 	color.Println("********************************************************************")
 
+}
+
+func (self MakeProjectCommand) replaceFileContent(file string, content []byte, name string) string {
+	if file == ".run/rangine.run.xml" {
+		return strings.ReplaceAll(string(content), "w7-rangine-go-skeleton", filepath.Base(name))
+	}
+
+	if file == "app/home/provider.go" || file == "go.mod" || file == "main.go" {
+		return strings.ReplaceAll(string(content), "github.com/we7coreteam/w7-rangine-go-skeleton", name)
+	}
+
+	return string(content)
 }
