@@ -33,7 +33,6 @@ type Option struct {
 
 type App struct {
 	support.App
-	option Option
 
 	Name          string
 	Version       string
@@ -48,20 +47,14 @@ type App struct {
 func NewApp(option Option) *App {
 	GApp = &App{
 		Name:    "rangine",
-		Version: "1.0.0",
-		option:  option,
+		Version: "1.0.10",
 	}
-	if option.Name != "" {
-		GApp.Name = option.Name
-	}
-	if option.Version != "" {
-		GApp.Version = option.Version
-	}
+	GApp.ApplyOption(option)
 
 	facade.SetApp(GApp)
 
 	GApp.InitConsole()
-	GApp.InitConfig()
+	GApp.InitConfig(option)
 	GApp.InitContainer()
 	GApp.InitLoggerFactory()
 	GApp.InitEvent()
@@ -71,17 +64,26 @@ func NewApp(option Option) *App {
 	return GApp
 }
 
-func (app *App) InitConfig() {
+func (app *App) ApplyOption(option Option) {
+	if option.Name != "" {
+		app.Name = option.Name
+	}
+	if option.Version != "" {
+		app.Version = option.Version
+	}
+}
+
+func (app *App) InitConfig(option Option) {
 	app.config = viper.New()
 	app.config.AutomaticEnv()
 
 	envConfigPath := os.Getenv("RANGINE_CONFIG_FILE")
-	if envConfigPath == "" && app.option.DefaultConfigLoader == nil {
-		color.Warnln("Warning: The configuration file is missing. Specify config file by -f or --config-file params")
+	if envConfigPath == "" && option.DefaultConfigLoader == nil {
+		color.Warnln("Warning: The configuration file is missing. Confirm whether the configuration file is required and specify it")
 	}
 
-	if app.option.DefaultConfigLoader != nil {
-		app.option.DefaultConfigLoader(app.config)
+	if option.DefaultConfigLoader != nil {
+		option.DefaultConfigLoader(app.config)
 	}
 
 	if envConfigPath != "" {
@@ -201,7 +203,9 @@ func (app *App) InitConsole() {
 	})
 	app.console.RegisterCommand(new(console.ServerStopCommand))
 	app.console.RegisterCommand(new(console.ServerListCommand))
-	app.console.RegisterCommand(new(console.VersionCommand))
+	app.console.RegisterCommand(&console.VersionCommand{
+		Version: app.Version,
+	})
 }
 
 func (app *App) GetConsole() cons.Console {

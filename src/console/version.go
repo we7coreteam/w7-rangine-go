@@ -7,6 +7,7 @@ import (
 
 type VersionCommand struct {
 	Abstract
+	Version string
 }
 
 func (versionCommand VersionCommand) GetName() string {
@@ -22,5 +23,5 @@ func (versionCommand VersionCommand) Configure(cmd *cobra.Command) {
 }
 
 func (versionCommand VersionCommand) Handle(cmd *cobra.Command, args []string) {
-	color.Infoln("version: 1.0")
+	color.Infoln("version: " + versionCommand.Version)
 }
