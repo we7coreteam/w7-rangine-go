@@ -1,10 +1,7 @@
 package response
 
 import (
-	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
 	"net/http"
 )
 
@@ -14,21 +11,9 @@ type ErrResponseHandler func(ctx *gin.Context, env string, err error, statusCode
 type SuccessResponseHandler func(ctx *gin.Context, data any, statusCode int)
 
 var errResponseHandler ErrResponseHandler = func(ctx *gin.Context, env string, err error, statusCode int) {
-	if errors.As(err, &err_handler.ResponseError{}) {
-		ctx.JSON(statusCode, map[string]interface{}{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	if env == "release" {
-		ctx.JSON(statusCode, map[string]interface{}{
-			"error": "系统内部错误",
-		})
-		return
-	}
-
-	ctx.String(statusCode, "%s", fmt.Sprintf("[Err] %s\n%s", err.Error(), err_handler.Stack(3, 0)))
+	ctx.JSON(statusCode, map[string]interface{}{
+		"error": err.Error(),
+	})
 }
 
 var successResponseHandler SuccessResponseHandler = func(ctx *gin.Context, data any, statusCode int) {
