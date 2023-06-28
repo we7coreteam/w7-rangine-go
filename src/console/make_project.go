@@ -35,8 +35,11 @@ func (self MakeProjectCommand) Configure(cmd *cobra.Command) {
 func (self MakeProjectCommand) Handle(cmd *cobra.Command, args []string) {
 	moduleName, _ := cmd.Flags().GetString("name")
 	projectPath, _ := cmd.Flags().GetString("target-dir")
+	// 如果未指定目录，则生成到当前目录，并以 modulename 的最后一段为项目名称
+	if projectPath == "./" {
+		projectPath = "./" + filepath.Base(moduleName)
+	}
 	projectPath, _ = filepath.Abs(projectPath)
-
 	projectPath = strings.TrimRight(projectPath, "/")
 	exist, err := os.Stat(fmt.Sprintf("%s", projectPath))
 
