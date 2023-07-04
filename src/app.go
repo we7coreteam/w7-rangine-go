@@ -18,7 +18,6 @@ import (
 	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
 	"go.uber.org/zap"
-	"golang.org/x/exp/maps"
 	"os"
 	"strings"
 )
@@ -98,7 +97,6 @@ func (app *App) InitConfig(option Option) {
 		}
 	}
 
-	var envMap = make(map[string]interface{})
 	var buildMap func(path []string, value interface{}) map[string]interface{}
 	buildMap = func(path []string, value interface{}) map[string]interface{} {
 		if len(path) > 1 {
@@ -116,12 +114,12 @@ func (app *App) InitConfig(option Option) {
 		prefix := "RANGINE_"
 		if len(keyVal[0]) >= len(prefix) && keyVal[0][0:len(prefix)] == prefix {
 			path := strings.Split(strings.ToLower(keyVal[0][len(prefix):]), ".")
-			maps.Copy(envMap, buildMap(path, keyVal[1]))
+
+			err := app.config.MergeConfigMap(buildMap(path, keyVal[1]))
+			if err != nil {
+				panic(err)
+			}
 		}
-	}
-	err := app.config.MergeConfigMap(envMap)
-	if err != nil {
-		panic(err)
 	}
 
 	app.config.SetDefault("app.env", "release")
