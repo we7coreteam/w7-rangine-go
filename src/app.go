@@ -113,7 +113,7 @@ func (app *App) InitConfig(option Option) {
 		keyVal := strings.Split(env, "=")
 		prefix := "RANGINE_"
 		if len(keyVal[0]) >= len(prefix) && keyVal[0][0:len(prefix)] == prefix {
-			path := strings.Split(strings.ToLower(keyVal[0][len(prefix):]), ".")
+			path := strings.Split(keyVal[0][len(prefix):], ".")
 
 			err := app.config.MergeConfigMap(buildMap(path, keyVal[1]))
 			if err != nil {
