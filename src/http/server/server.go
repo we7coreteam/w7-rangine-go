@@ -3,12 +3,12 @@ package server
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go-support/src/server"
+	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
 	"net/http"
+	"strings"
 )
 
 type Server struct {
@@ -76,20 +76,12 @@ func (server *Server) GetOptions() map[string]string {
 }
 
 func (server *Server) Start() {
-	err := binding.Validator.ValidateStruct(server.config)
-	if err != nil {
-		if validationErrors, ok := err.(validator.ValidationErrors); ok {
-			errStr := "http server config error, fields: "
-			for _, e := range validationErrors {
-				errStr += e.Field() + ";"
-			}
-			panic(errStr)
-		} else {
-			panic(err)
-		}
+	fields := helper.ValidateAndGetErrFields(server.config)
+	if len(fields) > 0 {
+		panic("http server config error, fields: " + strings.Join(fields, ","))
 	}
 
-	err = server.Engine.Run(server.config.Host + ":" + server.config.Port)
+	err := server.Engine.Run(server.config.Host + ":" + server.config.Port)
 	if err != nil {
 		panic(err)
 	}

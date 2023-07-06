@@ -3,11 +3,11 @@ package prof
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
 	"github.com/we7coreteam/w7-rangine-go-support/src/server"
+	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"net/http"
 	"net/http/pprof"
+	"strings"
 )
 
 type Server struct {
@@ -53,22 +53,14 @@ func (server *Server) GetOptions() map[string]string {
 }
 
 func (server *Server) Start() {
-	err := binding.Validator.ValidateStruct(server.config)
-	if err != nil {
-		if validationErrors, ok := err.(validator.ValidationErrors); ok {
-			errStr := "prof server config error, fields: "
-			for _, e := range validationErrors {
-				errStr += e.Field() + ";"
-			}
-			panic(errStr)
-		} else {
-			panic(err)
-		}
+	fields := helper.ValidateAndGetErrFields(server.config)
+	if len(fields) > 0 {
+		panic("prof server config error, fields: " + strings.Join(fields, ","))
 	}
 
 	server.registerRoutes()
 
-	err = http.ListenAndServe(fmt.Sprintf("%s:%s", server.config.Host, server.config.Port), server.server)
+	err := http.ListenAndServe(fmt.Sprintf("%s:%s", server.config.Host, server.config.Port), server.server)
 	if err != nil {
 		panic(err)
 	}

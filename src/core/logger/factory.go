@@ -2,11 +2,11 @@ package logger
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
+	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"strings"
 	"sync"
 )
 
@@ -153,17 +153,9 @@ func (factory *Factory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		func(channel string, config Config) {
 			factory.RegisterLogger(channel, func() (*zap.Logger, error) {
-				err := binding.Validator.ValidateStruct(value)
-				if err != nil {
-					if validationErrors, ok := err.(validator.ValidationErrors); ok {
-						errStr := "log config error, channel: " + key + ", fields: "
-						for _, e := range validationErrors {
-							errStr += e.Field() + ";"
-						}
-						panic(errStr)
-					} else {
-						panic(err)
-					}
+				fields := helper.ValidateAndGetErrFields(config)
+				if len(fields) > 0 {
+					panic("log config error, channel: " + channel + ", fields: " + strings.Join(fields, ","))
 				}
 
 				driver, err := factory.MakeDriver(config)

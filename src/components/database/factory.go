@@ -2,14 +2,14 @@ package database
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
+	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -168,17 +168,9 @@ func (factory *Factory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		func(channel string, config Config) {
 			factory.RegisterDb(channel, func() (*gorm.DB, error) {
-				err := binding.Validator.ValidateStruct(value)
-				if err != nil {
-					if validationErrors, ok := err.(validator.ValidationErrors); ok {
-						errStr := "database config error, channel: " + key + ", fields: "
-						for _, e := range validationErrors {
-							errStr += e.Field() + ";"
-						}
-						panic(errStr)
-					} else {
-						panic(err)
-					}
+				fields := helper.ValidateAndGetErrFields(config)
+				if len(fields) > 0 {
+					panic("database config error, channel: " + channel + ", fields: " + strings.Join(fields, ","))
 				}
 
 				driver, err := factory.MakeDriver(config)

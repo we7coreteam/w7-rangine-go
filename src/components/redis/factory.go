@@ -2,10 +2,10 @@ package redis
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
 	"github.com/redis/go-redis/v9"
+	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -64,21 +64,13 @@ func (factory *Factory) RegisterRedis(channel string, redisResolver func() redis
 func (factory *Factory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		func(channel string, config Config) {
-			factory.RegisterRedis(key, func() redis.Cmdable {
-				err := binding.Validator.ValidateStruct(value)
-				if err != nil {
-					if validationErrors, ok := err.(validator.ValidationErrors); ok {
-						errStr := "redis config error, channel: " + key + ", fields: "
-						for _, e := range validationErrors {
-							errStr += e.Field() + ";"
-						}
-						panic(errStr)
-					} else {
-						panic(err)
-					}
+			factory.RegisterRedis(channel, func() redis.Cmdable {
+				fields := helper.ValidateAndGetErrFields(config)
+				if len(fields) > 0 {
+					panic("redis config error, channel: " + channel + ", fields: " + strings.Join(fields, ","))
 				}
 
-				return factory.MakeRedis(value)
+				return factory.MakeRedis(config)
 			})
 		}(key, value)
 	}
