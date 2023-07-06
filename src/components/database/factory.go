@@ -2,6 +2,8 @@ package database
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -166,6 +168,19 @@ func (factory *Factory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		func(channel string, config Config) {
 			factory.RegisterDb(channel, func() (*gorm.DB, error) {
+				err := binding.Validator.ValidateStruct(value)
+				if err != nil {
+					if validationErrors, ok := err.(validator.ValidationErrors); ok {
+						errStr := "database config error, channel: " + key + ", fields: "
+						for _, e := range validationErrors {
+							errStr += e.Field() + ";"
+						}
+						panic(errStr)
+					} else {
+						panic(err)
+					}
+				}
+
 				driver, err := factory.MakeDriver(config)
 				if err != nil {
 					return nil, err

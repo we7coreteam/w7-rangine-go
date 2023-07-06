@@ -17,7 +17,6 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
-	"go.uber.org/zap"
 	"os"
 	"strings"
 )
@@ -147,17 +146,7 @@ func (app *App) InitLoggerFactory() {
 		panic(err)
 	}
 
-	for key, value := range loggerConfigMap {
-		func(channel string, config logger.Config) {
-			factory.RegisterLogger(channel, func() (*zap.Logger, error) {
-				driver, err := factory.MakeDriver(config)
-				if err != nil {
-					return nil, err
-				}
-				return factory.MakeLogger(factory.ConvertLevel(config.Level), driver), nil
-			})
-		}(key, value)
-	}
+	factory.Register(loggerConfigMap)
 
 	app.loggerFactory = factory
 }

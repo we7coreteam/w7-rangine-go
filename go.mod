@@ -19,10 +19,13 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230525093042-4cb94960caa1
 	go.uber.org/zap v1.24.0
+	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.4.6
 	gorm.io/gorm v1.25.0
 )
+
+replace github.com/we7coreteam/w7-rangine-go-support => ../w7-rangine-go-support
 
 require (
 	golang.org/x/mod v0.6.0 // indirect

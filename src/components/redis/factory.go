@@ -2,27 +2,49 @@ package redis
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/redis/go-redis/v9"
 	"strconv"
+	"sync"
 )
 
 type Factory struct {
-	channelMap map[string]redis.Cmdable
+	redisResolverMap map[string]func() redis.Cmdable
+	redisMap         map[string]redis.Cmdable
+	lock             sync.RWMutex
 }
 
 func NewRedisFactory() *Factory {
 	return &Factory{
-		channelMap: make(map[string]redis.Cmdable),
+		redisMap:         make(map[string]redis.Cmdable),
+		redisResolverMap: make(map[string]func() redis.Cmdable),
 	}
 }
 
 func (factory *Factory) Channel(channel string) (redis.Cmdable, error) {
-	cmdAble, exists := factory.channelMap[channel]
-	if !exists {
-		return nil, errors.New("redis channel " + channel + " not exists")
+	factory.lock.RLock()
+	redis, exists := factory.redisMap[channel]
+	factory.lock.RUnlock()
+	if exists {
+		return redis, nil
 	}
 
-	return cmdAble, nil
+	factory.lock.Lock()
+	defer factory.lock.Unlock()
+
+	redis, exists = factory.redisMap[channel]
+	if !exists {
+		redisResolver, exists := factory.redisResolverMap[channel]
+		if !exists {
+			return nil, errors.New("redis channel " + channel + " not exists")
+		}
+
+		redis = redisResolver()
+		factory.redisMap[channel] = redis
+	}
+
+	return redis, nil
 }
 
 func (factory *Factory) MakeRedis(config Config) redis.Cmdable {
@@ -35,12 +57,29 @@ func (factory *Factory) MakeRedis(config Config) redis.Cmdable {
 	})
 }
 
-func (factory *Factory) RegisterRedis(channel string, client redis.Cmdable) {
-	factory.channelMap[channel] = client
+func (factory *Factory) RegisterRedis(channel string, redisResolver func() redis.Cmdable) {
+	factory.redisResolverMap[channel] = redisResolver
 }
 
 func (factory *Factory) Register(maps map[string]Config) {
 	for key, value := range maps {
-		factory.RegisterRedis(key, factory.MakeRedis(value))
+		func(channel string, config Config) {
+			factory.RegisterRedis(key, func() redis.Cmdable {
+				err := binding.Validator.ValidateStruct(value)
+				if err != nil {
+					if validationErrors, ok := err.(validator.ValidationErrors); ok {
+						errStr := "redis config error, channel: " + key + ", fields: "
+						for _, e := range validationErrors {
+							errStr += e.Field() + ";"
+						}
+						panic(errStr)
+					} else {
+						panic(err)
+					}
+				}
+
+				return factory.MakeRedis(value)
+			})
+		}(key, value)
 	}
 }

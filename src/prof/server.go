@@ -3,7 +3,9 @@ package prof
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/we7coreteam/w7-rangine-go/src/http/server"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
+	"github.com/we7coreteam/w7-rangine-go-support/src/server"
 	"net/http"
 	"net/http/pprof"
 )
@@ -51,10 +53,22 @@ func (server *Server) GetOptions() map[string]string {
 }
 
 func (server *Server) Start() {
+	err := binding.Validator.ValidateStruct(server.config)
+	if err != nil {
+		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+			errStr := "prof server config error, fields: "
+			for _, e := range validationErrors {
+				errStr += e.Field() + ";"
+			}
+			panic(errStr)
+		} else {
+			panic(err)
+		}
+	}
+
 	server.registerRoutes()
 
-	addr := fmt.Sprintf("%s:%s", server.config.Host, server.config.Port)
-	err := http.ListenAndServe(addr, server.server)
+	err = http.ListenAndServe(fmt.Sprintf("%s:%s", server.config.Host, server.config.Port), server.server)
 	if err != nil {
 		panic(err)
 	}

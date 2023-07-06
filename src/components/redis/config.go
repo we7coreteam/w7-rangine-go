@@ -1,8 +1,8 @@
 package redis
 
 type Config struct {
-	Host     string         `mapstructure:"host" json:"host" yaml:"host"`
-	Port     int            `mapstructure:"port" json:"port" yaml:"port"`
+	Host     string         `mapstructure:"host" json:"host" yaml:"host" binding:"required"`
+	Port     int            `mapstructure:"port" json:"port" yaml:"port" binding:"required"`
 	Password string         `mapstructure:"password" json:"password" yaml:"password"`
 	Username string         `mapstructure:"user_name" json:"user_name" yaml:"user_name"`
 	Db       int            `mapstructure:"db" json:"db" yaml:"db"`
