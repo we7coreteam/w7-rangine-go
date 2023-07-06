@@ -5,14 +5,10 @@ import (
 )
 
 type ValidateFail struct {
-	Err          error
+	Msg          string
 	ValidateErrs validator.ValidationErrors
 }
 
-func (validateFail ValidateFail) Unwrap() error {
-	return validateFail.Err
-}
-
 func (validateFail ValidateFail) Error() string {
-	return validateFail.Err.Error()
+	return validateFail.Msg
 }

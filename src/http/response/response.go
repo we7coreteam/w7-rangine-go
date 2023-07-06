@@ -2,6 +2,7 @@ package response
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
 	"net/http"
 )
 
@@ -59,12 +60,9 @@ func (response Response) JsonResponseWithError(ctx *gin.Context, err error, stat
 }
 
 func (response Response) JsonResponse(ctx *gin.Context, data any, err error, statusCode int) {
-	ctx.Set("response_data", data)
-	ctx.Set("response_err", err)
-	ctx.Set("response_code", statusCode)
-
 	if err != nil {
 		GetErrResponseHandler()(ctx, Env, err, statusCode)
+		err_handler.Handle(err)
 		return
 	}
 

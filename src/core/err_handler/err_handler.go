@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
+	"golang.org/x/xerrors"
 	"math"
 	"os"
 	"runtime"
@@ -15,6 +17,45 @@ var (
 	dot       = []byte(".")
 	slash     = []byte("/")
 )
+
+type CustomHandler func(err error)
+
+var DefaultHandler = func(err error) {
+	logger, logErr := facade.GetLoggerFactory().Channel("default")
+	if logErr == nil {
+		if _, ok := err.(xerrors.Wrapper); ok {
+			logger.Error(fmt.Sprintf("%s\n%s", err.Error(), string(Stack(3, 0))))
+		} else {
+			logger.Error(fmt.Sprintf("%s\n%s", err.Error(), string(Stack(3, 0))))
+		}
+	}
+}
+
+func SetHandler(handler CustomHandler) {
+	DefaultHandler = handler
+}
+
+func Throw(message string, previous error) error {
+	var err error
+	if previous == nil {
+		err = errors.New(message)
+	} else {
+		err = errors.Wrap(previous, message)
+	}
+
+	return err
+}
+
+func Found(err error) bool {
+	if err != nil {
+		return true
+	}
+	return false
+}
+
+func Handle(err error) {
+	DefaultHandler(err)
+}
 
 // stack returns a nicely formatted stack frame, skipping skip frames.
 func Stack(skip int, until int) []byte {
@@ -79,22 +120,4 @@ func function(pc uintptr) []byte {
 	}
 	name = bytes.Replace(name, centerDot, dot, -1)
 	return name
-}
-
-func Throw(message string, previous error) error {
-	var err error
-	if previous == nil {
-		err = errors.New(message)
-	} else {
-		err = errors.Wrap(previous, message)
-	}
-
-	return err
-}
-
-func Found(err error) bool {
-	if err != nil {
-		return true
-	}
-	return false
 }

@@ -1,11 +1,10 @@
 package server
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go-support/src/server"
-	"github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
-	httperf "github.com/we7coreteam/w7-rangine-go/src/http/error"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
 	"net/http"
 )
@@ -34,23 +33,6 @@ func NewServer(config Config) *Server {
 	}
 	httpServer.initGinEngine()
 
-	responseObj := response.Response{}
-	httpServer.Engine.HandleMethodNotAllowed = true
-	httpServer.Engine.NoRoute(func(ctx *gin.Context) {
-		responseObj.JsonResponseWithError(ctx, httperf.RouteNotFound{
-			Err: err_handler.ResponseError{
-				Msg: "Route not found, " + ctx.Request.URL.Path,
-			},
-		}, http.StatusNotFound)
-	})
-	httpServer.Engine.NoMethod(func(ctx *gin.Context) {
-		responseObj.JsonResponseWithError(ctx, httperf.RouteNotAllow{
-			Err: err_handler.ResponseError{
-				Msg: "Route not allow, " + ctx.Request.URL.Path,
-			},
-		}, http.StatusMethodNotAllowed)
-	})
-
 	return httpServer
 }
 
@@ -58,6 +40,15 @@ func (server *Server) initGinEngine() {
 	gin.SetMode("release")
 	server.Engine = gin.New()
 	server.Engine.RedirectTrailingSlash = false
+
+	responseObj := response.Response{}
+	server.Engine.HandleMethodNotAllowed = true
+	server.Engine.NoRoute(func(ctx *gin.Context) {
+		responseObj.JsonResponseWithError(ctx, errors.New("Route not found, "+ctx.Request.URL.Path), http.StatusNotFound)
+	})
+	server.Engine.NoMethod(func(ctx *gin.Context) {
+		responseObj.JsonResponseWithError(ctx, errors.New("Route not allow, "+ctx.Request.URL.Path), http.StatusMethodNotAllowed)
+	})
 }
 
 func (server *Server) Use(middleware ...gin.HandlerFunc) gin.IRouter {

@@ -3,6 +3,7 @@ package middleware
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
 	"net/http"
 )
@@ -17,6 +18,6 @@ func GetPanicHandlerMiddleware() gin.HandlerFunc {
 			recoverErr = err.(error)
 		}
 
-		responseObj.JsonResponseWithError(ctx, recoverErr, http.StatusInternalServerError)
+		responseObj.JsonResponseWithError(ctx, err_handler.Throw("系统内部错误", recoverErr), http.StatusInternalServerError)
 	})
 }
