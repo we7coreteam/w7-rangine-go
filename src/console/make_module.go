@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"html/template"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -15,7 +16,8 @@ type commandArgs struct {
 }
 
 type TemplateData struct {
-	Name string
+	Name        string
+	PackageName string
 }
 
 var argsValue commandArgs
@@ -46,6 +48,23 @@ func (makeModuleCommand MakeModuleCommand) Handle(cmd *cobra.Command, args []str
 		cmd.Usage()
 		return
 	}
+
+	// 获取包名
+	modContent, err := os.ReadFile(fmt.Sprintf("%s/go.mod", baseDir))
+	if err != nil {
+		cmd.PrintErrln("Error: go.mod file is not exists")
+		cmd.Usage()
+		return
+	}
+	reg := regexp.MustCompile(`^module (.*)`)
+	match := reg.FindStringSubmatch(string(modContent))
+
+	if len(match) < 2 {
+		cmd.PrintErrln("Error: package name is undefined")
+		cmd.Usage()
+		return
+	}
+
 	//创建目录
 	for _, dir := range makeModuleCommand.templateDir() {
 		os.MkdirAll(fmt.Sprintf("%s/app/%s/%s", baseDir, argsValue.name, dir), 0755)
@@ -65,7 +84,8 @@ func (makeModuleCommand MakeModuleCommand) Handle(cmd *cobra.Command, args []str
 			panic(errors.New("error parsing template"))
 		}
 		templateParser.Execute(file, TemplateData{
-			Name: argsValue.name,
+			Name:        argsValue.name,
+			PackageName: match[1],
 		})
 	}
 
@@ -82,9 +102,9 @@ package {{.Name}}
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go-skeleton/app/{{.Name}}/command"
-	"github.com/we7coreteam/w7-rangine-go-skeleton/app/{{.Name}}/http/controller"
-	"github.com/we7coreteam/w7-rangine-go-skeleton/app/{{.Name}}/http/middleware"
+	"{{.PackageName}}/app/{{.Name}}/command"
+	"{{.PackageName}}/app/{{.Name}}/http/controller"
+	"{{.PackageName}}/app/{{.Name}}/http/middleware"
 	"github.com/we7coreteam/w7-rangine-go-support/src/console"
 	http_server "github.com/we7coreteam/w7-rangine-go/src/http/server"
 			
