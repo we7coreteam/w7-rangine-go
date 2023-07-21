@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
@@ -13,7 +14,7 @@ func GetPanicHandlerMiddleware() gin.HandlerFunc {
 	return gin.CustomRecoveryWithWriter(nil, func(ctx *gin.Context, err any) {
 		var recoverErr error
 		if _, ok := err.(error); !ok {
-			recoverErr = errors.New(err.(string))
+			recoverErr = errors.New(fmt.Sprintf("%v", err))
 		} else {
 			recoverErr = err.(error)
 		}
