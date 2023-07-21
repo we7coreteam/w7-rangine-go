@@ -24,9 +24,9 @@ var DefaultHandler = func(err error) {
 	logger, logErr := facade.GetLoggerFactory().Channel("default")
 	if logErr == nil {
 		if _, ok := err.(xerrors.Wrapper); ok {
-			logger.Error(fmt.Sprintf("%s \n %s", err.Error(), string(Stack(3, 0))))
+			logger.Error(fmt.Sprintf("%s\n%s", err.Error(), string(Stack(3, 0))))
 		} else {
-			logger.Error(fmt.Sprintf("%s \n %s", err.Error(), string(Stack(3, 0))))
+			logger.Error(fmt.Sprintf("%s\n%s", err.Error(), string(Stack(3, 11))))
 		}
 	}
 }

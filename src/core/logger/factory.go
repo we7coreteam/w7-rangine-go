@@ -8,6 +8,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Factory struct {
@@ -79,6 +80,15 @@ func (factory *Factory) MakeDriver(config Config) (zapcore.WriteSyncer, error) {
 }
 
 func (factory *Factory) MakeLogger(level zapcore.Level, ws ...zapcore.WriteSyncer) *zap.Logger {
+	customTimeEncoder := func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString("[" + t.Format("2006-01-02 15:04:05.000") + "]")
+	}
+	customLevelEncoder := func(level zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString("[" + level.CapitalString() + "]")
+	}
+	customCallerEncoder := func(caller zapcore.EntryCaller, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString("[" + caller.TrimmedPath() + "]")
+	}
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "time",
 		LevelKey:       "level",
@@ -87,10 +97,10 @@ func (factory *Factory) MakeLogger(level zapcore.Level, ws ...zapcore.WriteSynce
 		MessageKey:     "msg",
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.CapitalLevelEncoder,    // 小写编码器
-		EncodeTime:     zapcore.ISO8601TimeEncoder,     // ISO8601 UTC 时间格式
+		EncodeLevel:    customLevelEncoder,             // 小写编码器
+		EncodeTime:     customTimeEncoder,              // ISO8601 UTC 时间格式
 		EncodeDuration: zapcore.SecondsDurationEncoder, //
-		EncodeCaller:   zapcore.FullCallerEncoder,      // 全路径编码器
+		EncodeCaller:   customCallerEncoder,            // 全路径编码器
 		EncodeName:     zapcore.FullNameEncoder,
 	}
 
@@ -99,9 +109,9 @@ func (factory *Factory) MakeLogger(level zapcore.Level, ws ...zapcore.WriteSynce
 	atomicLevel.SetLevel(level)
 
 	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig), // 编码器配置
-		zapcore.NewMultiWriteSyncer(ws...),    // 打印到控制台和文件
-		atomicLevel,                           // 日志级别
+		zapcore.NewConsoleEncoder(encoderConfig), // 编码器配置
+		zapcore.NewMultiWriteSyncer(ws...),       // 打印到控制台和文件
+		atomicLevel,                              // 日志级别
 	)
 
 	return zap.New(core)
