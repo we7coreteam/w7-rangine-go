@@ -1,10 +1,20 @@
-package encoding
+package config
 
 import (
+	"github.com/spf13/afero"
 	"os"
 	"regexp"
 	"strings"
 )
+
+func ParseConfigFileEnv(path string) ([]byte, error) {
+	file, err := afero.ReadFile(afero.NewOsFs(), path)
+	if err != nil {
+		return nil, err
+	}
+
+	return ParseConfigContentEnv(file), nil
+}
 
 func ParseConfigContentEnv(b []byte) []byte {
 	content := string(b)

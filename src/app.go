@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bytes"
 	"github.com/asaskevich/EventBus"
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/gookit/color"
@@ -14,7 +15,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
 	"github.com/we7coreteam/w7-rangine-go/src/components/translator"
 	"github.com/we7coreteam/w7-rangine-go/src/console"
-	"github.com/we7coreteam/w7-rangine-go/src/core/config/encoding"
+	"github.com/we7coreteam/w7-rangine-go/src/core/config"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
@@ -73,7 +74,6 @@ func (app *App) ApplyOption(option Option) {
 
 func (app *App) InitConfig(option Option) {
 	app.config = viper.New()
-	_ = app.config.GetDecoderRegistry().RegisterDecoder("yaml", encoding.Codec{})
 	app.config.AutomaticEnv()
 
 	customerConfigPath := os.Getenv("RANGINE_CONFIG_FILE")
@@ -88,11 +88,16 @@ func (app *App) InitConfig(option Option) {
 	if customerConfigPath != "" {
 		_, err := os.Stat(customerConfigPath)
 		if err != nil && os.IsNotExist(err) {
-			return
+			panic(err)
 		}
 
 		app.config.SetConfigFile(customerConfigPath)
-		if err := app.config.MergeInConfig(); err != nil {
+		content, err := config.ParseConfigFileEnv(customerConfigPath)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := app.config.MergeConfig(bytes.NewReader(content)); err != nil {
 			panic(err)
 		}
 	}
