@@ -15,7 +15,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
 	"github.com/we7coreteam/w7-rangine-go/src/components/translator"
 	"github.com/we7coreteam/w7-rangine-go/src/console"
-	"github.com/we7coreteam/w7-rangine-go/src/core/config"
+	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
@@ -92,7 +92,7 @@ func (app *App) InitConfig(option Option) {
 		}
 
 		app.config.SetConfigFile(customerConfigPath)
-		content, err := config.ParseConfigFileEnv(customerConfigPath)
+		content, err := helper.ParseConfigFileEnv(customerConfigPath)
 		if err != nil {
 			panic(err)
 		}
