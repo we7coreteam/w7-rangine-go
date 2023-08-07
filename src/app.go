@@ -19,7 +19,6 @@ import (
 	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
 	"os"
-	"strings"
 )
 
 var GApp *App
@@ -77,8 +76,8 @@ func (app *App) InitConfig(option Option) {
 	_ = app.config.GetDecoderRegistry().RegisterDecoder("yaml", encoding.Codec{})
 	app.config.AutomaticEnv()
 
-	envConfigPath := os.Getenv("RANGINE_CONFIG_FILE")
-	if envConfigPath == "" && option.DefaultConfigLoader == nil {
+	customerConfigPath := os.Getenv("RANGINE_CONFIG_FILE")
+	if customerConfigPath == "" && option.DefaultConfigLoader == nil {
 		color.Warnln("Warning: The configuration file is missing. Confirm whether the configuration file is required and specify it")
 	}
 
@@ -86,40 +85,15 @@ func (app *App) InitConfig(option Option) {
 		option.DefaultConfigLoader(app.config)
 	}
 
-	if envConfigPath != "" {
-		_, err := os.Stat(envConfigPath)
+	if customerConfigPath != "" {
+		_, err := os.Stat(customerConfigPath)
 		if err != nil && os.IsNotExist(err) {
 			return
 		}
 
-		app.config.SetConfigFile(envConfigPath)
+		app.config.SetConfigFile(customerConfigPath)
 		if err := app.config.MergeInConfig(); err != nil {
 			panic(err)
-		}
-	}
-
-	var buildMap func(path []string, value interface{}) map[string]interface{}
-	buildMap = func(path []string, value interface{}) map[string]interface{} {
-		if len(path) > 1 {
-			return map[string]interface{}{
-				path[0]: buildMap(path[1:], value),
-			}
-		}
-
-		return map[string]interface{}{
-			path[0]: value,
-		}
-	}
-	for _, env := range os.Environ() {
-		keyVal := strings.Split(env, "=")
-		prefix := "RANGINE_"
-		if len(keyVal[0]) >= len(prefix) && keyVal[0][0:len(prefix)] == prefix {
-			path := strings.Split(keyVal[0][len(prefix):], ".")
-
-			err := app.config.MergeConfigMap(buildMap(path, keyVal[1]))
-			if err != nil {
-				panic(err)
-			}
 		}
 	}
 

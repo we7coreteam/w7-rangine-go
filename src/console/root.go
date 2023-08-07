@@ -39,7 +39,7 @@ func (rootCommand RootCommand) Handle(cmd *cobra.Command, args []string) {
 		for _, val := range env {
 			if strings.Index(val, "=") >= 0 {
 				varArr := strings.Split(val, "=")
-				os.Setenv("RANGINE_"+varArr[0], varArr[1])
+				os.Setenv(varArr[0], varArr[1])
 			}
 		}
 	}
