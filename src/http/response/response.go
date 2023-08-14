@@ -14,6 +14,7 @@ type SuccessResponseHandler func(ctx *gin.Context, data any, statusCode int)
 var errResponseHandler ErrResponseHandler = func(ctx *gin.Context, env string, err error, statusCode int) {
 	ctx.JSON(statusCode, map[string]interface{}{
 		"error": err.Error(),
+		"code":  statusCode,
 	})
 }
 
