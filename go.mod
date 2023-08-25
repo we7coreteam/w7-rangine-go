@@ -22,7 +22,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.4.6
-	gorm.io/gorm v1.25.0
+	gorm.io/gorm v1.24.5
 )
 
 require (
@@ -84,5 +84,5 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/gen v0.3.22
+	gorm.io/gen v0.3.23
 )
