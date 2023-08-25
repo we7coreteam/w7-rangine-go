@@ -3,26 +3,24 @@ package console
 import (
 	"github.com/spf13/cobra"
 	command "github.com/we7coreteam/w7-rangine-go-support/src/console"
-	"os"
 )
 
 type Console struct {
-	handler *cobra.Command
+	rootCommand *RootCommand
+	handler     *cobra.Command
 }
 
 func NewConsole() *Console {
-	rootCommandHandler := &RootCommand{}
+	rootCommand := &RootCommand{}
 	handler := &cobra.Command{
-		Use:   rootCommandHandler.GetName(),
-		Short: rootCommandHandler.GetDescription(),
+		Use:   rootCommand.GetName(),
+		Short: rootCommand.GetDescription(),
 	}
-	rootCommandHandler.Configure(handler)
-	cmd, flags, _ := handler.Find(os.Args[1:])
-	_ = cmd.ParseFlags(flags)
-	rootCommandHandler.Handle(cmd, flags)
+	rootCommand.Configure(handler)
 
 	return &Console{
-		handler: handler,
+		rootCommand: rootCommand,
+		handler:     handler,
 	}
 }
 
@@ -30,7 +28,10 @@ func (console Console) RegisterCommand(cmd command.Command) {
 	handler := &cobra.Command{
 		Use:   cmd.GetName(),
 		Short: cmd.GetDescription(),
-		Run:   cmd.Handle,
+		Run: func(curCmd *cobra.Command, args []string) {
+			console.rootCommand.Handle(curCmd, args)
+			cmd.Handle(curCmd, args)
+		},
 	}
 	cmd.Configure(handler)
 	console.handler.AddCommand(handler)
