@@ -17,12 +17,13 @@ require (
 	github.com/sevlyar/go-daemon v0.1.6
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
+	github.com/we7coreteam/gorm-gen-yaml v1.0.1
 	github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230706081709-fe27519aaa74
 	go.uber.org/zap v1.24.0
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
-	gorm.io/driver/mysql v1.4.6
-	gorm.io/gorm v1.24.5
+	gorm.io/driver/mysql v1.5.1-0.20230509030346-3715c134c25b
+	gorm.io/gorm v1.25.1-0.20230505075827-e61b98d69677
 )
 
 require (
