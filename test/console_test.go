@@ -25,7 +25,10 @@ func (c DefaultArgCommand) Configure(cmd *cobra.Command) {
 
 func (c DefaultArgCommand) Handle(cmd *cobra.Command, args []string) {
 	str, _ := cmd.Flags().GetString("test-arg")
-	os.Setenv("TEST_COMMAND_ARG", str)
+	err := os.Setenv("TEST_COMMAND_ARG", str)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func TestAddCommand(t *testing.T) {
@@ -63,7 +66,7 @@ func TestDefaultArgs(t *testing.T) {
 		t.Error(err)
 	}
 	oldEnv = os.Getenv("TEST_COMMAND_ENV")
-	os.Args = []string{"text", "default:args", "-eTEST_COMMAND_ENV=14", "--test-arg=test"}
+	os.Args = []string{"text", "default:args", "-eTEST_COMMAND_ENV=14", "--config-file=./console_test.go", "--test-arg=test"}
 	consoleManager := console.NewConsole()
 	consoleManager.RegisterCommand(&DefaultArgCommand{})
 	consoleManager.Run()
@@ -73,8 +76,13 @@ func TestDefaultArgs(t *testing.T) {
 		t.Error("command default args err")
 	}
 
+	configFile := os.Getenv("RANGINE_CONFIG_FILE")
+	if configFile != "./console_test.go" {
+		t.Error("command args config-file err")
+	}
+
 	argEnv := os.Getenv("TEST_COMMAND_ARG")
 	if argEnv != "test" {
-		t.Error("command default args err")
+		t.Error("command args test-arg err")
 	}
 }
