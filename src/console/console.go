@@ -39,6 +39,10 @@ func (console Console) RegisterCommand(cmd command.Command) {
 	console.handler.AddCommand(handler)
 }
 
+func (console Console) GetHandler() *cobra.Command {
+	return console.handler
+}
+
 func (console Console) Run() {
 	_ = console.handler.Execute()
 }
