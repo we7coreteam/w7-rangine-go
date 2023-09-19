@@ -7,6 +7,40 @@ import (
 	"testing"
 )
 
+func TestRegisterLogMap(t *testing.T) {
+	factory := logger.NewLoggerFactory()
+	factory.Register(map[string]logger.Config{
+		"test": {
+			Driver: "test_file",
+			Path:   "./test.log",
+			Level:  "debug",
+		},
+		"test1": {
+			Driver: "test_file",
+			Path:   "./test1.log",
+			Level:  "debug",
+		},
+	})
+	_, err := factory.Channel("test")
+	if err == nil {
+		t.Error("log channel test driver error")
+	}
+	_, err = factory.Channel("test1")
+	if err == nil {
+		t.Error("log channel test1 driver error")
+	}
+	factory.RegisterDriverResolver("test_file", factory.MakeFileStreamDriver)
+
+	_, err = factory.Channel("test")
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = factory.Channel("test1")
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestRegisterLogger(t *testing.T) {
 	factory := logger.NewLoggerFactory()
 	factory.RegisterDriverResolver("test_file", factory.MakeFileStreamDriver)
