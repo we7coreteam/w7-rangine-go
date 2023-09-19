@@ -15,11 +15,11 @@ func NewConsole() *Console {
 	handler := &cobra.Command{
 		Use:   rootCommand.GetName(),
 		Short: rootCommand.GetDescription(),
+		FParseErrWhitelist: cobra.FParseErrWhitelist{
+			UnknownFlags: true,
+		},
 	}
 	rootCommand.Configure(handler)
-	handler.FParseErrWhitelist = cobra.FParseErrWhitelist{
-		UnknownFlags: true,
-	}
 	cmd, flags, _ := handler.Find(os.Args[1:])
 	_ = cmd.ParseFlags(flags)
 	rootCommand.Handle(cmd, flags)
