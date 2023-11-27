@@ -86,8 +86,6 @@ func (factory *Factory) MakeSqliteDriver(config Config) (gorm.Dialector, error) 
 }
 
 func (factory *Factory) MakeDriver(config Config) (gorm.Dialector, error) {
-	fmt.Printf("%v \n", config)
-
 	driverResolver, exists := factory.driverResolverMap[config.Driver]
 	if !exists {
 		return nil, errors.New("db driver " + config.Driver + " not exists")
