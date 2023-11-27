@@ -2,8 +2,8 @@ package database
 
 type Config struct {
 	Driver        string         `mapstructure:"driver" json:"driver" yaml:"driver" binding:"required"`
-	Host          string         `mapstructure:"host" json:"host" yaml:"host" binding:"required_without=DSN"`
-	Port          int            `mapstructure:"port" json:"port" yaml:"port" binding:"required_without=DSN"`
+	Host          string         `mapstructure:"host" json:"host" yaml:"host" binding:"required_if=Driver mysql|required_without=DSN"`
+	Port          int            `mapstructure:"port" json:"port" yaml:"port" binding:"required_if=Driver mysql|required_without=DSN"`
 	Username      string         `mapstructure:"user_name" json:"user_name" yaml:"user_name" binding:"required_without=DSN"`
 	Password      string         `mapstructure:"password" json:"password" yaml:"password" binding:"required_without=DSN"`
 	DbName        string         `mapstructure:"db_name" json:"db_name" yaml:"db_name" binding:"required_without=DSN"`

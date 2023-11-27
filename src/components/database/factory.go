@@ -2,12 +2,15 @@ package database
 
 import (
 	"errors"
+	"fmt"
 	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -44,6 +47,7 @@ func NewDatabaseFactory() *Factory {
 	}
 
 	factory.RegisterDriverResolver("mysql", factory.MakeMysqlDriver)
+	factory.RegisterDriverResolver("sqlite", factory.MakeSqliteDriver)
 
 	return factory
 }
@@ -70,7 +74,20 @@ func (factory *Factory) MakeMysqlDriver(config Config) (gorm.Dialector, error) {
 	}), nil
 }
 
+func (factory *Factory) MakeSqliteDriver(config Config) (gorm.Dialector, error) {
+	var dsn = ""
+	if config.DSN != "" {
+		dsn = config.DSN
+	} else {
+		absPath, _ := filepath.Abs(config.DbName)
+		dsn = fmt.Sprintf("file://%s?cache=shared&mode=rwc", absPath)
+	}
+	return sqlite.Open(dsn), nil
+}
+
 func (factory *Factory) MakeDriver(config Config) (gorm.Dialector, error) {
+	fmt.Printf("%v \n", config)
+
 	driverResolver, exists := factory.driverResolverMap[config.Driver]
 	if !exists {
 		return nil, errors.New("db driver " + config.Driver + " not exists")
