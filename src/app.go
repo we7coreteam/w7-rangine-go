@@ -19,6 +19,8 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
 	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
+	"go.uber.org/zap/exp/zapslog"
+	"log/slog"
 	"os"
 )
 
@@ -128,6 +130,12 @@ func (app *App) InitLoggerFactory() {
 	}
 
 	factory.Register(loggerConfigMap)
+
+	defaultLog, err := factory.Channel("default")
+	if err == nil {
+		defaultSlog := slog.New(zapslog.NewHandler(defaultLog.Core(), nil))
+		slog.SetDefault(defaultSlog)
+	}
 
 	app.loggerFactory = factory
 }

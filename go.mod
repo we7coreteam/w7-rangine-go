@@ -1,6 +1,6 @@
 module github.com/we7coreteam/w7-rangine-go
 
-go 1.19
+go 1.21
 
 require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
@@ -19,7 +19,8 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/we7coreteam/gorm-gen-yaml v1.0.1
 	github.com/we7coreteam/w7-rangine-go-support v1.0.2-0.20231211082828-6817ad080abc
-	go.uber.org/zap v1.24.0
+	go.uber.org/zap v1.26.0
+	go.uber.org/zap/exp v0.2.0
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.1-0.20230509030346-3715c134c25b
@@ -30,8 +31,8 @@ require (
 require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
-	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/tools v0.6.0 // indirect
+	golang.org/x/mod v0.14.0 // indirect
+	golang.org/x/tools v0.16.0 // indirect
 	gorm.io/datatypes v1.1.1-0.20230130040222-c43177d3cf8c // indirect
 	gorm.io/hints v1.1.0 // indirect
 	gorm.io/plugin/dbresolver v1.3.0 // indirect
@@ -77,13 +78,12 @@ require (
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/wader/gormstore/v2 v2.0.3 // indirect
 	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
-	go.uber.org/atomic v1.9.0 // indirect
-	go.uber.org/multierr v1.8.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.11.0 // indirect
-	golang.org/x/net v0.12.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	golang.org/x/text v0.11.0 // indirect
+	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
