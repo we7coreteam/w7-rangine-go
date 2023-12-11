@@ -61,13 +61,15 @@ func (factory *Factory) SetLogger(logger *zap.Logger) {
 }
 
 func (factory *Factory) MakeMysqlDriver(config Config) (gorm.Dialector, error) {
-	var dns = ""
-	if config.DSN != "" {
-		dns = config.DSN
-	} else {
-		dns = config.Username + ":" + config.Password + "@tcp(" + config.Host + ":" + strconv.Itoa(config.Port) + ")/" + config.DbName + "?charset=" + config.Charset + "&parseTime=True&loc=Local"
+	if config.Port == 0 {
+		config.Port = 3306
+	}
+	fields := helper.ValidateAndGetErrFields(config)
+	if len(fields) > 0 {
+		return nil, errors.New("database config error, reason: fields: " + strings.Join(fields, ","))
 	}
 
+	dns := config.Username + ":" + config.Password + "@tcp(" + config.Host + ":" + strconv.Itoa(int(config.Port)) + ")/" + config.DbName + "?charset=" + config.Charset + "&parseTime=True&loc=Local"
 	return mysql.New(mysql.Config{
 		DSN:                       dns,   // data source name
 		SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
@@ -75,13 +77,22 @@ func (factory *Factory) MakeMysqlDriver(config Config) (gorm.Dialector, error) {
 }
 
 func (factory *Factory) MakeSqliteDriver(config Config) (gorm.Dialector, error) {
-	var dsn = ""
-	if config.DSN != "" {
-		dsn = config.DSN
-	} else {
-		absPath, _ := filepath.Abs(config.DbName)
-		dsn = fmt.Sprintf("file://%s?cache=shared&mode=rwc", absPath)
+	if config.Host == "" {
+		config.Host = "-"
 	}
+	if config.Username == "" {
+		config.Username = "-"
+	}
+	if config.Password == "" {
+		config.Password = "-"
+	}
+	fields := helper.ValidateAndGetErrFields(config)
+	if len(fields) > 0 {
+		return nil, errors.New("database config error, reason: fields: " + strings.Join(fields, ","))
+	}
+
+	absPath, _ := filepath.Abs(config.DbName)
+	dsn := fmt.Sprintf("file://%s?cache=shared&mode=rwc", absPath)
 	return sqlite.Open(dsn), nil
 }
 
@@ -99,7 +110,7 @@ func (factory *Factory) MakeDb(config Config, driver gorm.Dialector) (*gorm.DB, 
 	var dbLogger logger.Interface = nil
 	if factory.logger != nil {
 		if config.SlowThreshold <= 0 {
-			config.SlowThreshold = int64(200 * time.Millisecond)
+			config.SlowThreshold = uint64(200 * time.Millisecond)
 		}
 		dbLogger = logger.New(
 			&DbLogger{
@@ -130,8 +141,8 @@ func (factory *Factory) MakeDb(config Config, driver gorm.Dialector) (*gorm.DB, 
 		return nil, err
 	}
 
-	dbDriver.SetMaxIdleConns(config.MaxIdleConn)
-	dbDriver.SetMaxOpenConns(config.MaxConn)
+	dbDriver.SetMaxIdleConns(int(config.MaxIdleConn))
+	dbDriver.SetMaxOpenConns(int(config.MaxConn))
 
 	if factory.debug {
 		db = db.Debug()
@@ -163,7 +174,7 @@ func (factory *Factory) Channel(channel string) (*gorm.DB, error) {
 		var err error = nil
 		db, err = dbResolver()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("database resolve fail, channel:" + channel + ", error:" + err.Error())
 		}
 		factory.dbMap[channel] = db
 	}
@@ -183,11 +194,6 @@ func (factory *Factory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		func(channel string, config Config) {
 			factory.RegisterDb(channel, func() (*gorm.DB, error) {
-				fields := helper.ValidateAndGetErrFields(config)
-				if len(fields) > 0 {
-					panic("database config error, channel: " + channel + ", fields: " + strings.Join(fields, ","))
-				}
-
 				driver, err := factory.MakeDriver(config)
 				if err != nil {
 					return nil, err

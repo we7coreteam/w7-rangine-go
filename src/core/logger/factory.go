@@ -50,6 +50,11 @@ func (factory *Factory) ConvertLevel(level string) zapcore.Level {
 }
 
 func (factory *Factory) MakeFileStreamDriver(config Config) (zapcore.WriteSyncer, error) {
+	fields := helper.ValidateAndGetErrFields(config)
+	if len(fields) > 0 {
+		return nil, errors.New("log config error, reason: fields: " + strings.Join(fields, ","))
+	}
+
 	if config.MaxSize <= 0 {
 		config.MaxSize = 2
 	}
@@ -61,9 +66,9 @@ func (factory *Factory) MakeFileStreamDriver(config Config) (zapcore.WriteSyncer
 	}
 	hook := lumberjack.Logger{
 		Filename:   "./runtime/logs/" + config.Path,
-		MaxSize:    config.MaxSize,
-		MaxBackups: config.MaxBackups,
-		MaxAge:     config.MaxDays,
+		MaxSize:    int(config.MaxSize),
+		MaxBackups: int(config.MaxBackups),
+		MaxAge:     int(config.MaxDays),
 		Compress:   false,
 	}
 
@@ -138,7 +143,7 @@ func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
 		var err error = nil
 		logger, err = loggerResolver()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("log resolve fail, channel:" + channel + ", error:" + err.Error())
 		}
 		factory.loggerMap[channel] = logger
 	}
@@ -163,11 +168,6 @@ func (factory *Factory) Register(maps map[string]Config) {
 	for key, value := range maps {
 		func(channel string, config Config) {
 			factory.RegisterLogger(channel, func() (*zap.Logger, error) {
-				fields := helper.ValidateAndGetErrFields(config)
-				if len(fields) > 0 {
-					panic("log config error, channel: " + channel + ", fields: " + strings.Join(fields, ","))
-				}
-
 				driver, err := factory.MakeDriver(config)
 				if err != nil {
 					return nil, err
