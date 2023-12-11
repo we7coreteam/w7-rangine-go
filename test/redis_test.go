@@ -53,7 +53,7 @@ func TestRegisterRedisMap(t *testing.T) {
 
 func TestRegisterRedis(t *testing.T) {
 	factory := redis.NewRedisFactory()
-	factory.RegisterRedis("test", func() redis2.Cmdable {
+	factory.RegisterRedis("test", func() (redis2.Cmdable, error) {
 		return factory.MakeRedis(redis.Config{
 			Host: "127.0.0.1",
 			Port: 6379,

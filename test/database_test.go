@@ -15,11 +15,11 @@ func TestRegisterDbMap(t *testing.T) {
 	factory.Register(map[string]database.Config{
 		"test1": {
 			Driver: "sqlite",
-			DSN:    "./test1.db",
+			DbName: "./test1.db",
 		},
 		"test2": {
 			Driver: "sqlite",
-			DSN:    "./test2.db",
+			DbName: "./test2.db",
 		},
 	})
 	_, err := factory.Channel("test1")
@@ -32,7 +32,7 @@ func TestRegisterDbMap(t *testing.T) {
 	}
 
 	factory.RegisterDriverResolver("sqlite", func(config database.Config) (gorm.Dialector, error) {
-		return sqlite.Open(config.DSN), nil
+		return sqlite.Open(config.DbName), nil
 	})
 
 	db1, err := factory.Channel("test1")
@@ -57,13 +57,13 @@ func TestRegisterDbMap(t *testing.T) {
 func TestRegisterDb(t *testing.T) {
 	factory := database.NewDatabaseFactory()
 	factory.RegisterDriverResolver("sqlite", func(config database.Config) (gorm.Dialector, error) {
-		return sqlite.Open(config.DSN), nil
+		return sqlite.Open(config.DbName), nil
 	})
 
 	factory.RegisterDb("sqlite1", func() (*gorm.DB, error) {
 		driver, err := factory.MakeDriver(database.Config{
 			Driver: "sqlite",
-			DSN:    "./test1.db",
+			DbName: "./test1.db",
 		})
 		if err != nil {
 			return nil, err
@@ -75,7 +75,7 @@ func TestRegisterDb(t *testing.T) {
 	factory.RegisterDb("sqlite2", func() (*gorm.DB, error) {
 		driver, err := factory.MakeDriver(database.Config{
 			Driver: "sqlite",
-			DSN:    "./test2.db",
+			DbName: "./test2.db",
 		})
 		if err != nil {
 			return nil, err
