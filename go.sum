@@ -363,6 +363,8 @@ github.com/we7coreteam/gorm-gen-yaml v1.0.1 h1:aNEE2p6h8lFxQEePuWHVlwVI8agehLs2K
 github.com/we7coreteam/gorm-gen-yaml v1.0.1/go.mod h1:Au8YvqjDI8TZR0RAMWy4vDKSDZc3ZRtLVaB3Vr49JyY=
 github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230706081709-fe27519aaa74 h1:rGySbOnDMcXmptYWsi+Z9kne/28KQ96f/7aVYvMUBdQ=
 github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230706081709-fe27519aaa74/go.mod h1:XHkctahxj7VWvv5IyRsXGoN9/OFJycWF3vxfzgksxdc=
+github.com/we7coreteam/w7-rangine-go-support v1.0.2-0.20231211082828-6817ad080abc h1:ze8QzdgPqqQgrw9E1Rchmdzz7m7yXmnwb80QwOA00Uo=
+github.com/we7coreteam/w7-rangine-go-support v1.0.2-0.20231211082828-6817ad080abc/go.mod h1:XHkctahxj7VWvv5IyRsXGoN9/OFJycWF3vxfzgksxdc=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 h1:QldyIu/L63oPpyvQmHgvgickp1Yw510KJOqX7H24mg8=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778/go.mod h1:2MuV+tbUrU1zIOPMxZ5EncGwgmMJsa+9ucAQZXxsObs=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

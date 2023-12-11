@@ -18,7 +18,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
 	github.com/we7coreteam/gorm-gen-yaml v1.0.1
-	github.com/we7coreteam/w7-rangine-go-support v0.0.0-20230706081709-fe27519aaa74
+	github.com/we7coreteam/w7-rangine-go-support v1.0.2-0.20231211082828-6817ad080abc
 	go.uber.org/zap v1.24.0
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
