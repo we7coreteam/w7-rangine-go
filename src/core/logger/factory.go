@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -25,6 +26,7 @@ func NewLoggerFactory() *Factory {
 		driverResolverMap: make(map[string]func(config Config) (zapcore.WriteSyncer, error)),
 	}
 
+	factory.RegisterDriverResolver("console", factory.MakeConsoleDriver)
 	factory.RegisterDriverResolver("stream", factory.MakeFileStreamDriver)
 
 	return factory
@@ -73,6 +75,10 @@ func (factory *Factory) MakeFileStreamDriver(config Config) (zapcore.WriteSyncer
 	}
 
 	return zapcore.AddSync(&hook), nil
+}
+
+func (factory *Factory) MakeConsoleDriver(config Config) (zapcore.WriteSyncer, error) {
+	return zapcore.AddSync(os.Stdout), nil
 }
 
 func (factory *Factory) MakeDriver(config Config) (zapcore.WriteSyncer, error) {
