@@ -14,11 +14,11 @@ func TestRegisterDbMap(t *testing.T) {
 
 	factory.Register(map[string]database.Config{
 		"test1": {
-			Driver: "sqlite",
+			Driver: "sqlite_test",
 			DbName: "./test1.db",
 		},
 		"test2": {
-			Driver: "sqlite",
+			Driver: "sqlite_test",
 			DbName: "./test2.db",
 		},
 	})
@@ -31,7 +31,7 @@ func TestRegisterDbMap(t *testing.T) {
 		t.Error("database channel test2 driver error")
 	}
 
-	factory.RegisterDriverResolver("sqlite", func(config database.Config) (gorm.Dialector, error) {
+	factory.RegisterDriverResolver("sqlite_test", func(config database.Config) (gorm.Dialector, error) {
 		return sqlite.Open(config.DbName), nil
 	})
 
