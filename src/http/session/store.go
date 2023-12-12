@@ -63,7 +63,7 @@ func GetRedisStore(config *viper.Viper, keyPairs ...[]byte) sessions.Store {
 		panic(err)
 	}
 
-	store, err := redis.NewStoreWithDB(redisConfig.PoolSize, "tcp", redisConfig.Host+":"+strconv.Itoa(redisConfig.Port), redisConfig.Password, strconv.Itoa(redisConfig.Db), keyPairs...)
+	store, err := redis.NewStoreWithDB(int(redisConfig.PoolSize), "tcp", redisConfig.Host+":"+strconv.Itoa(int(redisConfig.Port)), redisConfig.Password, strconv.Itoa(int(redisConfig.Db)), keyPairs...)
 	if err != nil {
 		panic(err)
 	}
