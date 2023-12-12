@@ -27,7 +27,7 @@ func NewLoggerFactory() *Factory {
 	}
 
 	factory.RegisterDriverResolver("console", factory.MakeConsoleDriver)
-	factory.RegisterDriverResolver("stream", factory.MakeFileStreamDriver)
+	factory.RegisterDriverResolver("file", factory.MakeFileStreamDriver)
 
 	return factory
 }
