@@ -28,11 +28,13 @@ require (
 	gorm.io/gorm v1.25.1-0.20230505075827-e61b98d69677
 )
 
+exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
+
 require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
-	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
-	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/tools v0.16.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.15 // indirect
+	golang.org/x/mod v0.8.0 // indirect
+	golang.org/x/tools v0.6.0 // indirect
 	gorm.io/datatypes v1.1.1-0.20230130040222-c43177d3cf8c // indirect
 	gorm.io/hints v1.1.0 // indirect
 	gorm.io/plugin/dbresolver v1.3.0 // indirect
