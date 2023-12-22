@@ -17,6 +17,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/console"
 	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
+	"github.com/we7coreteam/w7-rangine-go/src/core/logger/config"
 	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
 	"go.uber.org/zap/exp/zapslog"
@@ -123,7 +124,7 @@ func (app *App) GetContainer() container.Container {
 func (app *App) InitLoggerFactory() {
 	factory := logger.NewLoggerFactory()
 
-	var loggerConfigMap map[string]logger.Config
+	var loggerConfigMap config.Config
 	err := app.config.UnmarshalKey("log", &loggerConfigMap)
 	if err != nil {
 		panic(err)

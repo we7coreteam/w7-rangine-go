@@ -2,18 +2,16 @@ package logger
 
 import (
 	"errors"
-	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/src/core/logger/config"
+	"github.com/we7coreteam/w7-rangine-go/src/core/logger/driver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"gopkg.in/natefinch/lumberjack.v2"
-	"os"
-	"strings"
 	"sync"
 	"time"
 )
 
 type Factory struct {
-	driverResolverMap map[string]func(config Config) (zapcore.WriteSyncer, error)
+	driverResolverMap map[string]func(config config.Driver) (driver.Driver, error)
 	loggerResolverMap map[string]func() (*zap.Logger, error)
 	loggerMap         map[string]*zap.Logger
 	lock              sync.RWMutex
@@ -23,11 +21,11 @@ func NewLoggerFactory() *Factory {
 	factory := &Factory{
 		loggerMap:         make(map[string]*zap.Logger),
 		loggerResolverMap: make(map[string]func() (*zap.Logger, error)),
-		driverResolverMap: make(map[string]func(config Config) (zapcore.WriteSyncer, error)),
+		driverResolverMap: make(map[string]func(config config.Driver) (driver.Driver, error)),
 	}
 
-	factory.RegisterDriverResolver("console", factory.MakeConsoleDriver)
-	factory.RegisterDriverResolver("file", factory.MakeFileStreamDriver)
+	factory.RegisterDriverResolver("console", driver.NewConsoleDriver)
+	factory.RegisterDriverResolver("file", driver.NewFileDriver)
 
 	return factory
 }
@@ -51,37 +49,7 @@ func (factory *Factory) ConvertLevel(level string) zapcore.Level {
 	}
 }
 
-func (factory *Factory) MakeFileStreamDriver(config Config) (zapcore.WriteSyncer, error) {
-	fields := helper.ValidateAndGetErrFields(config)
-	if len(fields) > 0 {
-		return nil, errors.New("log config error, reason: fields: " + strings.Join(fields, ","))
-	}
-
-	if config.MaxSize <= 0 {
-		config.MaxSize = 2
-	}
-	if config.MaxDays <= 0 {
-		config.MaxDays = 7
-	}
-	if config.MaxBackups <= 0 {
-		config.MaxBackups = 1
-	}
-	hook := lumberjack.Logger{
-		Filename:   "./runtime/logs/" + config.Path,
-		MaxSize:    int(config.MaxSize),
-		MaxBackups: int(config.MaxBackups),
-		MaxAge:     int(config.MaxDays),
-		Compress:   false,
-	}
-
-	return zapcore.AddSync(&hook), nil
-}
-
-func (factory *Factory) MakeConsoleDriver(config Config) (zapcore.WriteSyncer, error) {
-	return zapcore.AddSync(os.Stdout), nil
-}
-
-func (factory *Factory) MakeDriver(config Config) (zapcore.WriteSyncer, error) {
+func (factory *Factory) MakeDriver(config config.Driver) (driver.Driver, error) {
 	driverResolver, exists := factory.driverResolverMap[config.Driver]
 	if !exists {
 		return nil, errors.New("logger driver " + config.Driver + " not exists")
@@ -90,7 +58,7 @@ func (factory *Factory) MakeDriver(config Config) (zapcore.WriteSyncer, error) {
 	return driverResolver(config)
 }
 
-func (factory *Factory) MakeLogger(level zapcore.Level, ws ...zapcore.WriteSyncer) *zap.Logger {
+func (factory *Factory) MakeLogger(drivers ...driver.Driver) *zap.Logger {
 	customTimeEncoder := func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString("[" + t.Format("2006-01-02 15:04:05.000") + "]")
 	}
@@ -115,14 +83,9 @@ func (factory *Factory) MakeLogger(level zapcore.Level, ws ...zapcore.WriteSynce
 		EncodeName:     zapcore.FullNameEncoder,
 	}
 
-	// 设置日志级别
-	atomicLevel := zap.NewAtomicLevel()
-	atomicLevel.SetLevel(level)
-
-	core := zapcore.NewCore(
+	core := NewDefaultLogger(
 		zapcore.NewConsoleEncoder(encoderConfig), // 编码器配置
-		zapcore.NewMultiWriteSyncer(ws...),       // 打印到控制台和文件
-		atomicLevel,                              // 日志级别
+		drivers,                                  // 打印到控制台和文件
 	)
 
 	return zap.New(core)
@@ -157,7 +120,7 @@ func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
 	return logger, nil
 }
 
-func (factory *Factory) RegisterDriverResolver(driver string, resolver func(config Config) (zapcore.WriteSyncer, error)) {
+func (factory *Factory) RegisterDriverResolver(driver string, resolver func(config config.Driver) (driver.Driver, error)) {
 	factory.driverResolverMap[driver] = resolver
 }
 
@@ -170,16 +133,26 @@ func (factory *Factory) RegisterLogger(channel string, loggerResolver func() (*z
 	factory.loggerResolverMap[channel] = loggerResolver
 }
 
-func (factory *Factory) Register(maps map[string]Config) {
-	for key, value := range maps {
-		func(channel string, config Config) {
+func (factory *Factory) Register(conf config.Config) {
+	for channel, value := range conf.Channels {
+		func(channel string, value config.Channel) {
 			factory.RegisterLogger(channel, func() (*zap.Logger, error) {
-				driver, err := factory.MakeDriver(config)
-				if err != nil {
-					return nil, err
+				var drivers = make([]driver.Driver, len(value.Drivers))
+				for index, driverName := range value.Drivers {
+					_, exists := conf.Drivers[driverName]
+					if !exists {
+						return nil, errors.New("logger driver " + driverName + " not exists")
+					}
+
+					driver, err := factory.MakeDriver(conf.Drivers[driverName])
+					if err != nil {
+						return nil, err
+					}
+					drivers[index] = driver
 				}
-				return factory.MakeLogger(factory.ConvertLevel(config.Level), driver), nil
+
+				return factory.MakeLogger(drivers...), nil
 			})
-		}(key, value)
+		}(channel, value)
 	}
 }
