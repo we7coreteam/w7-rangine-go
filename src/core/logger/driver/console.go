@@ -34,5 +34,5 @@ func (c Console) Write(buffer []byte, ent zapcore.Entry, fields []zapcore.Field)
 }
 
 func (c Console) Sync() error {
-	return nil
+	return c.writer.Sync()
 }
