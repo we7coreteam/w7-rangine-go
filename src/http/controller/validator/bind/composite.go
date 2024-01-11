@@ -2,6 +2,7 @@ package bind
 
 import (
 	"errors"
+	"github.com/creasty/defaults"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"net/http"
@@ -26,6 +27,10 @@ func (Composite) Name() string {
 }
 
 func (c Composite) Bind(req *http.Request, obj any) error {
+	err := defaults.Set(obj)
+	if err != nil {
+		return err
+	}
 	if err := req.ParseForm(); err != nil {
 		return err
 	}

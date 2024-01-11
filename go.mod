@@ -31,6 +31,7 @@ require (
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
 
 require (
+	github.com/creasty/defaults v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	golang.org/x/mod v0.8.0 // indirect
