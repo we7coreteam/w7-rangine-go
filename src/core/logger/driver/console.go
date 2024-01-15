@@ -16,7 +16,11 @@ type Console struct {
 
 func NewConsoleDriver(config config.Driver) (Driver, error) {
 	atomicLevel := zap.NewAtomicLevel()
-	atomicLevel.SetLevel(zapcore.Level(config.Level))
+	level, err := zapcore.ParseLevel(config.Level)
+	if err != nil {
+		return nil, err
+	}
+	atomicLevel.SetLevel(level)
 
 	return &Console{
 		levelEnabler: atomicLevel,

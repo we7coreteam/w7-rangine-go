@@ -30,25 +30,6 @@ func NewLoggerFactory() *Factory {
 	return factory
 }
 
-func (factory *Factory) ConvertLevel(level string) zapcore.Level {
-	switch level {
-	case "debug":
-		return zap.DebugLevel
-	case "info":
-		return zap.InfoLevel
-	case "warn":
-		return zap.WarnLevel
-	case "error":
-		return zap.ErrorLevel
-	case "fatal":
-		return zap.FatalLevel
-	case "Panic":
-		return zap.PanicLevel
-	default:
-		return zap.DebugLevel
-	}
-}
-
 func (factory *Factory) MakeDriver(config config.Driver) (driver.Driver, error) {
 	driverResolver, exists := factory.driverResolverMap[config.Driver]
 	if !exists {

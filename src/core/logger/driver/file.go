@@ -40,8 +40,11 @@ func NewFileDriver(config config.Driver) (Driver, error) {
 		Compress:   false,
 	}
 
-	atomicLevel := zap.NewAtomicLevel()
-	atomicLevel.SetLevel(zapcore.Level(config.Level))
+	level, err := zapcore.ParseLevel(config.Level)
+	if err != nil {
+		return nil, err
+	}
+	atomicLevel := zap.NewAtomicLevelAt(level)
 
 	return &File{
 		levelEnabler: atomicLevel,

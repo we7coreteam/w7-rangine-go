@@ -14,12 +14,12 @@ func TestRegisterLogMap(t *testing.T) {
 			"test": {
 				Driver: "file",
 				Path:   "./test.log",
-				Level:  -1,
+				Level:  "debug",
 			},
 			"test1": {
 				Driver: "console",
 				Path:   "./test1.log",
-				Level:  2,
+				Level:  "error",
 			},
 		},
 		Channels: map[string]config.Channel{
@@ -39,7 +39,7 @@ func TestRegisterLogMap(t *testing.T) {
 
 	logger.Debug("dsfsdfsdf")
 	_, err = os.Stat("./runtime/logs/test.log")
-	if err == nil || !os.IsNotExist(err) {
+	if err != nil && !os.IsNotExist(err) {
 		t.Error(err)
 	}
 
