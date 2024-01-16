@@ -7,7 +7,7 @@ import (
 )
 
 func GetSessionMiddleware(config *viper.Viper, storeResolver func(*viper.Viper, ...[]byte) sessions.Store, keyPairs ...[]byte) gin.HandlerFunc {
-	config.SetDefault("session.name", "SESSIONID")
+	config.SetDefault("session.name", "SESSION_ID")
 
 	return sessions.Sessions(config.GetString("session.name"), storeResolver(config, keyPairs...))
 }

@@ -24,16 +24,16 @@ func NewRedisFactory() *Factory {
 
 func (factory *Factory) Channel(channel string) (redis.Cmdable, error) {
 	factory.lock.RLock()
-	redis, exists := factory.redisMap[channel]
+	redisHandler, exists := factory.redisMap[channel]
 	factory.lock.RUnlock()
 	if exists {
-		return redis, nil
+		return redisHandler, nil
 	}
 
 	factory.lock.Lock()
 	defer factory.lock.Unlock()
 
-	redis, exists = factory.redisMap[channel]
+	redisHandler, exists = factory.redisMap[channel]
 	if !exists {
 		redisResolver, exists := factory.redisResolverMap[channel]
 		if !exists {
@@ -41,14 +41,14 @@ func (factory *Factory) Channel(channel string) (redis.Cmdable, error) {
 		}
 
 		var err error = nil
-		redis, err = redisResolver()
+		redisHandler, err = redisResolver()
 		if err != nil {
 			return nil, errors.New("redis resolve fail, channel:" + channel + ", error:" + err.Error())
 		}
-		factory.redisMap[channel] = redis
+		factory.redisMap[channel] = redisHandler
 	}
 
-	return redis, nil
+	return redisHandler, nil
 }
 
 func (factory *Factory) MakeRedis(config Config) (redis.Cmdable, error) {

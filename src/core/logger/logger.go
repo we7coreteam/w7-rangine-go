@@ -47,11 +47,11 @@ func (c *Logger) Write(ent zapcore.Entry, fields []zapcore.Field) error {
 	defer buf.Free()
 
 	var writeErr error
-	for _, driver := range c.drivers {
-		if !driver.LevelEnable(ent.Level) {
+	for _, driverHandler := range c.drivers {
+		if !driverHandler.LevelEnable(ent.Level) {
 			continue
 		}
-		err := multierr.Append(writeErr, driver.Write(buf.Bytes(), ent, fields))
+		err := multierr.Append(writeErr, driverHandler.Write(buf.Bytes(), ent, fields))
 		if err != nil {
 			return err
 		}
@@ -68,8 +68,8 @@ func (c *Logger) Write(ent zapcore.Entry, fields []zapcore.Field) error {
 
 func (c *Logger) Sync() error {
 	var syncErr error
-	for _, driver := range c.drivers {
-		err := multierr.Append(syncErr, driver.Sync())
+	for _, driverHandler := range c.drivers {
+		err := multierr.Append(syncErr, driverHandler.Sync())
 		if err != nil {
 			return err
 		}
