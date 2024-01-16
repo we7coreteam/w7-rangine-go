@@ -1,12 +1,11 @@
 package config
 
 type Config struct {
-	Drivers  map[string]Driver  `mapstructure:"drivers" json:"drivers" yaml:"drivers" binding:"required"`
 	Channels map[string]Channel `mapstructure:"channels" json:"channels" yaml:"channels" binding:"required"`
 }
 
 type Channel struct {
-	Drivers []string `mapstructure:"drivers" json:"drivers" yaml:"drivers" binding:"required"`
+	Drivers []Driver `mapstructure:"drivers" json:"drivers" yaml:"drivers" binding:"required"`
 }
 
 type Driver struct {

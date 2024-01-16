@@ -119,13 +119,8 @@ func (factory *Factory) Register(conf config.Config) {
 		func(channel string, value config.Channel) {
 			factory.RegisterLogger(channel, func() (*zap.Logger, error) {
 				var drivers = make([]driver.Driver, len(value.Drivers))
-				for index, driverName := range value.Drivers {
-					_, exists := conf.Drivers[driverName]
-					if !exists {
-						return nil, errors.New("logger driver " + driverName + " not exists")
-					}
-
-					driver, err := factory.MakeDriver(conf.Drivers[driverName])
+				for index, driverConfig := range value.Drivers {
+					driver, err := factory.MakeDriver(driverConfig)
 					if err != nil {
 						return nil, err
 					}
