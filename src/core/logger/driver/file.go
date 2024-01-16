@@ -22,6 +22,9 @@ func NewFileDriver(config config.Driver) (Driver, error) {
 	if len(fields) > 0 {
 		return nil, errors.New("log config error, reason: fields: " + strings.Join(fields, ","))
 	}
+	if config.Path == "" {
+		return nil, errors.New("log config error, reason: fields: path")
+	}
 
 	if config.MaxSize <= 0 {
 		config.MaxSize = 2

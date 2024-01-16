@@ -132,8 +132,12 @@ func (app *App) InitLoggerFactory() {
 
 	factory.Register(loggerConfigMap)
 
-	defaultLog, err := factory.Channel("default")
-	if err == nil {
+	if _, exists := loggerConfigMap["default"]; exists {
+		defaultLog, err := factory.Channel("default")
+		if err != nil {
+			panic(err)
+		}
+
 		defaultSlog := slog.New(zapslog.NewHandler(defaultLog.Core(), nil))
 		slog.SetDefault(defaultSlog)
 	}
