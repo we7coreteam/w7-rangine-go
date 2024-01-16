@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
+	github.com/creasty/defaults v1.7.0
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/locales v0.14.1
@@ -31,7 +32,6 @@ require (
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
 
 require (
-	github.com/creasty/defaults v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	golang.org/x/mod v0.8.0 // indirect
