@@ -1,9 +1,5 @@
 package config
 
-type Config struct {
-	Channels map[string]Channel `mapstructure:"channels" json:"channels" yaml:"channels" binding:"required"`
-}
-
 type Channel struct {
 	Drivers []Driver `mapstructure:"drivers" json:"drivers" yaml:"drivers" binding:"required"`
 }

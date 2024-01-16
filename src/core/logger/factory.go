@@ -114,12 +114,12 @@ func (factory *Factory) RegisterLogger(channel string, loggerResolver func() (*z
 	factory.loggerResolverMap[channel] = loggerResolver
 }
 
-func (factory *Factory) Register(conf config.Config) {
-	for channel, value := range conf.Channels {
-		func(channel string, value config.Channel) {
-			factory.RegisterLogger(channel, func() (*zap.Logger, error) {
-				var drivers = make([]driver.Driver, len(value.Drivers))
-				for index, driverConfig := range value.Drivers {
+func (factory *Factory) Register(conf map[string]config.Channel) {
+	for channelName, channel := range conf {
+		func(channelName string, channel config.Channel) {
+			factory.RegisterLogger(channelName, func() (*zap.Logger, error) {
+				var drivers = make([]driver.Driver, len(channel.Drivers))
+				for index, driverConfig := range channel.Drivers {
 					driver, err := factory.MakeDriver(driverConfig)
 					if err != nil {
 						return nil, err
@@ -129,6 +129,6 @@ func (factory *Factory) Register(conf config.Config) {
 
 				return factory.MakeLogger(drivers...), nil
 			})
-		}(channel, value)
+		}(channelName, channel)
 	}
 }

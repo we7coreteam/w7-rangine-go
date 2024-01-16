@@ -9,20 +9,18 @@ import (
 
 func TestRegisterLogMap(t *testing.T) {
 	factory := logger.NewLoggerFactory()
-	factory.Register(config.Config{
-		Channels: map[string]config.Channel{
-			"test": {
-				Drivers: []config.Driver{
-					{
-						Driver: "file",
-						Path:   "./test.log",
-						Level:  "debug",
-					},
-					{
-						Driver: "console",
-						Path:   "./test1.log",
-						Level:  "error",
-					},
+	factory.Register(map[string]config.Channel{
+		"test": {
+			Drivers: []config.Driver{
+				{
+					Driver: "file",
+					Path:   "./test.log",
+					Level:  "debug",
+				},
+				{
+					Driver: "console",
+					Path:   "./test1.log",
+					Level:  "error",
 				},
 			},
 		},
