@@ -55,12 +55,17 @@ func NewFileDriver(config config.Driver) (Driver, error) {
 	}, nil
 }
 
-func (f File) LevelEnable(level zapcore.Level) bool {
-	return f.levelEnabler.Enabled(level)
-}
+func (f File) Write(level zapcore.Level, enc zapcore.Encoder, ent zapcore.Entry, fields []zapcore.Field) error {
+	if !f.levelEnabler.Enabled(level) {
+		return nil
+	}
+	buf, err := enc.EncodeEntry(ent, fields)
+	if err != nil {
+		return err
+	}
+	defer buf.Free()
 
-func (f File) Write(buffer []byte, ent zapcore.Entry, fields []zapcore.Field) error {
-	_, err := f.writer.Write(buffer)
+	_, err = f.writer.Write(buf.Bytes())
 	return err
 }
 

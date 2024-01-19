@@ -39,25 +39,11 @@ func (c *Logger) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.Che
 }
 
 func (c *Logger) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	buf, err := c.enc.EncodeEntry(ent, fields)
-	if err != nil {
-		return err
-	}
-
-	defer buf.Free()
-
-	var writeErr error
 	for _, driverHandler := range c.drivers {
-		if !driverHandler.LevelEnable(ent.Level) {
-			continue
-		}
-		err := multierr.Append(writeErr, driverHandler.Write(buf.Bytes(), ent, fields))
+		err := driverHandler.Write(ent.Level, c.enc, ent, fields)
 		if err != nil {
 			return err
 		}
-	}
-	if writeErr != nil {
-		return err
 	}
 
 	if ent.Level > zapcore.ErrorLevel {

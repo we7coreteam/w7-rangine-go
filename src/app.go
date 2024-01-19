@@ -124,7 +124,7 @@ func (app *App) GetContainer() container.Container {
 func (app *App) InitLoggerFactory() {
 	factory := logger.NewLoggerFactory()
 
-	var loggerConfigMap map[string]config.Channel
+	var loggerConfigMap map[string]config.Driver
 	err := app.config.UnmarshalKey("log", &loggerConfigMap)
 	if err != nil {
 		panic(err)

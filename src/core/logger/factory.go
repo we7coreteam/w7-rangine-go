@@ -26,6 +26,14 @@ func NewLoggerFactory() *Factory {
 
 	factory.RegisterDriverResolver("console", driver.NewConsoleDriver)
 	factory.RegisterDriverResolver("file", driver.NewFileDriver)
+	factory.RegisterDriverResolver("stack", driver.NewStackDriver(func(channel string) (zapcore.Core, error) {
+		logger, err := factory.Channel(channel)
+		if err != nil {
+			return nil, err
+		}
+
+		return logger.Core(), nil
+	}))
 
 	return factory
 }
@@ -114,20 +122,16 @@ func (factory *Factory) RegisterLogger(channel string, loggerResolver func() (*z
 	factory.loggerResolverMap[channel] = loggerResolver
 }
 
-func (factory *Factory) Register(conf map[string]config.Channel) {
+func (factory *Factory) Register(conf map[string]config.Driver) {
 	for channelName, channel := range conf {
-		func(channelName string, channel config.Channel) {
+		func(channelName string, driver config.Driver) {
 			factory.RegisterLogger(channelName, func() (*zap.Logger, error) {
-				var drivers = make([]driver.Driver, len(channel.Drivers))
-				for index, driverConfig := range channel.Drivers {
-					driverHandler, err := factory.MakeDriver(driverConfig)
-					if err != nil {
-						return nil, err
-					}
-					drivers[index] = driverHandler
+				driverHandler, err := factory.MakeDriver(driver)
+				if err != nil {
+					return nil, err
 				}
 
-				return factory.MakeLogger(drivers...), nil
+				return factory.MakeLogger(driverHandler), nil
 			})
 		}(channelName, channel)
 	}

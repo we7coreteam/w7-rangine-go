@@ -28,12 +28,17 @@ func NewConsoleDriver(config config.Driver) (Driver, error) {
 	}, nil
 }
 
-func (c Console) LevelEnable(level zapcore.Level) bool {
-	return c.levelEnabler.Enabled(level)
-}
+func (c Console) Write(level zapcore.Level, enc zapcore.Encoder, ent zapcore.Entry, fields []zapcore.Field) error {
+	if !c.levelEnabler.Enabled(level) {
+		return nil
+	}
+	buf, err := enc.EncodeEntry(ent, fields)
+	if err != nil {
+		return err
+	}
+	defer buf.Free()
 
-func (c Console) Write(buffer []byte, ent zapcore.Entry, fields []zapcore.Field) error {
-	_, err := c.writer.Write(buffer)
+	_, err = c.writer.Write(buf.Bytes())
 	return err
 }
 

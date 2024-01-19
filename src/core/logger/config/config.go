@@ -1,9 +1,5 @@
 package config
 
-type Channel struct {
-	Drivers []Driver `mapstructure:"drivers" json:"drivers" yaml:"drivers" binding:"required"`
-}
-
 type Driver struct {
 	Driver     string         `mapstructure:"driver" json:"driver" yaml:"driver" binding:"required"`
 	Path       string         `mapstructure:"path" json:"path" yaml:"path"`
@@ -12,4 +8,5 @@ type Driver struct {
 	MaxSize    uint           `mapstructure:"max_size" json:"max_size" yaml:"max_size"`
 	MaxBackups uint           `mapstructure:"max_backups" json:"max_backups" yaml:"max_backups"`
 	Options    map[string]any `mapstructure:"options" json:"options" yaml:"options"`
+	Channels   []string       `mapstructure:"channels" json:"channels" yaml:"channels"`
 }
