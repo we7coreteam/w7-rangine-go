@@ -18,10 +18,7 @@ func (provider Provider) Register(config *viper.Viper, loggerFactory logger.Fact
 	}
 
 	dbFactory := NewDatabaseFactory()
-	log, err := loggerFactory.Channel("default")
-	if err == nil {
-		dbFactory.SetLogger(log)
-	}
+	dbFactory.SetLoggerFactory(loggerFactory)
 	dbFactory.Register(dbConfigMap)
 	if config.GetString("app.env") == "debug" {
 		dbFactory.SetDebug()
