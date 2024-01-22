@@ -24,11 +24,8 @@ type DbLogger struct {
 }
 
 func (dbLogger *DbLogger) Printf(info string, vs ...any) {
-	var _vs []zap.Field
-	for k, v := range vs {
-		_vs = append(_vs, zap.Reflect(string(rune(k)), v))
-	}
-	dbLogger.logger.Info(info, _vs...)
+	buf := fmt.Appendf(nil, info, vs...)
+	dbLogger.logger.Info(string(buf))
 }
 
 type Factory struct {
@@ -127,7 +124,7 @@ func (factory *Factory) MakeDb(config Config, driver gorm.Dialector) (*gorm.DB, 
 				},
 				logger.Config{
 					SlowThreshold:             time.Duration(config.SlowThreshold), // Slow SQL threshold
-					LogLevel:                  logger.Silent,                       // Log level
+					LogLevel:                  logger.Info,                         // Log level
 					IgnoreRecordNotFoundError: true,                                // Ignore ErrRecordNotFound error for logger
 					Colorful:                  false,                               // Disable color
 				},
