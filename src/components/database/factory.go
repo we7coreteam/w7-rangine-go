@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	loggerFactory "github.com/we7coreteam/w7-rangine-go-support/src/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
@@ -34,7 +35,7 @@ type Factory struct {
 	driverResolverMap map[string]func(config Config) (gorm.Dialector, error)
 	dbResolverMap     map[string]func() (*gorm.DB, error)
 	dbMap             map[string]*gorm.DB
-	logger            *zap.Logger
+	loggerFactory     loggerFactory.Factory
 	lock              sync.RWMutex
 	debug             bool
 }
@@ -56,8 +57,8 @@ func (factory *Factory) SetDebug() {
 	factory.debug = true
 }
 
-func (factory *Factory) SetLogger(logger *zap.Logger) {
-	factory.logger = logger
+func (factory *Factory) SetLoggerFactory(loggerFactory loggerFactory.Factory) {
+	factory.loggerFactory = loggerFactory
 }
 
 func (factory *Factory) MakeMysqlDriver(config Config) (gorm.Dialector, error) {
@@ -108,21 +109,30 @@ func (factory *Factory) MakeDriver(config Config) (gorm.Dialector, error) {
 func (factory *Factory) MakeDb(config Config, driver gorm.Dialector) (*gorm.DB, error) {
 	//可根据配置开启日志
 	var dbLogger logger.Interface = nil
-	if factory.logger != nil {
-		if config.SlowThreshold <= 0 {
-			config.SlowThreshold = uint64(200 * time.Millisecond)
+
+	if factory.loggerFactory != nil {
+		var loggerChannel = "default"
+		val, exists := config.Options["logger"]
+		if exists {
+			loggerChannel = val.(string)
 		}
-		dbLogger = logger.New(
-			&DbLogger{
-				logger: factory.logger,
-			},
-			logger.Config{
-				SlowThreshold:             time.Duration(config.SlowThreshold),     // Slow SQL threshold
-				LogLevel:                  logger.LogLevel(factory.logger.Level()), // Log level
-				IgnoreRecordNotFoundError: true,                                    // Ignore ErrRecordNotFound error for logger
-				Colorful:                  false,                                   // Disable color
-			},
-		)
+		log, err := factory.loggerFactory.Channel(loggerChannel)
+		if err == nil {
+			if config.SlowThreshold <= 0 {
+				config.SlowThreshold = uint64(200 * time.Millisecond)
+			}
+			dbLogger = logger.New(
+				&DbLogger{
+					logger: log,
+				},
+				logger.Config{
+					SlowThreshold:             time.Duration(config.SlowThreshold), // Slow SQL threshold
+					LogLevel:                  logger.Silent,                       // Log level
+					IgnoreRecordNotFoundError: true,                                // Ignore ErrRecordNotFound error for logger
+					Colorful:                  false,                               // Disable color
+				},
+			)
+		}
 	}
 
 	db, err := gorm.Open(driver, &gorm.Config{
