@@ -14,7 +14,7 @@ type Factory struct {
 	driverResolverMap map[string]func(config logger.Config) (logger.Driver, error)
 	loggerResolverMap map[string]func() (*zap.Logger, error)
 	loggerMap         map[string]*zap.Logger
-	lock              sync.RWMutex
+	lock              sync.Mutex
 }
 
 func NewLoggerFactory() *Factory {
@@ -81,9 +81,9 @@ func (factory *Factory) MakeLogger(drivers ...logger.Driver) *zap.Logger {
 }
 
 func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
-	factory.lock.RLock()
+	//factory.lock.RLock()  //暂不用读写锁控制，这里可能会导致死锁, 比如新的channel 需要依赖其他channel, 写锁打开后，读锁获取不到，死锁
 	logger, exists := factory.loggerMap[channel]
-	factory.lock.RUnlock()
+	//factory.lock.RUnlock()
 	if exists {
 		return logger, nil
 	}
@@ -103,6 +103,7 @@ func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
 		if err != nil {
 			return nil, errors.New("log resolve fail, channel:" + channel + ", error:" + err.Error())
 		}
+		logger = logger.Named(channel)
 		factory.loggerMap[channel] = logger
 	}
 
