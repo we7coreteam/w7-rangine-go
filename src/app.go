@@ -10,7 +10,6 @@ import (
 	cons "github.com/we7coreteam/w7-rangine-go-support/src/console"
 	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
 	log "github.com/we7coreteam/w7-rangine-go-support/src/logger"
-	logSpt "github.com/we7coreteam/w7-rangine-go-support/src/logger"
 	"github.com/we7coreteam/w7-rangine-go-support/src/server"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
@@ -124,7 +123,7 @@ func (app *App) GetContainer() container.Container {
 func (app *App) InitLoggerFactory() {
 	factory := logger.NewLoggerFactory()
 
-	var loggerConfigMap map[string]logSpt.Config
+	var loggerConfigMap map[string]log.Config
 	err := app.config.UnmarshalKey("log", &loggerConfigMap)
 	if err != nil {
 		panic(err)
