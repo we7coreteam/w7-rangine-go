@@ -10,6 +10,7 @@ import (
 	cons "github.com/we7coreteam/w7-rangine-go-support/src/console"
 	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
 	log "github.com/we7coreteam/w7-rangine-go-support/src/logger"
+	logSpt "github.com/we7coreteam/w7-rangine-go-support/src/logger"
 	"github.com/we7coreteam/w7-rangine-go-support/src/server"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
@@ -17,7 +18,6 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/src/console"
 	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
-	"github.com/we7coreteam/w7-rangine-go/src/core/logger/config"
 	sm "github.com/we7coreteam/w7-rangine-go/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/src/prof"
 	"go.uber.org/zap/exp/zapslog"
@@ -124,7 +124,7 @@ func (app *App) GetContainer() container.Container {
 func (app *App) InitLoggerFactory() {
 	factory := logger.NewLoggerFactory()
 
-	var loggerConfigMap map[string]config.Driver
+	var loggerConfigMap map[string]logSpt.Config
 	err := app.config.UnmarshalKey("log", &loggerConfigMap)
 	if err != nil {
 		panic(err)

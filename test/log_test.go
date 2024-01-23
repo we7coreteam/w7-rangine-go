@@ -1,15 +1,15 @@
 package test
 
 import (
+	logSpt "github.com/we7coreteam/w7-rangine-go-support/src/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
-	"github.com/we7coreteam/w7-rangine-go/src/core/logger/config"
 	"os"
 	"testing"
 )
 
 func TestRegisterLogMap(t *testing.T) {
 	factory := logger.NewLoggerFactory()
-	factory.Register(map[string]config.Driver{
+	factory.Register(map[string]logSpt.Config{
 		"test": {
 			Driver: "file",
 			Path:   "./test.log",

@@ -11,7 +11,7 @@ type Provider struct {
 }
 
 func (provider Provider) Register(config *viper.Viper, loggerFactory logger.Factory, container container.Container) {
-	var dbConfigMap map[string]Config
+	var dbConfigMap map[string]database.Config
 	err := config.UnmarshalKey("database", &dbConfigMap)
 	if err != nil {
 		panic(err)

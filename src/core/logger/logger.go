@@ -1,17 +1,17 @@
 package logger
 
 import (
-	"github.com/we7coreteam/w7-rangine-go/src/core/logger/driver"
+	"github.com/we7coreteam/w7-rangine-go-support/src/logger"
 	"go.uber.org/multierr"
 	"go.uber.org/zap/zapcore"
 )
 
 type Logger struct {
 	enc     zapcore.Encoder
-	drivers []driver.Driver
+	drivers []logger.Driver
 }
 
-func NewDefaultLogger(enc zapcore.Encoder, drivers []driver.Driver) zapcore.Core {
+func NewDefaultLogger(enc zapcore.Encoder, drivers []logger.Driver) zapcore.Core {
 	return &Logger{
 		enc:     enc,
 		drivers: drivers,

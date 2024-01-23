@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	"github.com/we7coreteam/w7-rangine-go-support/src/database"
 	loggerFactory "github.com/we7coreteam/w7-rangine-go-support/src/logger"
 	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"go.uber.org/zap"
@@ -29,7 +30,7 @@ func (dbLogger *DbLogger) Printf(info string, vs ...any) {
 }
 
 type Factory struct {
-	driverResolverMap map[string]func(config Config) (gorm.Dialector, error)
+	driverResolverMap map[string]func(config database.Config) (gorm.Dialector, error)
 	dbResolverMap     map[string]func() (*gorm.DB, error)
 	dbMap             map[string]*gorm.DB
 	loggerFactory     loggerFactory.Factory
@@ -41,11 +42,11 @@ func NewDatabaseFactory() *Factory {
 	factory := &Factory{
 		dbMap:             make(map[string]*gorm.DB),
 		dbResolverMap:     make(map[string]func() (*gorm.DB, error)),
-		driverResolverMap: make(map[string]func(config Config) (gorm.Dialector, error)),
+		driverResolverMap: make(map[string]func(config database.Config) (gorm.Dialector, error)),
 	}
 
-	factory.RegisterDriverResolver("mysql", factory.MakeMysqlDriver)
-	factory.RegisterDriverResolver("sqlite", factory.MakeSqliteDriver)
+	factory.RegisterDriver("mysql", factory.MakeMysqlDriver)
+	factory.RegisterDriver("sqlite", factory.MakeSqliteDriver)
 
 	return factory
 }
@@ -58,7 +59,7 @@ func (factory *Factory) SetLoggerFactory(loggerFactory loggerFactory.Factory) {
 	factory.loggerFactory = loggerFactory
 }
 
-func (factory *Factory) MakeMysqlDriver(config Config) (gorm.Dialector, error) {
+func (factory *Factory) MakeMysqlDriver(config database.Config) (gorm.Dialector, error) {
 	if config.Port == 0 {
 		config.Port = 3306
 	}
@@ -74,7 +75,7 @@ func (factory *Factory) MakeMysqlDriver(config Config) (gorm.Dialector, error) {
 	}), nil
 }
 
-func (factory *Factory) MakeSqliteDriver(config Config) (gorm.Dialector, error) {
+func (factory *Factory) MakeSqliteDriver(config database.Config) (gorm.Dialector, error) {
 	if config.Host == "" {
 		config.Host = "-"
 	}
@@ -94,7 +95,7 @@ func (factory *Factory) MakeSqliteDriver(config Config) (gorm.Dialector, error) 
 	return sqlite.Open(dsn), nil
 }
 
-func (factory *Factory) MakeDriver(config Config) (gorm.Dialector, error) {
+func (factory *Factory) MakeDriver(config database.Config) (gorm.Dialector, error) {
 	driverResolver, exists := factory.driverResolverMap[config.Driver]
 	if !exists {
 		return nil, errors.New("db driver " + config.Driver + " not exists")
@@ -103,7 +104,7 @@ func (factory *Factory) MakeDriver(config Config) (gorm.Dialector, error) {
 	return driverResolver(config)
 }
 
-func (factory *Factory) MakeDb(config Config, driver gorm.Dialector) (*gorm.DB, error) {
+func (factory *Factory) MakeDb(config database.Config, driver gorm.Dialector) (*gorm.DB, error) {
 	//可根据配置开启日志
 	var dbLogger logger.Interface = nil
 
@@ -189,7 +190,7 @@ func (factory *Factory) Channel(channel string) (*gorm.DB, error) {
 	return db, nil
 }
 
-func (factory *Factory) RegisterDriverResolver(driver string, resolver func(config Config) (gorm.Dialector, error)) {
+func (factory *Factory) RegisterDriver(driver string, resolver func(config database.Config) (gorm.Dialector, error)) {
 	factory.driverResolverMap[driver] = resolver
 }
 
@@ -197,9 +198,9 @@ func (factory *Factory) RegisterDb(channel string, dbResolver func() (*gorm.DB, 
 	factory.dbResolverMap[channel] = dbResolver
 }
 
-func (factory *Factory) Register(maps map[string]Config) {
+func (factory *Factory) Register(maps map[string]database.Config) {
 	for key, value := range maps {
-		func(channel string, config Config) {
+		func(channel string, config database.Config) {
 			factory.RegisterDb(channel, func() (*gorm.DB, error) {
 				driver, err := factory.MakeDriver(config)
 				if err != nil {
