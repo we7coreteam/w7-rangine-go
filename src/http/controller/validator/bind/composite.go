@@ -27,10 +27,6 @@ func (Composite) Name() string {
 }
 
 func (c Composite) Bind(req *http.Request, obj any) error {
-	err := defaults.Set(obj)
-	if err != nil {
-		return err
-	}
 	if err := req.ParseForm(); err != nil {
 		return err
 	}
@@ -50,20 +46,27 @@ func (c Composite) Bind(req *http.Request, obj any) error {
 		}
 	}
 
+	var err error
 	switch c.contentType {
 	case binding.MIMEJSON:
-		return binding.JSON.Bind(req, obj)
+		err = binding.JSON.Bind(req, obj)
 	case binding.MIMEXML, binding.MIMEXML2:
-		return binding.XML.Bind(req, obj)
+		err = binding.XML.Bind(req, obj)
 	case binding.MIMEPROTOBUF:
-		return binding.ProtoBuf.Bind(req, obj)
+		err = binding.ProtoBuf.Bind(req, obj)
 	case binding.MIMEMSGPACK, binding.MIMEMSGPACK2:
-		return binding.MsgPack.Bind(req, obj)
+		err = binding.MsgPack.Bind(req, obj)
 	case binding.MIMEYAML:
-		return binding.YAML.Bind(req, obj)
+		err = binding.YAML.Bind(req, obj)
 	case binding.MIMETOML:
-		return binding.TOML.Bind(req, obj)
+		err = binding.TOML.Bind(req, obj)
 	default:
-		return binding.Validator.ValidateStruct(obj)
+		err = binding.Validator.ValidateStruct(obj)
 	}
+
+	if err == nil {
+		err = defaults.Set(obj)
+	}
+
+	return err
 }
