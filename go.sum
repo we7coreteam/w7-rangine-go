@@ -372,10 +372,8 @@ github.com/wader/gormstore/v2 v2.0.3 h1:/29GWPauY8xZkpLnB8hsp+dZfP3ivA9fiDw1YVNT
 github.com/wader/gormstore/v2 v2.0.3/go.mod h1:sr3N3a8F1+PBc3fHoKaphFqDXLRJ9Oe6Yow0HxKFbbg=
 github.com/we7coreteam/gorm-gen-yaml v1.0.1 h1:aNEE2p6h8lFxQEePuWHVlwVI8agehLs2K05+dnMij6I=
 github.com/we7coreteam/gorm-gen-yaml v1.0.1/go.mod h1:Au8YvqjDI8TZR0RAMWy4vDKSDZc3ZRtLVaB3Vr49JyY=
-github.com/we7coreteam/w7-rangine-go-support v1.0.3-0.20240123084446-dee8ab78f9d0 h1:NsaBjWl2Ll4WF3I3PfAdgbwOwsB0l/3glegg4sdMRPk=
-github.com/we7coreteam/w7-rangine-go-support v1.0.3-0.20240123084446-dee8ab78f9d0/go.mod h1:XHkctahxj7VWvv5IyRsXGoN9/OFJycWF3vxfzgksxdc=
-github.com/we7coreteam/w7-rangine-go-support v1.0.3-0.20240123085628-2e4c57ede69a h1:lv4zLuM6cBNr1SQaAcFB6xZFJjUEYgUyhAlOotgJyMs=
-github.com/we7coreteam/w7-rangine-go-support v1.0.3-0.20240123085628-2e4c57ede69a/go.mod h1:XHkctahxj7VWvv5IyRsXGoN9/OFJycWF3vxfzgksxdc=
+github.com/we7coreteam/w7-rangine-go-support v1.0.3 h1:uNH5ggilmlGsRGyZEfRLCy26DB5mt9ND5ClQ3JvoUt0=
+github.com/we7coreteam/w7-rangine-go-support v1.0.3/go.mod h1:XHkctahxj7VWvv5IyRsXGoN9/OFJycWF3vxfzgksxdc=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 h1:QldyIu/L63oPpyvQmHgvgickp1Yw510KJOqX7H24mg8=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778/go.mod h1:2MuV+tbUrU1zIOPMxZ5EncGwgmMJsa+9ucAQZXxsObs=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
