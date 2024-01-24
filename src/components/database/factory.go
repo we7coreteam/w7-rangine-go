@@ -125,7 +125,7 @@ func (factory *Factory) MakeDb(config database.Config, driver gorm.Dialector) (*
 				},
 				logger.Config{
 					SlowThreshold:             time.Duration(config.SlowThreshold), // Slow SQL threshold
-					LogLevel:                  logger.Info,                         // Log level
+					LogLevel:                  logger.Silent,                       // Log level
 					IgnoreRecordNotFoundError: true,                                // Ignore ErrRecordNotFound error for logger
 					Colorful:                  false,                               // Disable color
 				},
