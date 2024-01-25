@@ -42,6 +42,9 @@ func (server *Server) initGinEngine() {
 	gin.SetMode("release")
 	server.Engine = gin.New()
 	server.Engine.RedirectTrailingSlash = false
+	if server.config.MaxBodySize > 0 {
+		server.Engine.MaxMultipartMemory = server.config.MaxBodySize
+	}
 
 	responseObj := response.Response{}
 	server.Engine.HandleMethodNotAllowed = true
