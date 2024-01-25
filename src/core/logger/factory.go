@@ -27,12 +27,12 @@ func NewLoggerFactory() *Factory {
 	factory.RegisterDriver("console", driver.NewConsoleDriver)
 	factory.RegisterDriver("file", driver.NewFileDriver)
 	factory.RegisterDriver("stack", driver.NewStackDriver(func(channel string) (zapcore.Core, error) {
-		logger, err := factory.Channel(channel)
+		channelLogger, err := factory.Channel(channel)
 		if err != nil {
 			return nil, err
 		}
 
-		return logger.Core(), nil
+		return channelLogger.Core(), nil
 	}))
 
 	return factory
@@ -82,16 +82,16 @@ func (factory *Factory) MakeLogger(drivers ...logger.Driver) *zap.Logger {
 
 func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
 	//factory.lock.RLock()  //暂不用读写锁控制，这里可能会导致死锁, 比如新的channel 需要依赖其他channel, 写锁打开后，读锁获取不到，死锁
-	logger, exists := factory.loggerMap[channel]
+	channelLogger, exists := factory.loggerMap[channel]
 	//factory.lock.RUnlock()
 	if exists {
-		return logger, nil
+		return channelLogger, nil
 	}
 
 	factory.lock.Lock()
 	defer factory.lock.Unlock()
 
-	logger, exists = factory.loggerMap[channel]
+	channelLogger, exists = factory.loggerMap[channel]
 	if !exists {
 		loggerResolver, exists := factory.loggerResolverMap[channel]
 		if !exists {
@@ -99,15 +99,15 @@ func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
 		}
 
 		var err error = nil
-		logger, err = loggerResolver()
+		channelLogger, err = loggerResolver()
 		if err != nil {
 			return nil, errors.New("log resolve fail, channel:" + channel + ", error:" + err.Error())
 		}
-		logger = logger.Named(channel)
-		factory.loggerMap[channel] = logger
+		channelLogger = channelLogger.Named(channel)
+		factory.loggerMap[channel] = channelLogger
 	}
 
-	return logger, nil
+	return channelLogger, nil
 }
 
 func (factory *Factory) RegisterDriver(driver string, resolver func(config logger.Config) (logger.Driver, error)) {

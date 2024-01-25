@@ -35,12 +35,12 @@ func NewStackDriver(loggerResolver func(channel string) (zapcore.Core, error)) f
 
 func (s Stack) Write(level zapcore.Level, enc zapcore.Encoder, ent zapcore.Entry, fields []zapcore.Field) error {
 	for _, channel := range s.channels {
-		logger, err := s.loggerResolver(channel)
+		channelLogger, err := s.loggerResolver(channel)
 		if err != nil {
 			return err
 		}
 
-		err = logger.Write(ent, fields)
+		err = channelLogger.Write(ent, fields)
 		if err != nil {
 			return err
 		}
