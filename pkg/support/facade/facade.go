@@ -17,9 +17,6 @@ var Container container.Container
 var Config *viper.Viper
 var Event EventBus.Bus
 var LoggerFactory logger.Factory
-var RedisFactory redis.Factory
-var DbFactory database.Factory
-var translator ut.Translator
 var Validator binding.StructValidator
 var Console console.Console
 var ServerManager server.Manager
