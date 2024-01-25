@@ -33,6 +33,13 @@ func (c Composite) Bind(req *http.Request, obj any) error {
 		}
 	}
 
+	//预先判断一次是context.shouldBind方法里面得multipart解析使用的包大小设置是写死的
+	if c.context.ContentType() == binding.MIMEMultipartPOSTForm {
+		_, err := c.context.MultipartForm()
+		if err != nil {
+			return err
+		}
+	}
 	err := c.context.ShouldBind(obj)
 	if err == nil {
 		err = defaults.Set(obj)
