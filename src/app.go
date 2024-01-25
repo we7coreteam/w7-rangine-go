@@ -6,11 +6,10 @@ import (
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/gookit/color"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go-support/src"
-	cons "github.com/we7coreteam/w7-rangine-go-support/src/console"
-	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
-	log "github.com/we7coreteam/w7-rangine-go-support/src/logger"
-	"github.com/we7coreteam/w7-rangine-go-support/src/server"
+	cons "github.com/we7coreteam/w7-rangine-go/pkg/support/console"
+	"github.com/we7coreteam/w7-rangine-go/pkg/support/facade"
+	log "github.com/we7coreteam/w7-rangine-go/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/pkg/support/server"
 	"github.com/we7coreteam/w7-rangine-go/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/src/components/redis"
 	"github.com/we7coreteam/w7-rangine-go/src/components/translator"
@@ -33,8 +32,6 @@ type Option struct {
 }
 
 type App struct {
-	support.App
-
 	Name          string
 	Version       string
 	config        *viper.Viper
@@ -51,8 +48,6 @@ func NewApp(option Option) *App {
 		Version: "1.0.10",
 	}
 	GApp.ApplyOption(option)
-
-	facade.SetApp(GApp)
 
 	GApp.InitConsole()
 	GApp.InitConfig(option)
@@ -106,6 +101,8 @@ func (app *App) InitConfig(option Option) {
 
 	app.config.SetDefault("app.env", "release")
 	app.config.SetDefault("app.lang", "zh")
+
+	facade.Config = app.config
 }
 
 func (app *App) GetConfig() *viper.Viper {
@@ -114,6 +111,8 @@ func (app *App) GetConfig() *viper.Viper {
 
 func (app *App) InitContainer() {
 	app.container = container.New()
+
+	facade.Container = app.container
 }
 
 func (app *App) GetContainer() container.Container {
@@ -144,6 +143,8 @@ func (app *App) InitLoggerFactory() {
 	}
 
 	app.loggerFactory = factory
+
+	facade.LoggerFactory = app.loggerFactory
 }
 
 func (app *App) GetLoggerFactory() log.Factory {
@@ -152,6 +153,8 @@ func (app *App) GetLoggerFactory() log.Factory {
 
 func (app *App) InitEvent() {
 	app.event = EventBus.New()
+
+	facade.Event = app.event
 }
 
 func (app *App) GetEvent() EventBus.Bus {
@@ -167,6 +170,8 @@ func (app *App) RegisterProviders() {
 
 func (app *App) InitServerManager() {
 	app.serverManager = sm.NewDefaultServerManager()
+
+	facade.ServerManager = app.serverManager
 }
 
 func (app *App) GetServerManager() server.Manager {
@@ -188,6 +193,8 @@ func (app *App) InitConsole() {
 	app.console.RegisterCommand(&console.VersionCommand{
 		Version: app.Version,
 	})
+
+	facade.Console = app.console
 }
 
 func (app *App) GetConsole() cons.Console {

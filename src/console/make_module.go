@@ -105,7 +105,7 @@ import (
 	"{{.PackageName}}/app/{{.Name}}/command"
 	"{{.PackageName}}/app/{{.Name}}/http/controller"
 	"{{.PackageName}}/app/{{.Name}}/http/middleware"
-	"github.com/we7coreteam/w7-rangine-go-support/src/console"
+	"github.com/we7coreteam/w7-rangine-go/pkg/support/console"
 	http_server "github.com/we7coreteam/w7-rangine-go/src/http/server"
 			
 )
@@ -166,7 +166,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
+	"github.com/we7coreteam/w7-rangine-go/pkg/support/facade"
 	"github.com/we7coreteam/w7-rangine-go/src/http/middleware"
 	"time"
 )

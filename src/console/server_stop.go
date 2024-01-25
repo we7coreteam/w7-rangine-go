@@ -3,7 +3,7 @@ package console
 import (
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go-support/src/facade"
+	"github.com/we7coreteam/w7-rangine-go/pkg/support/facade"
 	"strings"
 )
 

@@ -2,8 +2,8 @@ package http
 
 import (
 	"github.com/spf13/viper"
-	support "github.com/we7coreteam/w7-rangine-go-support/src/console"
-	"github.com/we7coreteam/w7-rangine-go-support/src/server"
+	support "github.com/we7coreteam/w7-rangine-go/pkg/support/console"
+	"github.com/we7coreteam/w7-rangine-go/pkg/support/server"
 	"github.com/we7coreteam/w7-rangine-go/src/http/console"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
 	httpserver "github.com/we7coreteam/w7-rangine-go/src/http/server"

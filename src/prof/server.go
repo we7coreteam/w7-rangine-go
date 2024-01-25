@@ -3,7 +3,7 @@ package prof
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/we7coreteam/w7-rangine-go-support/src/server"
+	"github.com/we7coreteam/w7-rangine-go/pkg/support/server"
 	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"net/http"
 	"net/http/pprof"

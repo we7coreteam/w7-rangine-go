@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go-support/src/server"
+	"github.com/we7coreteam/w7-rangine-go/pkg/support/server"
 	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
 	"github.com/we7coreteam/w7-rangine-go/src/http/response"
 	"net/http"

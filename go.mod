@@ -19,7 +19,6 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
 	github.com/we7coreteam/gorm-gen-yaml v1.0.1
-	github.com/we7coreteam/w7-rangine-go-support v1.0.3
 	go.uber.org/zap v1.26.0
 	go.uber.org/zap/exp v0.2.0
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2

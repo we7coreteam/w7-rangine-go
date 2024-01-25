@@ -2,7 +2,7 @@ package server
 
 import (
 	"errors"
-	"github.com/we7coreteam/w7-rangine-go-support/src/server"
+	"github.com/we7coreteam/w7-rangine-go/pkg/support/server"
 	"os"
 	"strconv"
 	"strings"
