@@ -32,7 +32,7 @@ func (abstract Abstract) TranslateValidationError(err error) error {
 }
 
 func (abstract Abstract) Validate(ctx *gin.Context, requestData interface{}) bool {
-	err := ctx.ShouldBindWith(requestData, bind.NewCompositeBind(ctx.ContentType(), ctx.Params))
+	err := ctx.ShouldBindWith(requestData, bind.NewCompositeBind(ctx))
 	if err != nil {
 		abstract.JsonResponseWithServerError(ctx, abstract.TranslateValidationError(err))
 		return false
