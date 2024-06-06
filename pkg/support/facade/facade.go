@@ -17,7 +17,7 @@ var Container container.Container
 var Config *viper.Viper
 var Event EventBus.Bus
 var LoggerFactory logger.Factory
-var Validator binding.StructValidator
+var Validator = binding.Validator
 var Console console.Console
 var ServerManager server.Manager
 
