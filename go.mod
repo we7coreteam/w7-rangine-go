@@ -24,7 +24,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.1-0.20230509030346-3715c134c25b
-	gorm.io/driver/sqlite v1.4.3
+	gorm.io/driver/sqlite v1.5.0
 	gorm.io/gorm v1.25.1-0.20230505075827-e61b98d69677
 )
 
