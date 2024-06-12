@@ -24,15 +24,15 @@ require (
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.1-0.20230509030346-3715c134c25b
-	gorm.io/driver/sqlite v1.5.0
-	gorm.io/gorm v1.25.1-0.20230505075827-e61b98d69677
+	gorm.io/driver/sqlite v1.5.5
+	gorm.io/gorm v1.25.7-0.20240204074919-46816ad31dde
 )
 
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
 
 require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
-	github.com/mattn/go-sqlite3 v1.14.15 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	gorm.io/datatypes v1.1.1-0.20230130040222-c43177d3cf8c // indirect
