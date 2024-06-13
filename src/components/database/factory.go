@@ -91,7 +91,7 @@ func (factory *Factory) MakeSqliteDriver(config database.Config) (gorm.Dialector
 	}
 
 	absPath, _ := filepath.Abs(config.DbName)
-	dsn := fmt.Sprintf("file://%s?cache=shared&mode=rwc", absPath)
+	dsn := fmt.Sprintf("%s?cache=shared&mode=rwc", absPath)
 	return sqlite.Open(dsn), nil
 }
 
