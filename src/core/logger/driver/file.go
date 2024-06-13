@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"path/filepath"
 	"strings"
 )
 
@@ -37,7 +38,7 @@ func NewFileDriver(config logger.Config) (logger.Driver, error) {
 	}
 
 	path := "./runtime/logs/" + config.Path
-	if config.Path[0] == '/' {
+	if filepath.IsAbs(config.Path) {
 		path = config.Path
 	}
 	writer := lumberjack.Logger{
