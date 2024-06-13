@@ -35,8 +35,13 @@ func NewFileDriver(config logger.Config) (logger.Driver, error) {
 	if config.MaxBackups <= 0 {
 		config.MaxBackups = 1
 	}
+
+	path := "./runtime/logs/" + config.Path
+	if config.Path[0] == '/' {
+		path = config.Path
+	}
 	writer := lumberjack.Logger{
-		Filename:   "./runtime/logs/" + config.Path,
+		Filename:   path,
 		MaxSize:    int(config.MaxSize),
 		MaxBackups: int(config.MaxBackups),
 		MaxAge:     int(config.MaxDays),
