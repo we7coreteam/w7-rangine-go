@@ -3,9 +3,9 @@ package database
 import (
 	"errors"
 	"fmt"
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/database"
-	loggerFactory "github.com/we7coreteam/w7-rangine-go/pkg/support/logger"
-	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/database"
+	loggerFactory "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"

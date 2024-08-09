@@ -1,7 +1,7 @@
 package test
 
 import (
-	"github.com/we7coreteam/w7-rangine-go/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
 	"os"
 	"testing"
 )

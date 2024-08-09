@@ -6,11 +6,11 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/console"
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/database"
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/logger"
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/redis"
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/server"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/console"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/database"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/redis"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
 )
 
 var Container container.Container

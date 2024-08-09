@@ -7,7 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	translational "github.com/go-playground/validator/v10/translations/zh"
 	"github.com/golobby/container/v3/pkg/container"
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/facade"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
 )
 
 type Provider struct {

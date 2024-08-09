@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
-	"github.com/we7coreteam/w7-rangine-go/src/http/response"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/err_handler"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/http/response"
 	"net/http"
 )
 

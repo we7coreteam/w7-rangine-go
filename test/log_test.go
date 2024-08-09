@@ -1,8 +1,8 @@
 package test
 
 import (
-	logSpt "github.com/we7coreteam/w7-rangine-go/pkg/support/logger"
-	"github.com/we7coreteam/w7-rangine-go/src/core/logger"
+	logSpt "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/logger"
 	"os"
 	"testing"
 )

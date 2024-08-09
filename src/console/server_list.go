@@ -3,7 +3,7 @@ package console
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/facade"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
 	"os"
 )
 

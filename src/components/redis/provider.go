@@ -3,7 +3,7 @@ package redis
 import (
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/redis"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/redis"
 )
 
 type Provider struct {

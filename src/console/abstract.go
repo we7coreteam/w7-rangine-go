@@ -2,7 +2,7 @@ package console
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/console"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/console"
 )
 
 type Abstract struct {

@@ -2,7 +2,7 @@ package response
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/err_handler"
 	"net/http"
 )
 

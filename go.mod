@@ -1,4 +1,4 @@
-module github.com/we7coreteam/w7-rangine-go
+module github.com/we7coreteam/w7-rangine-go/v2
 
 go 1.21
 

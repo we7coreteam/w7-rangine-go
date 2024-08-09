@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/src/core/err_handler"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/err_handler"
 	"io"
 	"net/http"
 	"os"
@@ -28,7 +28,7 @@ func (self MakeProjectCommand) GetDescription() string {
 
 func (self MakeProjectCommand) Configure(cmd *cobra.Command) {
 	cmd.Flags().String("target-dir", "./", "Created project path, the default is the current directory")
-	cmd.Flags().String("name", "", "Project name, such as github.com/we7coreteam/w7-rangine-go-skeleton or w7-rangine-go-skeleton")
+	cmd.Flags().String("name", "", "Project name, such as github.com/we7coreteam/w7-rangine-go/v2-skeleton or w7-rangine-go-skeleton")
 	cmd.MarkFlagRequired("name")
 }
 
@@ -53,11 +53,11 @@ func (self MakeProjectCommand) Handle(cmd *cobra.Command, args []string) {
 	}
 	os.MkdirAll(fmt.Sprintf("%s", projectPath), 0755)
 
-	response, _ := http.Get("https://codeload.github.com/we7coreteam/w7-rangine-go-skeleton/zip/refs/heads/main")
+	response, _ := http.Get("https://codeload.github.com/we7coreteam/w7-rangine-go/v2-skeleton/zip/refs/heads/main")
 	defer response.Body.Close()
 	data, _ := io.ReadAll(response.Body)
 	if len(data) == 0 {
-		cmd.PrintErrln("Error: Failed to download zip file, Please download from https://codeload.github.com/we7coreteam/w7-rangine-go-skeleton/zip/refs/heads/main")
+		cmd.PrintErrln("Error: Failed to download zip file, Please download from https://codeload.github.com/we7coreteam/w7-rangine-go/v2-skeleton/zip/refs/heads/main")
 		cmd.Usage()
 		return
 	}
@@ -98,7 +98,7 @@ func (self MakeProjectCommand) replaceFileContent(file string, content []byte, n
 	}
 
 	if file == "app/home/provider.go" || file == "go.mod" || file == "main.go" {
-		return strings.ReplaceAll(string(content), "github.com/we7coreteam/w7-rangine-go-skeleton", name)
+		return strings.ReplaceAll(string(content), "github.com/we7coreteam/w7-rangine-go/v2-skeleton", name)
 	}
 
 	return string(content)

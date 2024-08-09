@@ -1,7 +1,7 @@
 package driver
 
 import (
-	"github.com/we7coreteam/w7-rangine-go/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
