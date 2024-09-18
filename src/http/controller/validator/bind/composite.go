@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"net/http"
+	"reflect"
 )
 
 type Composite struct {
@@ -40,7 +41,14 @@ func (c Composite) Bind(req *http.Request, obj any) error {
 			return err
 		}
 	}
-	err := c.context.ShouldBind(obj)
+
+	var err error
+	b := binding.Default(req.Method, c.context.ContentType())
+	if reflect.TypeOf(b).Implements(reflect.TypeOf((*binding.BindingBody)(nil)).Elem()) {
+		err = c.context.ShouldBindBodyWith(obj, b.(binding.BindingBody))
+	} else {
+		err = c.context.ShouldBindWith(obj, b)
+	}
 	if err == nil {
 		err = defaults.Set(obj)
 	}

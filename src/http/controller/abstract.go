@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/http/controller/validator/bind"
 	httperf "github.com/we7coreteam/w7-rangine-go/v2/src/http/error"
@@ -15,9 +16,7 @@ type Abstract struct {
 
 func (abstract Abstract) TranslateValidationError(err error) error {
 	if validationErrors, ok := err.(validator.ValidationErrors); !ok {
-		return httperf.ValidateFail{
-			Msg: "参数数据格式错误",
-		}
+		return errors.WithMessage(err, "参数数据格式错误")
 	} else {
 		errStr := ""
 		for _, e := range validationErrors {
