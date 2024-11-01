@@ -6,17 +6,15 @@ import (
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/gookit/color"
 	"github.com/spf13/viper"
-	cons "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/console"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
-	log "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
+	"github.com/we7coreteam/w7-rangine-go/v2/facade"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/components/redis"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/components/translator"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/console"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/logger"
-	sm "github.com/we7coreteam/w7-rangine-go/v2/src/core/server"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/logger/config"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/prof"
 	"go.uber.org/zap/exp/zapslog"
 	"log/slog"
@@ -36,10 +34,10 @@ type App struct {
 	Version       string
 	config        *viper.Viper
 	container     container.Container
-	loggerFactory log.Factory
-	serverManager server.Manager
+	loggerFactory *logger.Factory
+	serverManager *server.Manager
 	event         EventBus.Bus
-	console       cons.Console
+	console       *console.Console
 }
 
 func NewApp(option Option) *App {
@@ -122,7 +120,7 @@ func (app *App) GetContainer() container.Container {
 func (app *App) InitLoggerFactory() {
 	factory := logger.NewLoggerFactory()
 
-	var loggerConfigMap map[string]log.Config
+	var loggerConfigMap map[string]config.Config
 	err := app.config.UnmarshalKey("log", &loggerConfigMap)
 	if err != nil {
 		panic(err)
@@ -147,7 +145,7 @@ func (app *App) InitLoggerFactory() {
 	facade.LoggerFactory = app.loggerFactory
 }
 
-func (app *App) GetLoggerFactory() log.Factory {
+func (app *App) GetLoggerFactory() *logger.Factory {
 	return app.loggerFactory
 }
 
@@ -162,19 +160,19 @@ func (app *App) GetEvent() EventBus.Bus {
 }
 
 func (app *App) RegisterProviders() {
-	translator.Provider{}.Register(app.container)
-	database.Provider{}.Register(app.config, app.loggerFactory, app.container)
+	translator.Provider{}.Register(app.config, app.container)
+	database.Provider{}.Register(app.config, app.loggerFactory, app.container, app.console)
 	redis.Provider{}.Register(app.config, app.container)
 	prof.Provider{}.Register(app.config, app.GetServerManager())
 }
 
 func (app *App) InitServerManager() {
-	app.serverManager = sm.NewDefaultServerManager()
+	app.serverManager = server.NewDefaultServerManager()
 
 	facade.ServerManager = app.serverManager
 }
 
-func (app *App) GetServerManager() server.Manager {
+func (app *App) GetServerManager() *server.Manager {
 	return app.serverManager
 }
 
@@ -183,13 +181,19 @@ func (app *App) InitConsole() {
 
 	app.console.RegisterCommand(new(console.MakeModuleCommand))
 	app.console.RegisterCommand(new(console.MakeProjectCommand))
-	app.console.RegisterCommand(new(console.MakeModelCommand))
 	app.console.RegisterCommand(new(console.MakeCmdCommand))
 	app.console.RegisterCommand(&console.ServerStartCommand{
-		Name: app.Name,
+		Name:          app.Name,
+		Config:        app.config,
+		ServerManager: app.serverManager,
 	})
-	app.console.RegisterCommand(new(console.ServerStopCommand))
-	app.console.RegisterCommand(new(console.ServerListCommand))
+	app.console.RegisterCommand(&console.ServerStopCommand{
+		ServerManager: app.serverManager,
+		Config:        app.config,
+	})
+	app.console.RegisterCommand(&console.ServerListCommand{
+		ServerManager: app.serverManager,
+	})
 	app.console.RegisterCommand(&console.VersionCommand{
 		Version: app.Version,
 	})
@@ -197,7 +201,7 @@ func (app *App) InitConsole() {
 	facade.Console = app.console
 }
 
-func (app *App) GetConsole() cons.Console {
+func (app *App) GetConsole() *console.Console {
 	return app.console
 }
 

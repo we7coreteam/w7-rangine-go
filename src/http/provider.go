@@ -2,8 +2,8 @@ package http
 
 import (
 	"github.com/spf13/viper"
-	support "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/console"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
+	appConsole "github.com/we7coreteam/w7-rangine-go/v2/src/console"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/http/console"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/http/response"
 	httpserver "github.com/we7coreteam/w7-rangine-go/v2/src/http/server"
@@ -13,7 +13,7 @@ type Provider struct {
 	server *httpserver.Server
 }
 
-func (provider *Provider) Register(config *viper.Viper, consoleManager support.Console, serverManager server.Manager) *Provider {
+func (provider *Provider) Register(config *viper.Viper, consoleManager *appConsole.Console, serverManager server.Manager) *Provider {
 	response.Env = config.GetString("app.env")
 
 	httpServer := httpserver.NewHttpDefaultServer(config)

@@ -1,4 +1,4 @@
-package logger
+package config
 
 type Config struct {
 	Driver     string         `mapstructure:"driver" json:"driver" yaml:"driver" binding:"required"`

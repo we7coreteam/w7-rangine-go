@@ -1,7 +1,6 @@
 package test
 
 import (
-	databaseSpt "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/database"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/components/database"
 	"gorm.io/driver/sqlite"
 	_ "gorm.io/driver/sqlite"
@@ -13,7 +12,7 @@ import "testing"
 func TestRegisterDbMap(t *testing.T) {
 	factory := database.NewDatabaseFactory()
 
-	factory.Register(map[string]databaseSpt.Config{
+	factory.Register(map[string]database.Config{
 		"test1": {
 			Driver: "sqlite_test",
 			DbName: "./test1.db",
@@ -32,7 +31,7 @@ func TestRegisterDbMap(t *testing.T) {
 		t.Error("database channel test2 driver error")
 	}
 
-	factory.RegisterDriver("sqlite_test", func(config databaseSpt.Config) (gorm.Dialector, error) {
+	factory.RegisterDriver("sqlite_test", func(config database.Config) (gorm.Dialector, error) {
 		return sqlite.Open(config.DbName), nil
 	})
 
@@ -57,31 +56,31 @@ func TestRegisterDbMap(t *testing.T) {
 
 func TestRegisterDb(t *testing.T) {
 	factory := database.NewDatabaseFactory()
-	factory.RegisterDriver("sqlite", func(config databaseSpt.Config) (gorm.Dialector, error) {
+	factory.RegisterDriver("sqlite", func(config database.Config) (gorm.Dialector, error) {
 		return sqlite.Open(config.DbName), nil
 	})
 
 	factory.RegisterDb("sqlite1", func() (*gorm.DB, error) {
-		driver, err := factory.MakeDriver(databaseSpt.Config{
+		driver, err := factory.MakeDriver(database.Config{
 			Driver: "sqlite",
 			DbName: "./test1.db",
 		})
 		if err != nil {
 			return nil, err
 		}
-		return factory.MakeDb(databaseSpt.Config{
+		return factory.MakeDb(database.Config{
 			Prefix: "test1_",
 		}, driver)
 	})
 	factory.RegisterDb("sqlite2", func() (*gorm.DB, error) {
-		driver, err := factory.MakeDriver(databaseSpt.Config{
+		driver, err := factory.MakeDriver(database.Config{
 			Driver: "sqlite",
 			DbName: "./test2.db",
 		})
 		if err != nil {
 			return nil, err
 		}
-		return factory.MakeDb(databaseSpt.Config{
+		return factory.MakeDb(database.Config{
 			Prefix: "test2_",
 		}, driver)
 	})

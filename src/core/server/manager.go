@@ -2,32 +2,30 @@ package server
 
 import (
 	"errors"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
 	"os"
 	"strconv"
 	"strings"
 )
 
 type Manager struct {
-	server.Manager
-	servers map[string]server.Server
+	servers map[string]Server
 }
 
 func NewDefaultServerManager() *Manager {
 	return &Manager{
-		servers: make(map[string]server.Server),
+		servers: make(map[string]Server),
 	}
 }
 
-func (sm *Manager) RegisterServer(server server.Server) {
+func (sm *Manager) RegisterServer(server Server) {
 	sm.servers[server.GetServerName()] = server
 }
 
-func (sm *Manager) GetAllServer() map[string]server.Server {
+func (sm *Manager) GetAllServer() map[string]Server {
 	return sm.servers
 }
 
-func (sm *Manager) GetServer(serverName string) server.Server {
+func (sm *Manager) GetServer(serverName string) Server {
 	s, exists := sm.servers[serverName]
 	if !exists {
 		return nil

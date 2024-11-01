@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/components/database"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/console"
 	"os"
 	"testing"
@@ -35,7 +36,7 @@ func TestAddCommand(t *testing.T) {
 	consoleManager := console.NewConsole()
 
 	consoleManager.RegisterCommand(new(console.MakeModuleCommand))
-	consoleManager.RegisterCommand(new(console.MakeModelCommand))
+	consoleManager.RegisterCommand(new(database.MakeModelCommand))
 	if len(consoleManager.GetHandler().Commands()) != 2 {
 		t.Error("command register fail")
 	}

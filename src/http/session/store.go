@@ -6,7 +6,7 @@ import (
 	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/components/database"
 	rf "github.com/we7coreteam/w7-rangine-go/v2/src/components/redis"
 	"net/http"
 	"strconv"
@@ -36,12 +36,12 @@ func GetMemoryStore(config *viper.Viper, keyPairs ...[]byte) sessions.Store {
 	return store
 }
 
-func GetGormStore(config *viper.Viper, keyPairs ...[]byte) sessions.Store {
+func GetGormStore(config *viper.Viper, dbFactory *database.Factory, keyPairs ...[]byte) sessions.Store {
 	sessionDb := config.GetString("session.db")
 	if sessionDb == "" {
 		sessionDb = "default"
 	}
-	db, err := facade.GetDbFactory().Channel(sessionDb)
+	db, err := dbFactory.Channel(sessionDb)
 	if err != nil {
 		panic(err)
 	}

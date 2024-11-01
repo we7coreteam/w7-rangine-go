@@ -2,8 +2,8 @@ package driver
 
 import (
 	"errors"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/logger/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -12,13 +12,13 @@ import (
 )
 
 type File struct {
-	logger.Driver
+	Driver
 
 	levelEnabler zapcore.LevelEnabler
 	writer       zapcore.WriteSyncer
 }
 
-func NewFileDriver(config logger.Config) (logger.Driver, error) {
+func NewFileDriver(config config.Config) (Driver, error) {
 	fields := helper.ValidateAndGetErrFields(config)
 	if len(fields) > 0 {
 		return nil, errors.New("log config error, reason: fields: " + strings.Join(fields, ","))

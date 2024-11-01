@@ -3,7 +3,7 @@ package console
 import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
-	command "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/console"
+	command "github.com/we7coreteam/w7-rangine-go/v2/src/console"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/http/server"
 	"os"
 )

@@ -1,15 +1,15 @@
-package console
+package database
 
 import (
 	"github.com/spf13/cobra"
 	yamlgen "github.com/we7coreteam/gorm-gen-yaml"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/err_handler"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/console"
 	"gorm.io/gen"
 )
 
 type MakeModelCommand struct {
-	Abstract
+	console.Abstract
+	DbFactory *Factory
 }
 
 func (self MakeModelCommand) GetName() string {
@@ -33,8 +33,8 @@ func (self MakeModelCommand) Handle(cmd *cobra.Command, args []string) {
 		ModelPkgPath: "./common/entity",
 	})
 	dbChannel, _ := cmd.Flags().GetString("db-channel")
-	db, err := facade.GetDbFactory().Channel(dbChannel)
-	if err_handler.Found(err) {
+	db, err := self.DbFactory.Channel(dbChannel)
+	if err != nil {
 		cmd.PrintErrln("Db channel not found")
 		cmd.Usage()
 		return

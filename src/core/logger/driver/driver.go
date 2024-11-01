@@ -1,4 +1,4 @@
-package logger
+package driver
 
 import "go.uber.org/zap/zapcore"
 

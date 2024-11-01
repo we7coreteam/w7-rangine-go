@@ -3,7 +3,6 @@ package redis
 import (
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/redis"
 )
 
 type Provider struct {
@@ -19,7 +18,7 @@ func (provider Provider) Register(config *viper.Viper, container container.Conta
 	factory := NewRedisFactory()
 	factory.Register(redisConfigMap)
 
-	err = container.NamedSingleton("redis-factory", func() redis.Factory {
+	err = container.NamedSingleton("redis-factory", func() *Factory {
 		return factory
 	})
 	if err != nil {

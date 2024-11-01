@@ -3,12 +3,15 @@ package console
 import (
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
+	"github.com/spf13/viper"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/server"
 	"strings"
 )
 
 type ServerStopCommand struct {
 	Abstract
+	Config        *viper.Viper
+	ServerManager *server.Manager
 }
 
 func (serverCommand ServerStopCommand) GetName() string {
@@ -22,7 +25,7 @@ func (serverCommand ServerStopCommand) GetDescription() string {
 func (serverCommand ServerStopCommand) Handle(cmd *cobra.Command, args []string) {
 	servers := ""
 	if len(args) == 0 {
-		servers = facade.GetConfig().GetString("app.server")
+		servers = serverCommand.Config.GetString("app.server")
 	} else {
 		servers = args[0]
 	}
@@ -31,7 +34,7 @@ func (serverCommand ServerStopCommand) Handle(cmd *cobra.Command, args []string)
 		return
 	}
 
-	facade.GetServerManager().Stop(strings.Split(servers, "|"))
+	serverCommand.ServerManager.Stop(strings.Split(servers, "|"))
 
 	color.Successln("servers " + servers + " stop success")
 }

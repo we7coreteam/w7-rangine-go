@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/err_handler"
 	"io"
 	"net/http"
 	"os"
@@ -62,7 +61,7 @@ func (self MakeProjectCommand) Handle(cmd *cobra.Command, args []string) {
 		return
 	}
 	reader, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
-	if err_handler.Found(err) {
+	if err != nil {
 		cmd.PrintErrln("Error: " + err.Error())
 		cmd.Usage()
 		return

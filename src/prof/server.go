@@ -3,8 +3,8 @@ package prof
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/server"
 	"net/http"
 	"net/http/pprof"
 	"strings"

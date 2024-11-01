@@ -5,7 +5,8 @@ import (
 	"github.com/gookit/color"
 	"github.com/sevlyar/go-daemon"
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
+	"github.com/spf13/viper"
+	"github.com/we7coreteam/w7-rangine-go/v2/src/core/server"
 	"log"
 	"os"
 	"os/signal"
@@ -15,7 +16,9 @@ import (
 
 type ServerStartCommand struct {
 	Abstract
-	Name string
+	Name          string
+	Config        *viper.Viper
+	ServerManager *server.Manager
 }
 
 func (serverCommand ServerStartCommand) GetName() string {
@@ -33,7 +36,7 @@ func (serverCommand ServerStartCommand) GetDescription() string {
 func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string) {
 	servers := ""
 	if len(args) == 0 {
-		servers = facade.GetConfig().GetString("app.server")
+		servers = serverCommand.Config.GetString("app.server")
 	} else {
 		servers = args[0]
 	}
@@ -45,7 +48,7 @@ func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string
 	color.Println("********************************************************************")
 
 	for _, serverName := range strings.Split(servers, "|") {
-		serverObj := facade.GetServerManager().GetServer(serverName)
+		serverObj := serverCommand.ServerManager.GetServer(serverName)
 		if serverObj == nil {
 			panic(errors.New("server " + serverName + " not found"))
 		}
@@ -79,7 +82,7 @@ func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string
 		return
 	}
 
-	facade.GetServerManager().Start(strings.Split(servers, "|"))
+	serverCommand.ServerManager.Start(strings.Split(servers, "|"))
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)

@@ -7,15 +7,15 @@ import (
 	"github.com/go-playground/validator/v10"
 	translational "github.com/go-playground/validator/v10/translations/zh"
 	"github.com/golobby/container/v3/pkg/container"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
+	"github.com/spf13/viper"
 )
 
 type Provider struct {
 }
 
-func (provider Provider) Register(container container.Container) {
+func (provider Provider) Register(config *viper.Viper, container container.Container) {
 	uni := ut.New(zh.New())
-	translator, _ := uni.GetTranslator(facade.GetConfig().GetString("app.lang"))
+	translator, _ := uni.GetTranslator(config.GetString("app.lang"))
 	_ = translational.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), translator)
 
 	err := container.NamedSingleton("translator", func() ut.Translator {
