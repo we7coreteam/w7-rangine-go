@@ -90,8 +90,19 @@ func (factory *Factory) MakeSqliteDriver(config database.Config) (gorm.Dialector
 		return nil, errors.New("database config error, reason: fields: " + strings.Join(fields, ","))
 	}
 
+	mode := "rwc"
+	if config.Options != nil {
+		data, exists := config.Options["mode"]
+		if exists {
+			_, ok := data.(string)
+			if ok {
+				mode = data.(string)
+			}
+		}
+	}
+
 	absPath, _ := filepath.Abs(config.DbName)
-	dsn := fmt.Sprintf("%s?cache=shared&mode=rwc", absPath)
+	dsn := fmt.Sprintf("%s?cache=shared&mode="+mode, absPath)
 	return sqlite.Open(dsn), nil
 }
 
