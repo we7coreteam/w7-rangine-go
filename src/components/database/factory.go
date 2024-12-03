@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+	"net/url"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -90,19 +91,21 @@ func (factory *Factory) MakeSqliteDriver(config database.Config) (gorm.Dialector
 		return nil, errors.New("database config error, reason: fields: " + strings.Join(fields, ","))
 	}
 
-	mode := "rwc"
-	if config.Options != nil {
-		data, exists := config.Options["mode"]
-		if exists {
-			_, ok := data.(string)
-			if ok {
-				mode = data.(string)
-			}
+	if config.Options == nil {
+		config.Options = map[string]any{
+			"mode": "rwc",
+		}
+	}
+	params := url.Values{}
+	for key, value := range config.Options {
+		_, ok := value.(string)
+		if ok {
+			params.Add(key, value.(string))
 		}
 	}
 
 	absPath, _ := filepath.Abs(config.DbName)
-	dsn := fmt.Sprintf("%s?cache=shared&mode="+mode, absPath)
+	dsn := fmt.Sprintf("file:%s?"+params.Encode(), absPath)
 	return sqlite.Open(dsn), nil
 }
 
