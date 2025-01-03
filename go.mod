@@ -20,7 +20,7 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/we7coreteam/gorm-gen-yaml v1.0.1
 	go.uber.org/zap v1.26.0
-	go.uber.org/zap/exp v0.2.0
+	go.uber.org/zap/exp v0.3.0
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.1-0.20230509030346-3715c134c25b

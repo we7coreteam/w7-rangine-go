@@ -136,9 +136,7 @@ func (app *App) InitLoggerFactory() {
 			panic(err)
 		}
 
-		defaultSlog := slog.New(zapslog.NewHandler(defaultLog.Core(), &zapslog.HandlerOptions{
-			LoggerName: "default",
-		}))
+		defaultSlog := slog.New(zapslog.NewHandler(defaultLog.Core(), zapslog.WithName("default")))
 		slog.SetDefault(defaultSlog)
 	}
 
