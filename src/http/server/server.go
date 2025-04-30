@@ -8,7 +8,6 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/http/response"
 	"net/http"
-	"strings"
 )
 
 type Server struct {
@@ -79,12 +78,12 @@ func (server *Server) GetOptions() map[string]string {
 }
 
 func (server *Server) Start() {
-	fields := helper.ValidateAndGetErrFields(server.config)
-	if len(fields) > 0 {
-		panic("http server config error, fields: " + strings.Join(fields, ","))
+	err := helper.ValidateConfig(server.config)
+	if err != nil {
+		panic(errors.New("http server config error, reason: " + err.Error()))
 	}
 
-	err := server.Engine.Run(server.config.Host + ":" + server.config.Port)
+	err = server.Engine.Run(server.config.Host + ":" + server.config.Port)
 	if err != nil {
 		panic(err)
 	}

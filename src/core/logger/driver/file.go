@@ -8,7 +8,6 @@ import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"path/filepath"
-	"strings"
 )
 
 type File struct {
@@ -19,9 +18,9 @@ type File struct {
 }
 
 func NewFileDriver(config logger.Config) (logger.Driver, error) {
-	fields := helper.ValidateAndGetErrFields(config)
-	if len(fields) > 0 {
-		return nil, errors.New("log config error, reason: fields: " + strings.Join(fields, ","))
+	err := helper.ValidateConfig(config)
+	if err != nil {
+		return nil, errors.New("log config error, reason: " + err.Error())
 	}
 	if config.Path == "" {
 		return nil, errors.New("log config error, reason: fields: path")

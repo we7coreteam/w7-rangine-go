@@ -15,7 +15,6 @@ import (
 	"net/url"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 )
@@ -64,9 +63,9 @@ func (factory *Factory) MakeMysqlDriver(config database.Config) (gorm.Dialector,
 	if config.Port == 0 {
 		config.Port = 3306
 	}
-	fields := helper.ValidateAndGetErrFields(config)
-	if len(fields) > 0 {
-		return nil, errors.New("database config error, reason: fields: " + strings.Join(fields, ","))
+	err := helper.ValidateConfig(config)
+	if err != nil {
+		return nil, errors.New("database config error, reason: " + err.Error())
 	}
 
 	dns := config.Username + ":" + config.Password + "@tcp(" + config.Host + ":" + strconv.Itoa(int(config.Port)) + ")/" + config.DbName + "?charset=" + config.Charset + "&parseTime=True&loc=Local"
@@ -86,11 +85,10 @@ func (factory *Factory) MakeSqliteDriver(config database.Config) (gorm.Dialector
 	if config.Password == "" {
 		config.Password = "-"
 	}
-	fields := helper.ValidateAndGetErrFields(config)
-	if len(fields) > 0 {
-		return nil, errors.New("database config error, reason: fields: " + strings.Join(fields, ","))
+	err := helper.ValidateConfig(config)
+	if err != nil {
+		return nil, errors.New("database config error, reason: " + err.Error())
 	}
-
 	if config.Options == nil {
 		config.Options = map[string]any{
 			"mode": "rwc",

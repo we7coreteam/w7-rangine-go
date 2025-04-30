@@ -5,7 +5,6 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
 	"go.uber.org/zap/zapcore"
-	"strings"
 )
 
 type Stack struct {
@@ -18,9 +17,9 @@ type Stack struct {
 func NewStackDriver(loggerResolver func(channel string) (zapcore.Core, error)) func(driver logger.Config) (logger.Driver, error) {
 	return func(config logger.Config) (logger.Driver, error) {
 		config.Level = "debug"
-		fields := helper.ValidateAndGetErrFields(config)
-		if len(fields) > 0 {
-			return nil, errors.New("log config error, reason: fields: " + strings.Join(fields, ","))
+		err := helper.ValidateConfig(config)
+		if err != nil {
+			return nil, errors.New("log config error, reason: " + err.Error())
 		}
 		if len(config.Channels) == 0 {
 			return nil, errors.New("log config error, reason: fields: channels")

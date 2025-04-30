@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/afero"
@@ -9,19 +10,18 @@ import (
 	"strings"
 )
 
-func ValidateAndGetErrFields(obj any) []string {
+func ValidateConfig(obj any) error {
 	err := binding.Validator.ValidateStruct(obj)
 
 	if err != nil {
+		var validateErrMsg string
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
-			fields := make([]string, len(validationErrors))
-			for index, e := range validationErrors {
-				fields[index] = e.Field()
+			for _, e := range validationErrors {
+				validateErrMsg += e.Error() + ""
 			}
-			return fields
 		}
 
-		return []string{err.Error()}
+		return errors.New(validateErrMsg)
 	}
 
 	return nil

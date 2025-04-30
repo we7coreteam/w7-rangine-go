@@ -5,7 +5,6 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
 	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -52,9 +51,9 @@ func (factory *Factory) Channel(channel string) (redis.Cmdable, error) {
 }
 
 func (factory *Factory) MakeRedis(config Config) (redis.Cmdable, error) {
-	fields := helper.ValidateAndGetErrFields(config)
-	if len(fields) > 0 {
-		return nil, errors.New("redis config error, reason: fields: " + strings.Join(fields, ","))
+	err := helper.ValidateConfig(config)
+	if err != nil {
+		return nil, errors.New("redis config error, reason: " + err.Error())
 	}
 
 	return redis.NewClient(&redis.Options{

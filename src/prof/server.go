@@ -2,12 +2,12 @@ package prof
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
 	"net/http"
 	"net/http/pprof"
-	"strings"
 )
 
 type Server struct {
@@ -53,14 +53,14 @@ func (server *Server) GetOptions() map[string]string {
 }
 
 func (server *Server) Start() {
-	fields := helper.ValidateAndGetErrFields(server.config)
-	if len(fields) > 0 {
-		panic("prof server config error, fields: " + strings.Join(fields, ","))
+	err := helper.ValidateConfig(server.config)
+	if err != nil {
+		panic(errors.New("prof server config error, reason: " + err.Error()))
 	}
 
 	server.registerRoutes()
 
-	err := http.ListenAndServe(fmt.Sprintf("%s:%s", server.config.Host, server.config.Port), server.server)
+	err = http.ListenAndServe(fmt.Sprintf("%s:%s", server.config.Host, server.config.Port), server.server)
 	if err != nil {
 		panic(err)
 	}
