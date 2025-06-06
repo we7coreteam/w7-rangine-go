@@ -2,8 +2,8 @@ package logger
 
 import (
 	"errors"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/logger/driver"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/core/logger/driver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"sync"
@@ -11,7 +11,7 @@ import (
 )
 
 type Factory struct {
-	driverResolverMap map[string]func(config logger.Config) (logger.Driver, error)
+	driverResolverMap map[string]func(config logger.Config) (logger.IDriver, error)
 	loggerResolverMap map[string]func() (*zap.Logger, error)
 	loggerMap         map[string]*zap.Logger
 	lock              sync.Mutex
@@ -21,7 +21,7 @@ func NewLoggerFactory() *Factory {
 	factory := &Factory{
 		loggerMap:         make(map[string]*zap.Logger),
 		loggerResolverMap: make(map[string]func() (*zap.Logger, error)),
-		driverResolverMap: make(map[string]func(config logger.Config) (logger.Driver, error)),
+		driverResolverMap: make(map[string]func(config logger.Config) (logger.IDriver, error)),
 	}
 
 	factory.RegisterDriver("console", driver.NewConsoleDriver)
@@ -38,7 +38,7 @@ func NewLoggerFactory() *Factory {
 	return factory
 }
 
-func (factory *Factory) MakeDriver(config logger.Config) (logger.Driver, error) {
+func (factory *Factory) MakeDriver(config logger.Config) (logger.IDriver, error) {
 	driverResolver, exists := factory.driverResolverMap[config.Driver]
 	if !exists {
 		return nil, errors.New("logger driver " + config.Driver + " not exists")
@@ -47,7 +47,7 @@ func (factory *Factory) MakeDriver(config logger.Config) (logger.Driver, error) 
 	return driverResolver(config)
 }
 
-func (factory *Factory) MakeLogger(drivers ...logger.Driver) *zap.Logger {
+func (factory *Factory) MakeLogger(drivers ...logger.IDriver) *zap.Logger {
 	customTimeEncoder := func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString("[" + t.Format("2006-01-02 15:04:05.000") + "]")
 	}
@@ -110,7 +110,7 @@ func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
 	return channelLogger, nil
 }
 
-func (factory *Factory) RegisterDriver(driver string, resolver func(config logger.Config) (logger.Driver, error)) {
+func (factory *Factory) RegisterDriver(driver string, resolver func(config logger.Config) (logger.IDriver, error)) {
 	factory.driverResolverMap[driver] = resolver
 }
 

@@ -3,7 +3,7 @@ package redis
 import (
 	"errors"
 	"github.com/redis/go-redis/v9"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/core/helper"
 	"strconv"
 	"sync"
 )

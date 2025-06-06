@@ -2,7 +2,7 @@ package test
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/console"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/console"
 	"os"
 	"testing"
 )

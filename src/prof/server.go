@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/server"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/core/helper"
 	"net/http"
 	"net/http/pprof"
 )
 
 type Server struct {
-	server.Server
+	server.IServer
 
 	config Config
 	server *http.ServeMux

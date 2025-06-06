@@ -1,6 +1,6 @@
 package server
 
-type Server interface {
+type IServer interface {
 	GetServerName() string
 	Start()
 	Stop()

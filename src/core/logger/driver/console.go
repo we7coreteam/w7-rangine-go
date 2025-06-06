@@ -1,20 +1,20 @@
 package driver
 
 import (
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/logger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
 )
 
 type Console struct {
-	logger.Driver
+	logger.IDriver
 
 	levelEnabler zapcore.LevelEnabler
 	writer       zapcore.WriteSyncer
 }
 
-func NewConsoleDriver(config logger.Config) (logger.Driver, error) {
+func NewConsoleDriver(config logger.Config) (logger.IDriver, error) {
 	atomicLevel := zap.NewAtomicLevel()
 	level, err := zapcore.ParseLevel(config.Level)
 	if err != nil {

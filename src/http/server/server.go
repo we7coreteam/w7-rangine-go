@@ -4,14 +4,14 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/http/response"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/server"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/http/response"
 	"net/http"
 )
 
 type Server struct {
-	server.Server
+	server.IServer
 	config Config
 
 	Engine *gin.Engine

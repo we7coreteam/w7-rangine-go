@@ -3,7 +3,7 @@ package test
 import (
 	"context"
 	redis2 "github.com/redis/go-redis/v9"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/components/redis"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/components/redis"
 	"testing"
 )
 

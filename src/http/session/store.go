@@ -6,8 +6,8 @@ import (
 	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
-	rf "github.com/we7coreteam/w7-rangine-go/v2/src/components/redis"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/facade"
+	rf "github.com/we7coreteam/w7-rangine-go/v3/src/components/redis"
 	"net/http"
 	"strconv"
 )

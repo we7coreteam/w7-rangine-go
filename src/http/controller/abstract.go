@@ -4,10 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/http/controller/validator/bind"
-	httperf "github.com/we7coreteam/w7-rangine-go/v2/src/http/error"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/http/response"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/facade"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/http/controller/validator/bind"
+	httperf "github.com/we7coreteam/w7-rangine-go/v3/src/http/error"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/http/response"
 )
 
 type Abstract struct {

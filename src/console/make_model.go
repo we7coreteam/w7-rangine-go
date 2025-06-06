@@ -3,8 +3,8 @@ package console
 import (
 	"github.com/spf13/cobra"
 	yamlgen "github.com/we7coreteam/gorm-gen-yaml"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/err_handler"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/facade"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/core/err_handler"
 	"gorm.io/gen"
 )
 

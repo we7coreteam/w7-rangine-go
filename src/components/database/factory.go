@@ -3,9 +3,9 @@ package database
 import (
 	"errors"
 	"fmt"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/database"
-	loggerFactory "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/database"
+	loggerFactory "github.com/we7coreteam/w7-rangine-go/v3/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/core/helper"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -33,7 +33,7 @@ type Factory struct {
 	driverResolverMap map[string]func(config database.Config) (gorm.Dialector, error)
 	dbResolverMap     map[string]func() (*gorm.DB, error)
 	dbMap             map[string]*gorm.DB
-	loggerFactory     loggerFactory.Factory
+	loggerFactory     loggerFactory.IFactory
 	lock              sync.RWMutex
 	debug             bool
 }
@@ -55,7 +55,7 @@ func (factory *Factory) SetDebug() {
 	factory.debug = true
 }
 
-func (factory *Factory) SetLoggerFactory(loggerFactory loggerFactory.Factory) {
+func (factory *Factory) SetLoggerFactory(loggerFactory loggerFactory.IFactory) {
 	factory.loggerFactory = loggerFactory
 }
 

@@ -105,8 +105,8 @@ import (
 	"{{.PackageName}}/app/{{.Name}}/command"
 	"{{.PackageName}}/app/{{.Name}}/http/controller"
 	"{{.PackageName}}/app/{{.Name}}/http/middleware"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/console"
-	http_server "github.com/we7coreteam/w7-rangine-go/v2/src/http/server"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/console"
+	http_server "github.com/we7coreteam/w7-rangine-go/v3/src/http/server"
 			
 )
 
@@ -128,7 +128,7 @@ package command
 import (
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/console"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/console"
 )
 
 type Test struct {
@@ -151,7 +151,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/http/controller"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/http/controller"
 )
 
 type Home struct {
@@ -166,8 +166,8 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/http/middleware"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/facade"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/http/middleware"
 	"time"
 )
 

@@ -1,8 +1,8 @@
 package test
 
 import (
-	databaseSpt "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/database"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/components/database"
+	databaseSpt "github.com/we7coreteam/w7-rangine-go/v3/pkg/support/database"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/components/database"
 	"gorm.io/driver/sqlite"
 	_ "gorm.io/driver/sqlite"
 	"gorm.io/gorm"

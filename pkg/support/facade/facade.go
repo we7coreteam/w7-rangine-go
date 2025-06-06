@@ -6,20 +6,20 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/spf13/viper"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/console"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/database"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/redis"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/console"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/database"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/redis"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/server"
 )
 
 var Container container.Container
 var Config *viper.Viper
 var Event EventBus.Bus
-var LoggerFactory logger.Factory
+var LoggerFactory logger.IFactory
 var Validator = binding.Validator
-var Console console.Console
-var ServerManager server.Manager
+var Console console.IConsole
+var ServerManager server.IManager
 
 func GetContainer() container.Container {
 	return Container
@@ -33,27 +33,27 @@ func GetEvent() EventBus.Bus {
 	return Event
 }
 
-func GetLoggerFactory() logger.Factory {
+func GetLoggerFactory() logger.IFactory {
 	return LoggerFactory
 }
 
-func GetConsole() console.Console {
+func GetConsole() console.IConsole {
 	return Console
 }
 
-func GetServerManager() server.Manager {
+func GetServerManager() server.IManager {
 	return ServerManager
 }
 
-func GetRedisFactory() redis.Factory {
-	var redisFactory redis.Factory
+func GetRedisFactory() redis.IFactory {
+	var redisFactory redis.IFactory
 	_ = GetContainer().NamedResolve(&redisFactory, "redis-factory")
 
 	return redisFactory
 }
 
-func GetDbFactory() database.Factory {
-	var dbFactory database.Factory
+func GetDbFactory() database.IFactory {
+	var dbFactory database.IFactory
 	_ = GetContainer().NamedResolve(&dbFactory, "db-factory")
 
 	return dbFactory

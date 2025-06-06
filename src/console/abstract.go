@@ -2,11 +2,11 @@ package console
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/console"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/console"
 )
 
 type Abstract struct {
-	console.Command
+	console.ICommand
 }
 
 func (abstract Abstract) GetDescription() string {

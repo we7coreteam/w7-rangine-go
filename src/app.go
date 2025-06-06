@@ -6,18 +6,18 @@ import (
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/gookit/color"
 	"github.com/spf13/viper"
-	cons "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/console"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
-	log "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/components/database"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/components/redis"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/components/translator"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/console"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/logger"
-	sm "github.com/we7coreteam/w7-rangine-go/v2/src/core/server"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/prof"
+	cons "github.com/we7coreteam/w7-rangine-go/v3/pkg/support/console"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/facade"
+	log "github.com/we7coreteam/w7-rangine-go/v3/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/server"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/components/database"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/components/redis"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/components/translator"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/console"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/core/logger"
+	sm "github.com/we7coreteam/w7-rangine-go/v3/src/core/server"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/prof"
 	"go.uber.org/zap/exp/zapslog"
 	"log/slog"
 	"os"
@@ -36,10 +36,10 @@ type App struct {
 	Version       string
 	config        *viper.Viper
 	container     container.Container
-	loggerFactory log.Factory
-	serverManager server.Manager
+	loggerFactory log.IFactory
+	serverManager server.IManager
 	event         EventBus.Bus
-	console       cons.Console
+	console       cons.IConsole
 }
 
 func NewApp(option Option) *App {
@@ -145,7 +145,7 @@ func (app *App) InitLoggerFactory() {
 	facade.LoggerFactory = app.loggerFactory
 }
 
-func (app *App) GetLoggerFactory() log.Factory {
+func (app *App) GetLoggerFactory() log.IFactory {
 	return app.loggerFactory
 }
 
@@ -172,7 +172,7 @@ func (app *App) InitServerManager() {
 	facade.ServerManager = app.serverManager
 }
 
-func (app *App) GetServerManager() server.Manager {
+func (app *App) GetServerManager() server.IManager {
 	return app.serverManager
 }
 
@@ -195,7 +195,7 @@ func (app *App) InitConsole() {
 	facade.Console = app.console
 }
 
-func (app *App) GetConsole() cons.Console {
+func (app *App) GetConsole() cons.IConsole {
 	return app.console
 }
 

@@ -2,20 +2,20 @@ package driver
 
 import (
 	"errors"
-	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
-	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
+	"github.com/we7coreteam/w7-rangine-go/v3/pkg/support/logger"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/core/helper"
 	"go.uber.org/zap/zapcore"
 )
 
 type Stack struct {
-	logger.Driver
+	logger.IDriver
 
 	channels       []string
 	loggerResolver func(channel string) (zapcore.Core, error)
 }
 
-func NewStackDriver(loggerResolver func(channel string) (zapcore.Core, error)) func(driver logger.Config) (logger.Driver, error) {
-	return func(config logger.Config) (logger.Driver, error) {
+func NewStackDriver(loggerResolver func(channel string) (zapcore.Core, error)) func(driver logger.Config) (logger.IDriver, error) {
+	return func(config logger.Config) (logger.IDriver, error) {
 		config.Level = "debug"
 		err := helper.ValidateConfig(config)
 		if err != nil {

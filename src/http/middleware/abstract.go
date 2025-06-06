@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/we7coreteam/w7-rangine-go/v2/src/http/response"
+	"github.com/we7coreteam/w7-rangine-go/v3/src/http/response"
 )
 
 type Abstract struct {
