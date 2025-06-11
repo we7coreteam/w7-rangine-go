@@ -8,10 +8,10 @@ import (
 
 type Logger struct {
 	enc     zapcore.Encoder
-	drivers []logger.IDriver
+	drivers []logger.DriverInterface
 }
 
-func NewDefaultLogger(enc zapcore.Encoder, drivers []logger.IDriver) zapcore.Core {
+func NewDefaultLogger(enc zapcore.Encoder, drivers []logger.DriverInterface) zapcore.Core {
 	return &Logger{
 		enc:     enc,
 		drivers: drivers,

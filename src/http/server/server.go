@@ -11,7 +11,7 @@ import (
 )
 
 type Server struct {
-	server.IServer
+	server.ServerInterface
 	config Config
 
 	Engine *gin.Engine

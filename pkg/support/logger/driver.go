@@ -2,7 +2,7 @@ package logger
 
 import "go.uber.org/zap/zapcore"
 
-type IDriver interface {
+type DriverInterface interface {
 	Write(level zapcore.Level, enc zapcore.Encoder, ent zapcore.Entry, fields []zapcore.Field) error
 	Sync() error
 }

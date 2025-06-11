@@ -8,13 +8,13 @@ import (
 )
 
 type Console struct {
-	logger.IDriver
+	logger.DriverInterface
 
 	levelEnabler zapcore.LevelEnabler
 	writer       zapcore.WriteSyncer
 }
 
-func NewConsoleDriver(config logger.Config) (logger.IDriver, error) {
+func NewConsoleDriver(config logger.Config) (logger.DriverInterface, error) {
 	atomicLevel := zap.NewAtomicLevel()
 	level, err := zapcore.ParseLevel(config.Level)
 	if err != nil {

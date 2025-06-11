@@ -9,7 +9,7 @@ import (
 )
 
 type RouteListCommand struct {
-	command.ICommand
+	command.CommandInterface
 	Server *server.Server
 }
 

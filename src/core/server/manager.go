@@ -9,25 +9,25 @@ import (
 )
 
 type Manager struct {
-	server.IManager
-	servers map[string]server.IServer
+	server.ManagerInterface
+	servers map[string]server.ServerInterface
 }
 
 func NewDefaultServerManager() *Manager {
 	return &Manager{
-		servers: make(map[string]server.IServer),
+		servers: make(map[string]server.ServerInterface),
 	}
 }
 
-func (sm *Manager) RegisterServer(server server.IServer) {
+func (sm *Manager) RegisterServer(server server.ServerInterface) {
 	sm.servers[server.GetServerName()] = server
 }
 
-func (sm *Manager) GetAllServer() map[string]server.IServer {
+func (sm *Manager) GetAllServer() map[string]server.ServerInterface {
 	return sm.servers
 }
 
-func (sm *Manager) GetServer(serverName string) server.IServer {
+func (sm *Manager) GetServer(serverName string) server.ServerInterface {
 	s, exists := sm.servers[serverName]
 	if !exists {
 		return nil

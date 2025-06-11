@@ -1,9 +1,9 @@
 package server
 
-type IManager interface {
-	RegisterServer(server IServer)
-	GetAllServer() map[string]IServer
-	GetServer(serverName string) IServer
+type ManagerInterface interface {
+	RegisterServer(server ServerInterface)
+	GetAllServer() map[string]ServerInterface
+	GetServer(serverName string) ServerInterface
 	Start(servers []string)
 	Stop(servers []string)
 }

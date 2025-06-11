@@ -8,14 +8,14 @@ import (
 )
 
 type Stack struct {
-	logger.IDriver
+	logger.DriverInterface
 
 	channels       []string
 	loggerResolver func(channel string) (zapcore.Core, error)
 }
 
-func NewStackDriver(loggerResolver func(channel string) (zapcore.Core, error)) func(driver logger.Config) (logger.IDriver, error) {
-	return func(config logger.Config) (logger.IDriver, error) {
+func NewStackDriver(loggerResolver func(channel string) (zapcore.Core, error)) func(driver logger.Config) (logger.DriverInterface, error) {
+	return func(config logger.Config) (logger.DriverInterface, error) {
 		config.Level = "debug"
 		err := helper.ValidateConfig(config)
 		if err != nil {

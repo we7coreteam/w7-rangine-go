@@ -6,7 +6,7 @@ import (
 )
 
 type Abstract struct {
-	console.ICommand
+	console.CommandInterface
 }
 
 func (abstract Abstract) GetDescription() string {

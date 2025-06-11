@@ -16,10 +16,10 @@ import (
 var Container container.Container
 var Config *viper.Viper
 var Event EventBus.Bus
-var LoggerFactory logger.IFactory
+var LoggerFactory logger.FactoryInterface
 var Validator = binding.Validator
-var Console console.IConsole
-var ServerManager server.IManager
+var Console console.ConsoleInterface
+var ServerManager server.ManagerInterface
 
 func GetContainer() container.Container {
 	return Container
@@ -33,27 +33,27 @@ func GetEvent() EventBus.Bus {
 	return Event
 }
 
-func GetLoggerFactory() logger.IFactory {
+func GetLoggerFactory() logger.FactoryInterface {
 	return LoggerFactory
 }
 
-func GetConsole() console.IConsole {
+func GetConsole() console.ConsoleInterface {
 	return Console
 }
 
-func GetServerManager() server.IManager {
+func GetServerManager() server.ManagerInterface {
 	return ServerManager
 }
 
-func GetRedisFactory() redis.IFactory {
-	var redisFactory redis.IFactory
+func GetRedisFactory() redis.FactoryInterface {
+	var redisFactory redis.FactoryInterface
 	_ = GetContainer().NamedResolve(&redisFactory, "redis-factory")
 
 	return redisFactory
 }
 
-func GetDbFactory() database.IFactory {
-	var dbFactory database.IFactory
+func GetDbFactory() database.FactoryInterface {
+	var dbFactory database.FactoryInterface
 	_ = GetContainer().NamedResolve(&dbFactory, "db-factory")
 
 	return dbFactory

@@ -19,7 +19,7 @@ func (provider Provider) Register(config *viper.Viper, container container.Conta
 	factory := NewRedisFactory()
 	factory.Register(redisConfigMap)
 
-	err = container.NamedSingleton("redis-factory", func() redis.IFactory {
+	err = container.NamedSingleton("redis-factory", func() redis.FactoryInterface {
 		return factory
 	})
 	if err != nil {

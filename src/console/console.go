@@ -29,7 +29,7 @@ func NewConsole() *Console {
 	}
 }
 
-func (console Console) RegisterCommand(cmd console.ICommand) {
+func (console Console) RegisterCommand(cmd console.CommandInterface) {
 	handler := &cobra.Command{
 		Use:   cmd.GetName(),
 		Short: cmd.GetDescription(),

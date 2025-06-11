@@ -33,7 +33,7 @@ type Factory struct {
 	driverResolverMap map[string]func(config database.Config) (gorm.Dialector, error)
 	dbResolverMap     map[string]func() (*gorm.DB, error)
 	dbMap             map[string]*gorm.DB
-	loggerFactory     loggerFactory.IFactory
+	loggerFactory     loggerFactory.FactoryInterface
 	lock              sync.RWMutex
 	debug             bool
 }
@@ -55,7 +55,7 @@ func (factory *Factory) SetDebug() {
 	factory.debug = true
 }
 
-func (factory *Factory) SetLoggerFactory(loggerFactory loggerFactory.IFactory) {
+func (factory *Factory) SetLoggerFactory(loggerFactory loggerFactory.FactoryInterface) {
 	factory.loggerFactory = loggerFactory
 }
 

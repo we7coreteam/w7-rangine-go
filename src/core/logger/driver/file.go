@@ -11,13 +11,13 @@ import (
 )
 
 type File struct {
-	logger.IDriver
+	logger.DriverInterface
 
 	levelEnabler zapcore.LevelEnabler
 	writer       zapcore.WriteSyncer
 }
 
-func NewFileDriver(config logger.Config) (logger.IDriver, error) {
+func NewFileDriver(config logger.Config) (logger.DriverInterface, error) {
 	err := helper.ValidateConfig(config)
 	if err != nil {
 		return nil, errors.New("log config error, reason: " + err.Error())

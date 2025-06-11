@@ -8,7 +8,7 @@ import (
 type Provider struct {
 }
 
-func (provider Provider) Register(config *viper.Viper, serverManager server.IManager) {
+func (provider Provider) Register(config *viper.Viper, serverManager server.ManagerInterface) {
 	var serverConfig Config
 	err := config.UnmarshalKey("server.prof", &serverConfig)
 	if err != nil {

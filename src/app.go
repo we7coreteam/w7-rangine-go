@@ -36,10 +36,10 @@ type App struct {
 	Version       string
 	config        *viper.Viper
 	container     container.Container
-	loggerFactory log.IFactory
-	serverManager server.IManager
+	loggerFactory log.FactoryInterface
+	serverManager server.ManagerInterface
 	event         EventBus.Bus
-	console       cons.IConsole
+	console       cons.ConsoleInterface
 }
 
 func NewApp(option Option) *App {
@@ -145,7 +145,7 @@ func (app *App) InitLoggerFactory() {
 	facade.LoggerFactory = app.loggerFactory
 }
 
-func (app *App) GetLoggerFactory() log.IFactory {
+func (app *App) GetLoggerFactory() log.FactoryInterface {
 	return app.loggerFactory
 }
 
@@ -172,7 +172,7 @@ func (app *App) InitServerManager() {
 	facade.ServerManager = app.serverManager
 }
 
-func (app *App) GetServerManager() server.IManager {
+func (app *App) GetServerManager() server.ManagerInterface {
 	return app.serverManager
 }
 
@@ -195,7 +195,7 @@ func (app *App) InitConsole() {
 	facade.Console = app.console
 }
 
-func (app *App) GetConsole() cons.IConsole {
+func (app *App) GetConsole() cons.ConsoleInterface {
 	return app.console
 }
 
