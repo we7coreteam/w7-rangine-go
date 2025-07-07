@@ -39,10 +39,7 @@ func (sm *Manager) GetServer(serverName string) server.Server {
 func (sm *Manager) getServersPidFilePath(servers []string) string {
 	_, err := os.Stat("./runtime")
 	if err != nil && os.IsNotExist(err) {
-		err = os.Mkdir("./runtime", os.ModePerm)
-		if err != nil {
-			panic(err)
-		}
+		_ = os.Mkdir("./runtime", os.ModePerm)
 	}
 	return "./runtime/" + strings.Join(servers, "_") + ".pid"
 }
@@ -58,10 +55,7 @@ func (sm *Manager) Start(servers []string) {
 	}
 
 	pidPath := sm.getServersPidFilePath(servers)
-	err := os.WriteFile(pidPath, []byte(strconv.Itoa(os.Getpid())), os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
+	_ = os.WriteFile(pidPath, []byte(strconv.Itoa(os.Getpid())), os.ModePerm)
 }
 
 func (sm *Manager) Stop(servers []string) {
