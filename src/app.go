@@ -186,7 +186,6 @@ func (app *App) InitConsole() {
 	app.console.RegisterCommand(&console.ServerStartCommand{
 		Name: app.Name,
 	})
-	app.console.RegisterCommand(new(console.ServerStopCommand))
 	app.console.RegisterCommand(new(console.ServerListCommand))
 	app.console.RegisterCommand(&console.VersionCommand{
 		Version: app.Version,
