@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 )
@@ -54,6 +55,7 @@ func (serverCommand ServerStartCommand) Handle(cmd *cobra.Command, args []string
 		for key, val := range serverObj.GetOptions() {
 			color.Print(key + ": " + val + ",")
 		}
+		color.Print("Pid: " + strconv.Itoa(os.Getpid()))
 		color.Println()
 	}
 

@@ -2,6 +2,9 @@ package app
 
 import (
 	"bytes"
+	"log/slog"
+	"os"
+
 	"github.com/asaskevich/EventBus"
 	"github.com/golobby/container/v3/pkg/container"
 	"github.com/gookit/color"
@@ -19,8 +22,6 @@ import (
 	sm "github.com/we7coreteam/w7-rangine-go/v3/src/core/server"
 	"github.com/we7coreteam/w7-rangine-go/v3/src/prof"
 	"go.uber.org/zap/exp/zapslog"
-	"log/slog"
-	"os"
 )
 
 var GApp *App
@@ -179,18 +180,15 @@ func (app *App) GetServerManager() server.ManagerInterface {
 func (app *App) InitConsole() {
 	app.console = console.NewConsole()
 
-	app.console.RegisterCommand(new(console.MakeModuleCommand))
-	app.console.RegisterCommand(new(console.MakeProjectCommand))
-	app.console.RegisterCommand(new(console.MakeModelCommand))
-	app.console.RegisterCommand(new(console.MakeCmdCommand))
 	app.console.RegisterCommand(&console.ServerStartCommand{
 		Name: app.Name,
 	})
-	app.console.RegisterCommand(new(console.ServerStopCommand))
 	app.console.RegisterCommand(new(console.ServerListCommand))
 	app.console.RegisterCommand(&console.VersionCommand{
 		Version: app.Version,
 	})
+
+	new(console.Provider).Register(app.console)
 
 	facade.Console = app.console
 }

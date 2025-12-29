@@ -5,5 +5,4 @@ type ManagerInterface interface {
 	GetAllServer() map[string]ServerInterface
 	GetServer(serverName string) ServerInterface
 	Start(servers []string)
-	Stop(servers []string)
 }
