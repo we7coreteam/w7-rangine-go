@@ -3,6 +3,12 @@ package database
 import (
 	"errors"
 	"fmt"
+	"net/url"
+	"path/filepath"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/database"
 	loggerFactory "github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
@@ -12,11 +18,6 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
-	"net/url"
-	"path/filepath"
-	"strconv"
-	"sync"
-	"time"
 )
 
 type DbLogger struct {
@@ -90,9 +91,10 @@ func (factory *Factory) MakeSqliteDriver(config database.Config) (gorm.Dialector
 		return nil, errors.New("database config error, reason: " + err.Error())
 	}
 	if config.Options == nil {
-		config.Options = map[string]any{
-			"mode": "rwc",
-		}
+		config.Options = map[string]any{}
+	}
+	if _, exists := config.Options["mode"]; !exists {
+		config.Options["mode"] = "rwc"
 	}
 	params := url.Values{}
 	for key, value := range config.Options {
