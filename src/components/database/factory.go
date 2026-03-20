@@ -14,6 +14,7 @@ import (
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -47,6 +48,7 @@ func NewDatabaseFactory() *Factory {
 
 	factory.RegisterDriver("mysql", factory.MakeMysqlDriver)
 	factory.RegisterDriver("sqlite", factory.MakeSqliteDriver)
+	factory.RegisterDriver("postgres", factory.MakePgsqlDriver)
 
 	return factory
 }
@@ -64,9 +66,9 @@ func (factory *Factory) MakeMysqlDriver(config database.Config) (gorm.Dialector,
 		return nil, errors.New("database config error, reason: " + err.Error())
 	}
 
-	dns := config.Username + ":" + config.Password + "@tcp(" + config.Host + ":" + strconv.Itoa(int(config.Port)) + ")/" + config.DbName + "?charset=" + config.Charset + "&parseTime=True&loc=Local"
+	dsn := config.Username + ":" + config.Password + "@tcp(" + config.Host + ":" + strconv.Itoa(int(config.Port)) + ")/" + config.DbName + "?charset=" + config.Charset + "&parseTime=True&loc=Local"
 	return mysql.New(mysql.Config{
-		DSN:                       dns,   // data source name
+		DSN:                       dsn,   // data source name
 		SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
 	}), nil
 }
@@ -95,13 +97,34 @@ func (factory *Factory) MakeSqliteDriver(config database.Config) (gorm.Dialector
 	for key, value := range config.Options {
 		_, ok := value.(string)
 		if ok {
-			params.Add(key, value.(string))
+			params.Add(key, fmt.Sprintf("%v", value))
 		}
 	}
 
 	absPath, _ := filepath.Abs(config.DbName)
 	dsn := fmt.Sprintf("file:%s?"+params.Encode(), absPath)
 	return sqlite.Open(dsn), nil
+}
+
+func (factory *Factory) MakePgsqlDriver(config database.Config) (gorm.Dialector, error) {
+	if config.Port == 0 {
+		config.Port = 5432
+	}
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d", config.Host, config.Username, config.Password, config.DbName, config.Port)
+	if config.Options == nil {
+		config.Options = map[string]any{}
+	}
+	if _, exists := config.Options["TimeZone"]; !exists {
+		config.Options["TimeZone"] = "Asia/Shanghai"
+	}
+	if _, exists := config.Options["sslmode"]; !exists {
+		config.Options["sslmode"] = "disable"
+	}
+	for key, value := range config.Options {
+		dsn += " " + key + "=" + fmt.Sprintf("%v", value)
+	}
+
+	return postgres.Open(dsn), nil
 }
 
 func (factory *Factory) MakeDriver(config database.Config) (gorm.Dialector, error) {
