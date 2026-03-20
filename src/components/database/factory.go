@@ -27,7 +27,7 @@ type DbLogger struct {
 
 func (dbLogger *DbLogger) Printf(info string, vs ...any) {
 	buf := fmt.Appendf(nil, info, vs...)
-	dbLogger.logger.Info(string(buf))
+	dbLogger.logger.Debug(string(buf))
 }
 
 type Factory struct {
@@ -36,7 +36,6 @@ type Factory struct {
 	dbMap             map[string]*gorm.DB
 	loggerFactory     loggerFactory.Factory
 	lock              sync.RWMutex
-	debug             bool
 }
 
 func NewDatabaseFactory() *Factory {
@@ -50,10 +49,6 @@ func NewDatabaseFactory() *Factory {
 	factory.RegisterDriver("sqlite", factory.MakeSqliteDriver)
 
 	return factory
-}
-
-func (factory *Factory) SetDebug() {
-	factory.debug = true
 }
 
 func (factory *Factory) SetLoggerFactory(loggerFactory loggerFactory.Factory) {
@@ -139,7 +134,7 @@ func (factory *Factory) MakeDb(config database.Config, driver gorm.Dialector) (*
 				},
 				logger.Config{
 					SlowThreshold:             time.Duration(config.SlowThreshold), // Slow SQL threshold
-					LogLevel:                  logger.Silent,                       // Log level
+					LogLevel:                  logger.Info,                         // Log level
 					IgnoreRecordNotFoundError: true,                                // Ignore ErrRecordNotFound error for logger
 					Colorful:                  false,                               // Disable color
 				},
@@ -165,10 +160,6 @@ func (factory *Factory) MakeDb(config database.Config, driver gorm.Dialector) (*
 
 	dbDriver.SetMaxIdleConns(int(config.MaxIdleConn))
 	dbDriver.SetMaxOpenConns(int(config.MaxConn))
-
-	if factory.debug {
-		db = db.Debug()
-	}
 
 	return db, nil
 }

@@ -20,7 +20,6 @@ func (provider Provider) Register(config *viper.Viper, loggerFactory logger.Fact
 	dbFactory := NewDatabaseFactory()
 	dbFactory.SetLoggerFactory(loggerFactory)
 	dbFactory.Register(dbConfigMap)
-	dbFactory.SetDebug()
 
 	err = container.NamedSingleton("db-factory", func() database.Factory {
 		return dbFactory
