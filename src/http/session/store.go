@@ -1,6 +1,8 @@
 package session
 
 import (
+	"strconv"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/gorm"
 	"github.com/gin-contrib/sessions/memstore"
@@ -8,8 +10,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/facade"
 	rf "github.com/we7coreteam/w7-rangine-go/v2/src/components/redis"
-	"net/http"
-	"strconv"
 )
 
 func BuildOptions(config *viper.Viper) sessions.Options {
@@ -21,7 +21,7 @@ func BuildOptions(config *viper.Viper) sessions.Options {
 
 	return sessions.Options{
 		MaxAge:   cookieConfig.MaxAge,
-		SameSite: http.SameSite(cookieConfig.SameSite),
+		SameSite: ParseSameSite(cookieConfig.SameSite),
 		Domain:   cookieConfig.Domain,
 		Path:     cookieConfig.Path,
 		Secure:   cookieConfig.Secure,
