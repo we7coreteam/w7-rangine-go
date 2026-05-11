@@ -102,7 +102,7 @@ func (factory *Factory) MakeSqliteDriver(config database.Config) (gorm.Dialector
 	}
 
 	absPath, _ := filepath.Abs(config.DbName)
-	dsn := fmt.Sprintf("file:%s?"+params.Encode(), absPath)
+	dsn := "file:" + absPath + "?" + params.Encode()
 	return sqlite.Open(dsn), nil
 }
 
