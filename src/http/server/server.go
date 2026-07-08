@@ -2,12 +2,13 @@ package server
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/server"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/helper"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/http/response"
-	"net/http"
 )
 
 type Server struct {
@@ -71,20 +72,133 @@ func (server *Server) GetServerName() string {
 }
 
 func (server *Server) GetOptions() map[string]string {
-	return map[string]string{
+	options := map[string]string{
 		"Host": server.config.Host,
-		"Port": server.config.Port,
+		"Mode": server.mode(),
 	}
+	if server.plainHTTPEnabled() {
+		options["Port"] = server.config.Port
+	}
+	if server.httpsEnabled() {
+		options["TLSPort"] = server.httpsPort()
+	}
+
+	return options
 }
 
 func (server *Server) Start() {
-	err := helper.ValidateConfig(server.config)
+	err := server.validateConfig()
 	if err != nil {
 		panic(errors.New("http server config error, reason: " + err.Error()))
 	}
 
-	err = server.Engine.Run(server.config.Host + ":" + server.config.Port)
+	if server.plainHTTPEnabled() && server.httpsEnabled() {
+		go server.startHTTP()
+		server.startHTTPS()
+		return
+	}
+
+	if server.httpsEnabled() {
+		server.startHTTPS()
+		return
+	}
+
+	server.startHTTP()
+}
+
+func (server *Server) startHTTP() {
+	err := server.Engine.Run(server.httpAddress())
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (server *Server) startHTTPS() {
+	err := server.Engine.RunTLS(server.httpsAddress(), server.config.TLS.CertFile, server.config.TLS.KeyFile)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (server *Server) httpAddress() string {
+	return server.config.Host + ":" + server.config.Port
+}
+
+func (server *Server) httpsAddress() string {
+	return server.config.Host + ":" + server.httpsPort()
+}
+
+func (server *Server) httpsPort() string {
+	if server.config.TLS.Port != "" {
+		return server.config.TLS.Port
+	}
+
+	return server.config.Port
+}
+
+func (server *Server) plainHTTPEnabled() bool {
+	if server.config.Port == "" {
+		return false
+	}
+	if !server.config.TLS.Enable {
+		return true
+	}
+
+	// When TLS is enabled without tls.port, port is kept as HTTPS-only for compatibility.
+	return server.config.TLS.Port != ""
+}
+
+func (server *Server) httpsEnabled() bool {
+	return server.config.TLS.Enable
+}
+
+func (server *Server) mode() string {
+	if server.plainHTTPEnabled() && server.httpsEnabled() {
+		return "http+https"
+	}
+	if server.httpsEnabled() {
+		return "https"
+	}
+	if server.plainHTTPEnabled() {
+		return "http"
+	}
+
+	return ""
+}
+
+func (server *Server) validateConfig() error {
+	err := helper.ValidateConfig(server.config)
+	if err != nil {
+		return err
+	}
+
+	if !server.plainHTTPEnabled() && !server.httpsEnabled() {
+		return errors.New("http port or tls must be enabled")
+	}
+
+	if server.httpsEnabled() {
+		err = server.validateHTTPSConfig()
+		if err != nil {
+			return errors.New("tls config error, reason: " + err.Error())
+		}
+	}
+
+	return nil
+}
+
+func (server *Server) validateHTTPSConfig() error {
+	if server.httpsPort() == "" {
+		return errors.New("tls port is required")
+	}
+	if server.config.TLS.Port != "" && server.config.TLS.Port == server.config.Port {
+		return errors.New("tls port must be different from http port")
+	}
+	if server.config.TLS.CertFile == "" {
+		return errors.New("tls cert_file is required")
+	}
+	if server.config.TLS.KeyFile == "" {
+		return errors.New("tls key_file is required")
+	}
+
+	return nil
 }
