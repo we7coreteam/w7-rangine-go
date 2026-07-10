@@ -7,7 +7,6 @@ import (
 )
 
 type Cookie struct {
-	Name     string         `mapstructure:"name" json:"name" yaml:"name"`
 	MaxAge   int            `mapstructure:"expires" json:"expires" yaml:"expires"`
 	Domain   string         `mapstructure:"domain" json:"domain" yaml:"domain"`
 	HttpOnly bool           `mapstructure:"http_only" json:"http_only" yaml:"http_only"`
