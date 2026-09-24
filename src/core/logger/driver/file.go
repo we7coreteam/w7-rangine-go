@@ -15,6 +15,7 @@ type File struct {
 
 	levelEnabler zapcore.LevelEnabler
 	writer       zapcore.WriteSyncer
+	rotator      *lumberjack.Logger
 }
 
 func NewFileDriver(config logger.Config) (logger.Driver, error) {
@@ -57,7 +58,12 @@ func NewFileDriver(config logger.Config) (logger.Driver, error) {
 	return &File{
 		levelEnabler: atomicLevel,
 		writer:       zapcore.AddSync(&writer),
+		rotator:      &writer,
 	}, nil
+}
+
+func (f *File) Rotate() error {
+	return f.rotator.Rotate()
 }
 
 func (f File) Write(level zapcore.Level, enc zapcore.Encoder, ent zapcore.Entry, fields []zapcore.Field) error {

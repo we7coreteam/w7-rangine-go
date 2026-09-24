@@ -2,6 +2,7 @@ package logger
 
 import (
 	"errors"
+	"fmt"
 	"github.com/we7coreteam/w7-rangine-go/v2/pkg/support/logger"
 	"github.com/we7coreteam/w7-rangine-go/v2/src/core/logger/driver"
 	"go.uber.org/zap"
@@ -108,6 +109,31 @@ func (factory *Factory) Channel(channel string) (*zap.Logger, error) {
 	}
 
 	return channelLogger, nil
+}
+
+// Rotate rotates an initialized file channel without resolving a new channel.
+func (factory *Factory) Rotate(channel string) error {
+	factory.lock.Lock()
+	channelLogger, initialized := factory.loggerMap[channel]
+	_, registered := factory.loggerResolverMap[channel]
+	factory.lock.Unlock()
+
+	if !registered {
+		return fmt.Errorf("logger channel %s not exists", channel)
+	}
+	if !initialized {
+		return fmt.Errorf("logger channel %s is not initialized", channel)
+	}
+
+	core, ok := channelLogger.Core().(*Logger)
+	if !ok || len(core.drivers) != 1 {
+		return fmt.Errorf("logger channel %s is not a file channel", channel)
+	}
+	file, ok := core.drivers[0].(*driver.File)
+	if !ok {
+		return fmt.Errorf("logger channel %s is not a file channel", channel)
+	}
+	return file.Rotate()
 }
 
 func (factory *Factory) RegisterDriver(driver string, resolver func(config logger.Config) (logger.Driver, error)) {
