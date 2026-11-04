@@ -8,6 +8,7 @@ import (
 
 type Logger struct {
 	enc     zapcore.Encoder
+	fields  []zapcore.Field
 	drivers []logger.Driver
 }
 
@@ -28,9 +29,7 @@ func (c *Logger) Enabled(level zapcore.Level) bool {
 
 func (c *Logger) With(fields []zapcore.Field) zapcore.Core {
 	clone := c.clone()
-	for i := range fields {
-		fields[i].AddTo(clone.enc)
-	}
+	clone.fields = append(clone.fields, fields...)
 	return clone
 }
 
@@ -39,6 +38,13 @@ func (c *Logger) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.Che
 }
 
 func (c *Logger) Write(ent zapcore.Entry, fields []zapcore.Field) error {
+	// Stack drivers forward fields to channel cores, not the parent encoder.
+	// Include With context in the forwarded fields so every output retains it.
+	if len(c.fields) != 0 {
+		combined := make([]zapcore.Field, 0, len(c.fields)+len(fields))
+		combined = append(combined, c.fields...)
+		fields = append(combined, fields...)
+	}
 	for _, driverHandler := range c.drivers {
 		err := driverHandler.Write(ent.Level, c.enc, ent, fields)
 		if err != nil {
@@ -67,6 +73,7 @@ func (c *Logger) Sync() error {
 func (c *Logger) clone() *Logger {
 	return &Logger{
 		enc:     c.enc.Clone(),
+		fields:  append([]zapcore.Field(nil), c.fields...),
 		drivers: c.drivers,
 	}
 }
